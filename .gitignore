@@ -358,3 +358,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+#tutorial
+robogen-windows/Cart-Robot/*
+robogen-windows/run/results/*
