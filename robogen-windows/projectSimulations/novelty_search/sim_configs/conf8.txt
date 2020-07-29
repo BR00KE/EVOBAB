@@ -1,7 +1,7 @@
-#full friction, low obstacles
+#low friction, varied obstacles
 #Simulator Configuration File
 
-scenario=racing
+scenario=novelty_locomotion.js
 
 #optionally specify the name of another file where obstacles are defined 
 obstaclesConfigFile= obstacles1.txt
@@ -24,7 +24,7 @@ terrainWidth=4
 #terrainHeightField=height_field.jpg
 terrainHeight=0.5
 
-terrainFriction=1.0
+terrainFriction=0.2
 
 sensorNoiseLevel=0.0
 motorNoiseLevel=0.0

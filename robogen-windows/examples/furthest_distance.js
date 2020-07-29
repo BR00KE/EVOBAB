@@ -29,7 +29,7 @@
 			minDistance = dist;
 		}
 	}
-	
+	minDistance = 0;
 	this.distances.push(minDistance);
 	return true;
     },
@@ -42,6 +42,11 @@
 			fitness = this.distances[i];
 	}
         return fitness;
-    },
+	},
+	
+	complexityCost: function() {
+		return true;
+	},
+
 
 }
