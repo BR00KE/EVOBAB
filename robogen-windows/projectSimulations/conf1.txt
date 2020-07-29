@@ -1,3 +1,4 @@
+#Base environment - flat ground, max friction
 #Simulator Configuration File
 
 scenario=racing
@@ -6,18 +7,18 @@ scenario=racing
 #obstaclesConfigFile
 
 #starting positions and orientations defined
-#startPositionConfigFile
+startPositionConfigFile=startposconfig.txt
 
 #how much real time each iteration of the simulator represents
 timeStep=0.005
 
-nTimeSteps = 800
-#simulationTime=8.0
+#nTimeSteps = 800
+simulationTime=10.0
 #nTimeSteps or simulationTime – these options specify the length of simulation in terms of the number of time steps or number of seconds respectively (use one or the other).
 
 actuationFrequency=25
 terrainType=flat
-terrainLength=4
+terrainLength=6
 terrainWidth=4
 
 terrainFriction=1.0
