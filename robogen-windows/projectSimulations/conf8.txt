@@ -1,10 +1,10 @@
-#medium friction, varied obstacles
+#low friction, varied obstacles
 #Simulator Configuration File
 
 scenario=racing
 
 #optionally specify the name of another file where obstacles are defined 
-obstaclesConfigFile= obstacles2.txt
+obstaclesConfigFile= obstacles1.txt
 
 #starting positions and orientations defined
 startPositionConfigFile=startposconfig.txt
@@ -24,7 +24,7 @@ terrainWidth=4
 #terrainHeightField=height_field.jpg
 terrainHeight=0.5
 
-terrainFriction=0.6
+terrainFriction=0.2
 
 sensorNoiseLevel=0.0
 motorNoiseLevel=0.0

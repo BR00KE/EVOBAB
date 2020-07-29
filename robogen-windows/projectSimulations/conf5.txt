@@ -1,4 +1,4 @@
-#medium friction, low obstacles
+#low friction, low obstacles
 #Simulator Configuration File
 
 scenario=racing
@@ -24,7 +24,7 @@ terrainWidth=4
 #terrainHeightField=height_field.jpg
 terrainHeight=0.5
 
-terrainFriction=0.6
+terrainFriction=0.2
 
 sensorNoiseLevel=0.0
 motorNoiseLevel=0.0

@@ -1,10 +1,10 @@
-#flat environment - very low friction (0.2)
+#full friction, low obstacles
 #Simulator Configuration File
 
 scenario=racing
 
 #optionally specify the name of another file where obstacles are defined 
-#obstaclesConfigFile
+obstaclesConfigFile= obstacles1.txt
 
 #starting positions and orientations defined
 startPositionConfigFile=startposconfig.txt
@@ -17,11 +17,14 @@ simulationTime=10.0
 #nTimeSteps or simulationTime – these options specify the length of simulation in terms of the number of time steps or number of seconds respectively (use one or the other).
 
 actuationFrequency=25
+
 terrainType=flat
 terrainLength=6
 terrainWidth=4
+#terrainHeightField=height_field.jpg
+terrainHeight=0.5
 
-terrainFriction=0.2
+terrainFriction=1.0
 
 sensorNoiseLevel=0.0
 motorNoiseLevel=0.0

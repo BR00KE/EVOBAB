@@ -1,4 +1,4 @@
-#flat environment - lower friction (0.6)
+#flat environment - very low friction (0.2)
 #Simulator Configuration File
 
 scenario=racing
@@ -21,7 +21,7 @@ terrainType=flat
 terrainLength=6
 terrainWidth=4
 
-terrainFriction=0.6
+terrainFriction=0.2
 
 sensorNoiseLevel=0.0
 motorNoiseLevel=0.0
