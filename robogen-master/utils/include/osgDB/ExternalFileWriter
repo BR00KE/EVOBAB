@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -66,7 +66,7 @@ namespace osgDB
             ObjectData(const std::string & absolutePath, const std::string & relativePath, bool written) : absolutePath(absolutePath), relativePath(relativePath), written(written) {}
             std::string absolutePath;
             std::string relativePath;
-            bool written;        ///< Says if write succeded or not.
+            bool written;        ///< Says if write succeeded or not.
         };
 
         /// Set of written objects, with their absolute writing path.
@@ -91,7 +91,7 @@ namespace osgDB
         const unsigned int _allowUpDirs;
 
         /// Generates a unique name for an object to be written on disk.
-        /// Side effect: updates _lastGeneratedObjectIndex to the index associated withe the returned name.
+        /// Side effect: updates _lastGeneratedObjectIndex to the index associated with the returned name.
         void generateObjectName(std::string & out_relativePath, std::string & out_absolutePath, int type);
 
         bool absoluteObjectPathExists(const std::string & path);

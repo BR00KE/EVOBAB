@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -26,12 +26,13 @@ class StateSet;
 class StateAttribute;
 class StateAttributeCallback;
 class Uniform;
+class UniformCallback;
 class Node;
 class Drawable;
 class Array;
 class PrimitiveSet;
 class Shape;
-class NodeCallback;
+class Callback;
 
 
 /** Copy Op(erator) used to control whether shallow or deep copy is used
@@ -40,7 +41,7 @@ class OSG_EXPORT CopyOp
 {
 
     public:
-    
+
         enum Options
         {
             SHALLOW_COPY                = 0,
@@ -80,11 +81,12 @@ class OSG_EXPORT CopyOp
         virtual PrimitiveSet*   operator() (const PrimitiveSet* primitives) const;
         virtual Shape*          operator() (const Shape* shape) const;
         virtual Uniform*        operator() (const Uniform* shape) const;
-        virtual NodeCallback*   operator() (const NodeCallback* nodecallback) const;
+        virtual Callback*       operator() (const Callback* nodecallback) const;
         virtual StateAttributeCallback* operator() (const StateAttributeCallback* stateattributecallback) const;
+        virtual UniformCallback*        operator() (const UniformCallback* uniformcallback) const;
 
     protected:
-    
+
         CopyFlags _flags;
 };
 

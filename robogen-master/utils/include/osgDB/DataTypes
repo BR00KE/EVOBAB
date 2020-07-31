@@ -16,6 +16,7 @@
 #define OSGDB_DATATYPES
 
 #include <string>
+#include <osg/GL>
 
 namespace osgDB
 {
@@ -57,6 +58,18 @@ const int ID_VEC4_ARRAY = 17;
 const int ID_VEC2D_ARRAY = 18;
 const int ID_VEC3D_ARRAY = 19;
 const int ID_VEC4D_ARRAY = 20;
+const int ID_VEC2UB_ARRAY = 21;
+const int ID_VEC3UB_ARRAY = 22;
+const int ID_VEC2US_ARRAY = 23;
+const int ID_VEC3US_ARRAY = 24;
+const int ID_VEC4US_ARRAY = 25;
+
+const int ID_VEC2I_ARRAY = 26;
+const int ID_VEC3I_ARRAY = 27;
+const int ID_VEC4I_ARRAY = 28;
+const int ID_VEC2UI_ARRAY = 29;
+const int ID_VEC3UI_ARRAY = 30;
+const int ID_VEC4UI_ARRAY = 31;
 
 const int ID_DRAWARRAYS = 50;
 const int ID_DRAWARRAY_LENGTH = 51;
@@ -87,49 +100,41 @@ struct ObjectGLenum
 class ObjectProperty
 {
 public:
+    ObjectProperty() : _value(0), _mapProperty(false) {}
+
     ObjectProperty( const char* name, int value=0, bool useMap=false )
     : _name(name), _value(value), _mapProperty(useMap) {}
-    
+
     ObjectProperty( const ObjectProperty& copy )
     : _name(copy._name), _value(copy._value), _mapProperty(copy._mapProperty) {}
-    
-    ObjectProperty& proto( const char* name )
+
+    ObjectProperty& operator()( const char* name )
     { _name = name; return *this; }
-    
+
     void set( int v ) { _value = v; }
     int get() const { return _value; }
-    
+
     std::string _name;
     int _value;
     bool _mapProperty;
-
-protected:
-    ObjectProperty():_value(0),_mapProperty(false) {}
 };
-static ObjectProperty defaultProp("");
-
-#define PROPERTY(name) defaultProp.proto(name)
 #define MAPPEE(pairName, value) osgDB::ObjectProperty(#pairName, value, true)
-#define DEF_PROPERTY(name, var) osgDB::ObjectProperty var(name);
 #define DEF_MAPPEE(pairName, var) osgDB::ObjectProperty var(#pairName, 0, true);
 
 class ObjectMark
 {
 public:
-    ObjectMark( const char* name, int delta=0 )
-    : _name(name), _indentDelta(delta) {}
-    
+    ObjectMark() : _indentDelta(0) {}
+
     ObjectMark( const ObjectMark& copy )
     : _name(copy._name), _indentDelta(copy._indentDelta) {}
-    
+
+    void set( const char* name, int delta=0 )
+    { _name = name, _indentDelta = delta; }
+
     std::string _name;
     int _indentDelta;
-
-protected:
-    ObjectMark():_indentDelta(0) {}
 };
-static ObjectMark BEGIN_BRACKET("{", +INDENT_VALUE);
-static ObjectMark END_BRACKET  ("}", -INDENT_VALUE);
 
 }
 #endif

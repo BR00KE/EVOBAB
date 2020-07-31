@@ -1,13 +1,13 @@
 /* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2010 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -29,6 +29,15 @@
 #include <osgText/Style>
 
 #include <OpenThreads/Mutex>
+
+// GL_ALPHA is deprecated in GL3/GL4 core profile, use GL_RED and a shader in this case. See osgText example.
+#if defined(OSG_GL3_AVAILABLE) && !defined(OSG_GL2_AVAILABLE) && !defined(OSG_GL1_AVAILABLE)
+#define OSGTEXT_GLYPH_FORMAT GL_RED
+#define OSGTEXT_GLYPH_INTERNALFORMAT GL_R8
+#else
+#define OSGTEXT_GLYPH_FORMAT GL_ALPHA
+#define OSGTEXT_GLYPH_INTERNALFORMAT GL_ALPHA
+#endif
 
 namespace osgText {
 
@@ -263,9 +272,9 @@ public:
     /** Resize any per context GLObject buffers to specified size. */
     virtual void resizeGLObjectBuffers(unsigned int maxSize);
 
-    /** create an image that maps all the associated Glyph's onto a single image, that is equivilant to what will be downloaded to the texture.*/
+    /** create an image that maps all the associated Glyph's onto a single image, that is equivalent to what will be downloaded to the texture.*/
     osg::Image* createImage();
-    
+
 protected:
 
     virtual ~GlyphTexture();

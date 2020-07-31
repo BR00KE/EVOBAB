@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -69,6 +69,7 @@
     #define GL_COLOR_INDEX          0x1900
     #define GL_INTENSITY12          0x804C
     #define GL_INTENSITY16          0x804D
+    #define GL_INTENSITY            0x8049
     #define GL_INTENSITY4           0x804A
     #define GL_INTENSITY8           0x804B
     #define GL_LUMINANCE12          0x8041
@@ -82,6 +83,7 @@
     #define GL_LUMINANCE8           0x8040
     #define GL_LUMINANCE8_ALPHA8    0x8045
     #define GL_RGBA8                0x8058
+    #define GL_RGBA16               0x805B
     #define GL_PACK_ROW_LENGTH      0x0D02
 #endif
 
@@ -90,6 +92,41 @@
     #define GL_PACK_IMAGE_HEIGHT    0x806C
     #define GL_UNPACK_SKIP_IMAGES   0x806D
     #define GL_UNPACK_IMAGE_HEIGHT  0x806E
+#endif
+
+#ifndef GL_OES_compressed_ETC1_RGB8_texture
+    #define GL_ETC1_RGB8_OES        0x8D64
+#endif
+
+#ifndef GL_ARB_ES3_compatibility
+    #define GL_COMPRESSED_RGB8_ETC2                             0x9274
+    #define GL_COMPRESSED_SRGB8_ETC2                            0x9275
+    #define GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2         0x9276
+    #define GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2        0x9277
+    #define GL_COMPRESSED_RGBA8_ETC2_EAC                        0x9278
+    #define GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC                 0x9279
+    #define GL_COMPRESSED_R11_EAC                               0x9270
+    #define GL_COMPRESSED_SIGNED_R11_EAC                        0x9271
+    #define GL_COMPRESSED_RG11_EAC                              0x9272
+    #define GL_COMPRESSED_SIGNED_RG11_EAC                       0x9273
+#endif
+
+#ifndef GL_DEPTH_COMPONENT
+#define GL_DEPTH_COMPONENT              0x1902
+#endif
+
+#ifndef GL_VERSION_1_4
+#define GL_DEPTH_COMPONENT16              0x81A5
+#define GL_DEPTH_COMPONENT24              0x81A6
+#define GL_DEPTH_COMPONENT32              0x81A7
+#endif
+
+#ifndef GL_DEPTH_COMPONENT32F
+#define GL_DEPTH_COMPONENT32F             0x8CAC
+#endif
+
+#ifndef GL_DEPTH_COMPONENT32F_NV
+#define GL_DEPTH_COMPONENT32F_NV          0x8DAB
 #endif
 
 namespace osg {
@@ -104,7 +141,7 @@ class OSG_EXPORT Image : public BufferData
     public :
 
         Image();
-        
+
         /** Copy constructor using CopyOp to manage deep vs shallow copy. */
         Image(const Image& image,const CopyOp& copyop=CopyOp::SHALLOW_COPY);
 
@@ -114,6 +151,9 @@ class OSG_EXPORT Image : public BufferData
         virtual const char* libraryName() const { return "osg"; }
         virtual const char* className() const { return "Image"; }
 
+        virtual osg::Image* asImage() { return this; }
+        virtual const osg::Image* asImage() const { return this; }
+
         virtual const GLvoid*   getDataPointer() const { return data(); }
         virtual unsigned int    getTotalDataSize() const { return getTotalSizeInBytesIncludingMipmaps(); }
 
@@ -122,22 +162,22 @@ class OSG_EXPORT Image : public BufferData
 
         void setFileName(const std::string& fileName);
         inline const std::string& getFileName() const { return _fileName; }
-        
+
         enum WriteHint {
             NO_PREFERENCE,
             STORE_INLINE,
             EXTERNAL_FILE
         };
-        
+
         void setWriteHint(WriteHint writeHint) { _writeHint = writeHint; }
         WriteHint getWriteHint() const { return _writeHint; }
-        
+
         enum AllocationMode {
             NO_DELETE,
             USE_NEW_DELETE,
             USE_MALLOC_FREE
         };
-        
+
         /** Set the method used for deleting data once it goes out of scope. */
         void setAllocationMode(AllocationMode mode) { _allocationMode = mode; }
 
@@ -149,28 +189,30 @@ class OSG_EXPORT Image : public BufferData
         virtual void allocateImage(int s,int t,int r,
                            GLenum pixelFormat,GLenum type,
                            int packing=1);
-        
-        
+
+
         /** Set the image dimensions, format and data. */
         virtual void setImage(int s,int t,int r,
                       GLint internalTextureformat,
                       GLenum pixelFormat,GLenum type,
                       unsigned char* data,
                       AllocationMode mode,
-                      int packing=1);
-            
+                      int packing=1, int rowLength=0);
+
         /** Read pixels from current frame buffer at specified position and size, using glReadPixels.
           * Create memory for storage if required, reuse existing pixel coords if possible.
         */
         virtual void readPixels(int x,int y,int width,int height,
-                        GLenum pixelFormat,GLenum type);
-            
+                        GLenum pixelFormat, GLenum type, int packing=1);
+
 
         /** Read the contents of the current bound texture, handling compressed pixelFormats if present.
           * Create memory for storage if required, reuse existing pixel coords if possible.
         */
-        virtual void readImageFromCurrentTexture(unsigned int contextID, bool copyMipMapsIfAvailable, GLenum type = GL_UNSIGNED_BYTE);
+        virtual void readImageFromCurrentTexture(unsigned int contextID, bool copyMipMapsIfAvailable, GLenum type = GL_UNSIGNED_BYTE, unsigned int face = 0);
 
+        /** swap the data and settings between two image objects.*/
+        void swap(osg::Image& rhs);
 
         /** Scale image to specified size. */
         void scaleImage(int s,int t,int r) { scaleImage(s,t,r, getDataType()); }
@@ -182,51 +224,54 @@ class OSG_EXPORT Image : public BufferData
           * Typically used to copy to an already allocated image, such as creating
           * a 3D image from a stack 2D images.
           * If this Image is empty then image data is created to
-          * accomodate the source image in its offset position.
+          * accommodate the source image in its offset position.
           * If source is NULL then no operation happens, this Image is left unchanged.
         */
         virtual void copySubImage(int s_offset, int t_offset, int r_offset, const osg::Image* source);
 
 
-        enum Origin 
+        enum Origin
         {
             BOTTOM_LEFT,
             TOP_LEFT
         };
-        
+
         /** Set the origin of the image.
           * The default value is BOTTOM_LEFT and is consistent with OpenGL.
           * TOP_LEFT is used for imagery that follows standard Imagery convention, such as movies,
           * and hasn't been flipped yet.  For such images one much flip the t axis of the tex coords.
           * to handle this origin position. */
         void setOrigin(Origin origin) { _origin = origin; }
-        
+
         /** Get the origin of the image.*/
         Origin getOrigin() const { return _origin; }
-        
+
 
         /** Width of image. */
         inline int s() const { return _s; }
 
         /** Height of image. */
         inline int t() const { return _t; }
-        
+
         /** Depth of image. */
         inline int r() const { return _r; }
-        
+
+        void setRowLength(int length);
+        inline int getRowLength() const { return _rowLength; }
+
         void setInternalTextureFormat(GLint internalFormat);
         inline GLint getInternalTextureFormat() const { return _internalTextureFormat; }
-        
+
         void setPixelFormat(GLenum pixelFormat);
         inline GLenum getPixelFormat() const { return _pixelFormat; }
-        
+
         void setDataType(GLenum dataType);
-        inline GLenum getDataType() const { return _dataType; }        
-        
+        inline GLenum getDataType() const { return _dataType; }
+
         void setPacking(unsigned int packing) { _packing = packing; }
         inline unsigned int getPacking() const { return _packing; }
 
-        /** return true of the pixel format is an OpenGL compressed pixel format.*/
+        /** Return true of the pixel format is an OpenGL compressed pixel format.*/
         bool isCompressed() const;
 
         /** Set the pixel aspect ratio, defined as the pixel width divided by the pixel height.*/
@@ -234,16 +279,24 @@ class OSG_EXPORT Image : public BufferData
 
         /** Get the pixel aspect ratio.*/
         inline float getPixelAspectRatio() const { return _pixelAspectRatio; }
-        
+
         /** Return the number of bits required for each pixel. */
         inline unsigned int getPixelSizeInBits() const { return computePixelSizeInBits(_pixelFormat,_dataType); }
 
         /** Return the number of bytes each row of pixels occupies once it has been packed. */
         inline unsigned int getRowSizeInBytes() const { return computeRowWidthInBytes(_s,_pixelFormat,_dataType,_packing); }
 
+        /** Return the number of bytes between each successive row.
+          * Note, getRowSizeInBytes() will only equal getRowStepInBytes() when isDataContiguous() return true. */
+        inline unsigned int getRowStepInBytes() const { return computeRowWidthInBytes(_rowLength==0?_s:_rowLength,_pixelFormat,_dataType,_packing); }
+
         /** Return the number of bytes each image (_s*_t) of pixels occupies. */
         inline unsigned int getImageSizeInBytes() const { return getRowSizeInBytes()*_t; }
-        
+
+        /** Return the number of bytes between each successive image.
+          * Note, getImageSizeInBytes() will only equal getImageStepInBytes() when isDataContiguous() return true. */
+        inline unsigned int getImageStepInBytes() const { return getRowStepInBytes()*_t; }
+
         /** Return the number of bytes the whole row/image/volume of pixels occupies. */
         inline unsigned int getTotalSizeInBytes() const { return getImageSizeInBytes()*_r; }
 
@@ -253,24 +306,63 @@ class OSG_EXPORT Image : public BufferData
         /** Return true if the Image represent a valid and usable imagery.*/
         bool valid() const { return _s!=0 && _t!=0 && _r!=0 && _data!=0 && _dataType!=0; }
 
-        /** Raw image data. */
+        /** Raw image data.
+          * Note, data in successive rows may not be contiguous, isDataContiguous() return false then you should
+          * take care to access the data per row rather than treating the whole data as a single block. */
         inline unsigned char* data() { return _data; }
-        
-        /** Raw const image data. */
+
+        /** Raw const image data.
+          * Note, data in successive rows may not be contiguous, isDataContiguous() return false then you should
+          * take care to access the data per row rather than treating the whole data as a single block. */
         inline const unsigned char* data() const { return _data; }
 
+        inline unsigned char* data(unsigned int column, unsigned int row = 0, unsigned int image = 0)
+        {
+            if (!_data) return NULL;
+            return _data+(column*getPixelSizeInBits())/8+row*getRowStepInBytes()+image*getImageSizeInBytes();
+        }
 
-        inline unsigned char* data(int column, int row=0,int image=0)
+        inline const unsigned char* data(unsigned int column, unsigned int row = 0, unsigned int image = 0) const
         {
             if (!_data) return NULL;
-            return _data+(column*getPixelSizeInBits())/8+row*getRowSizeInBytes()+image*getImageSizeInBytes();
+            return _data+(column*getPixelSizeInBits())/8+row*getRowStepInBytes()+image*getImageSizeInBytes();
         }
-        
-        inline const unsigned char* data(int column, int row=0,int image=0) const
+
+        /** return true if the data stored in the image is a contiguous block of data.*/
+        bool isDataContiguous() const { return _rowLength==0 || _rowLength==_s; }
+
+        /** Convenience class for assisting the copying of image data when the image data isn't contiguous.*/
+        class OSG_EXPORT DataIterator
         {
-            if (!_data) return NULL;
-            return _data+(column*getPixelSizeInBits())/8+row*getRowSizeInBytes()+image*getImageSizeInBytes();
-        }
+        public:
+            DataIterator(const Image* image);
+            DataIterator(const DataIterator& ri);
+            ~DataIterator() {}
+
+            /** advance iterator to next block of data.*/
+            void operator ++ ();
+
+            /** is iterator valid.*/
+            bool valid() const { return _currentPtr!=0; }
+
+            /** data pointer of current block to copy.*/
+            const unsigned char* data() const { return _currentPtr; }
+
+            /** Size of current block to copy.*/
+            unsigned int size() const { return _currentSize; }
+
+        protected:
+
+
+            void assign();
+
+            const osg::Image*                   _image;
+            int                                 _rowNum;
+            int                                 _imageNum;
+            unsigned int                        _mipmapNum;
+            const unsigned char*                _currentPtr;
+            unsigned int                        _currentSize;
+        };
 
         /** Get the color value for specified texcoord.*/
         Vec4 getColor(unsigned int s,unsigned t=0,unsigned r=0) const;
@@ -281,13 +373,23 @@ class OSG_EXPORT Image : public BufferData
         /** Get the color value for specified texcoord.*/
         Vec4 getColor(const Vec3& texcoord) const;
 
+         /** Set the color value for specified texcoord.*/
+        void setColor(const osg::Vec4& color, unsigned int s, unsigned int t=0, unsigned int r=0);
 
-        /** Flip the image horizontally. */
+         /** Set the color value for specified texcoord. Note texcoord is clamped to edge.*/
+        void setColor(const osg::Vec4& color, const osg::Vec2& texcoord ) { setColor(color, osg::Vec3(texcoord, 0.0f)); }
+
+         /** Set the color value for specified texcoord. Note texcoord is clamped to edge.*/
+        void setColor(const osg::Vec4& color, const osg::Vec3& texcoord );
+
+        /** Flip the image horizontally, around s dimension. */
         void flipHorizontal();
-        
-        /** Flip the image vertically. */
+
+        /** Flip the image vertically, around t dimension. */
         void flipVertical();
 
+        /** Flip the image around the r dimension. Only relevant for 3D textures. */
+        void flipDepth();
 
         /** Ensure image dimensions are a power of two.
           * Mipmapped textures require the image dimensions to be
@@ -299,9 +401,11 @@ class OSG_EXPORT Image : public BufferData
         static bool isPackedType(GLenum type);
         static GLenum computePixelFormat(GLenum pixelFormat);
         static GLenum computeFormatDataType(GLenum pixelFormat);
+        static unsigned int computeBlockSize(GLenum pixelFormat, GLenum packing);
         static unsigned int computeNumComponents(GLenum pixelFormat);
         static unsigned int computePixelSizeInBits(GLenum pixelFormat,GLenum type);
         static unsigned int computeRowWidthInBytes(int width,GLenum pixelFormat,GLenum type,int packing);
+        static unsigned int computeImageSizeInBytes(int width,int height, int depth, GLenum pixelFormat, GLenum type, int packing = 1, int slice_packing = 1, int image_packing = 1);
         static int computeNearestPowerOfTwo(int s,float bias=0.5f);
         static int computeNumberOfMipmapLevels(int s,int t = 1, int r = 1);
 
@@ -317,7 +421,7 @@ class OSG_EXPORT Image : public BufferData
 
         /** Send offsets into data. It is assumed that first mipmap offset (index 0) is 0.*/
         inline void setMipmapLevels(const MipmapDataType& mipmapDataVector) { _mipmapData = mipmapDataVector; }
-        
+
         inline const MipmapDataType& getMipmapLevels() const { return _mipmapData; }
 
         inline unsigned int getMipmapOffset(unsigned int mipmapLevel) const
@@ -328,7 +432,7 @@ class OSG_EXPORT Image : public BufferData
                return _mipmapData[mipmapLevel-1];
             return 0;
         };
-        
+
         inline unsigned char* getMipmapData(unsigned int mipmapLevel)
         {
            return _data+getMipmapOffset(mipmapLevel);
@@ -339,31 +443,28 @@ class OSG_EXPORT Image : public BufferData
            return _data+getMipmapOffset(mipmapLevel);
         }
 
-        /*inline const unsigned char* getMipmapData(unsigned int row, unsigned int column, unsigned int mipmapLevel) const
-        {
-           if (!_data) return NULL;
-           return getMipmapData(mipmapLevel) + (column*getPixelSizeInBits())/8+row*getRowSizeInBytes();
-        }*/
+        /** returns false for texture formats that do not support texture subloading */
+        bool supportsTextureSubloading() const;
 
         /** Return true if this image is translucent - i.e. it has alpha values that are less 1.0 (when normalized). */
         virtual bool isImageTranslucent() const;
 
-        /** Set the optional PixelBufferObject used to map the image memory efficiently to graphics memory. */ 
+        /** Set the optional PixelBufferObject used to map the image memory efficiently to graphics memory. */
         void setPixelBufferObject(PixelBufferObject* buffer) { setBufferObject(buffer); }
 
         /** Get the PixelBufferObject.*/
-        PixelBufferObject* getPixelBufferObject() { return dynamic_cast<PixelBufferObject*>(_bufferObject.get()); }
+        PixelBufferObject* getPixelBufferObject() { return dynamic_cast<PixelBufferObject*>(getBufferObject()); }
 
         /** Get the const PixelBufferObject.*/
-        const PixelBufferObject* getPixelBufferObject() const { return dynamic_cast<const PixelBufferObject*>(_bufferObject.get()); }
+        const PixelBufferObject* getPixelBufferObject() const { return dynamic_cast<const PixelBufferObject*>(getBufferObject()); }
 
-        /** return whether the update(NodeVisitor* nv) should be required on each frame to enable proper working of osg::Image.*/
+        /** Return whether the update(NodeVisitor* nv) should be required on each frame to enable proper working of osg::Image.*/
         virtual bool requiresUpdateCall() const { return false; }
 
         /** update method for osg::Image subclasses that update themselves during the update traversal.*/
         virtual void update(NodeVisitor* /*nv*/) {}
 
-        /** convience update callback class that can be attached to StateAttribute (such as Textures) to ensure
+        /** Convenience update callback class that can be attached to a StateAttribute (such as Textures) to ensure
           * that the Image::update(NodeVisitor*) method is called during the update traversal.  This callback
           * is automatically attached when Image::requiresUpdateCall() is true (it's false by default.)
           */
@@ -372,17 +473,28 @@ class OSG_EXPORT Image : public BufferData
             virtual void operator () (osg::StateAttribute* attr, osg::NodeVisitor* nv);
         };
 
-        /** method for hinting whether to enable or disable focus to images acting as front ends to interactive surfaces such as a vnc or browser window.  Return true if handled. */
+        /** Hint whether to enable or disable focus to images acting as front ends to interactive surfaces such as a vnc or browser window.  Return true if handled. */
         virtual bool sendFocusHint(bool /*focus*/) { return false; }
 
-        /** method for sending pointer events to images that are acting as front ends to interactive surfaces such as a vnc or browser window.  Return true if handled. */
+        /** Send pointer events to images that are acting as front ends to interactive surfaces such as a vnc or browser window.  Return true if handled. */
         virtual bool sendPointerEvent(int /*x*/, int /*y*/, int /*buttonMask*/) { return false; }
 
-        /** method for sending key events to images that are acting as front ends to interactive surfaces such as a vnc or browser window.  Return true if handled.*/
+        /** Send key events to images that are acting as front ends to interactive surfaces such as a vnc or browser window.  Return true if handled.*/
         virtual bool sendKeyEvent(int /*key*/, bool /*keyDown*/) { return false; }
 
-        /** method for passing frame information to the custom Image classes, to be called only when objects associated with imagery are not culled.*/
+        /** Pass frame information to the custom Image classes, to be called only when objects associated with imagery are not culled.*/
         virtual void setFrameLastRendered(const osg::FrameStamp* /*frameStamp*/) {}
+
+        class DimensionsChangedCallback : public osg::Referenced {
+        public:
+            DimensionsChangedCallback() : osg::Referenced() {}
+            virtual void operator()(osg::Image* image) = 0;
+        };
+
+        typedef std::vector< osg::ref_ptr<DimensionsChangedCallback> > DimensionsChangedCallbackVector;
+
+        void addDimensionsChangedCallback(DimensionsChangedCallback* cb);
+        void removeDimensionsChangedCallback(DimensionsChangedCallback* cb);
 
     protected :
 
@@ -390,13 +502,21 @@ class OSG_EXPORT Image : public BufferData
 
         Image& operator = (const Image&) { return *this; }
 
+        void handleDimensionsChangedCallbacks()
+        {
+            for(DimensionsChangedCallbackVector::iterator i = _dimensionsChangedCallbacks.begin(); i != _dimensionsChangedCallbacks.end(); ++i)
+            {
+                (*i)->operator()(this);
+            }
+        }
+
         std::string _fileName;
         WriteHint   _writeHint;
-
 
         Origin _origin;
 
         int _s, _t, _r;
+        int _rowLength;
         GLint _internalTextureFormat;
         GLenum _pixelFormat;
         GLenum _dataType;
@@ -405,14 +525,14 @@ class OSG_EXPORT Image : public BufferData
 
         AllocationMode _allocationMode;
         unsigned char* _data;
-        
+
         void deallocateData();
-        
+
         void setData(unsigned char* data,AllocationMode allocationMode);
 
         MipmapDataType _mipmapData;
-        
-        ref_ptr<PixelBufferObject> _bufferObject;
+
+        DimensionsChangedCallbackVector _dimensionsChangedCallbacks;
 };
 
 class Geode;

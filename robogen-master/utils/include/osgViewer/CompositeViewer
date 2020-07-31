@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -40,7 +40,7 @@ class OSGVIEWER_EXPORT CompositeViewer : public ViewerBase
         bool readConfiguration(const std::string& filename);
 
 
-        /** Set the Stats object used for collect various frame related timing and scene graph stats.*/
+        /** Set the Stats object used to collect various frame related timing and scene graph stats.*/
         virtual void setViewerStats(osg::Stats* stats) { _stats = stats; }
 
         /** Get the Viewers Stats object.*/
@@ -87,6 +87,9 @@ class OSGVIEWER_EXPORT CompositeViewer : public ViewerBase
         /** Check to see if the new frame is required, called by run() when FrameScheme is set to ON_DEMAND.*/
         virtual bool checkNeedToDoFrame();
 
+        /** check to see if events have been received, return true if events are now available.*/
+        virtual bool checkEvents();
+
         virtual void advance(double simulationTime=USE_REFERENCE_TIME);
 
         virtual void eventTraversal();
@@ -123,6 +126,10 @@ class OSGVIEWER_EXPORT CompositeViewer : public ViewerBase
 
         virtual void viewerInit();
 
+        void generateSlavePointerData(osg::Camera* camera, osgGA::GUIEventAdapter& event);
+        void generatePointerData(osgGA::GUIEventAdapter& event);
+        void reprojectPointerData(osgGA::GUIEventAdapter& source_event, osgGA::GUIEventAdapter& dest_event);
+
         typedef std::vector< osg::ref_ptr<osgViewer::View> > RefViews;
         RefViews _views;
 
@@ -135,6 +142,8 @@ class OSGVIEWER_EXPORT CompositeViewer : public ViewerBase
 
         osg::observer_ptr<osg::Camera>      _cameraWithFocus;
         osg::observer_ptr<osgViewer::View>  _viewWithFocus;
+        
+        osg::ref_ptr<osgGA::GUIEventAdapter> _previousEvent;
 
 };
 

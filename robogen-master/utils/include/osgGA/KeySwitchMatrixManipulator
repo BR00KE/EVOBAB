@@ -24,7 +24,7 @@ class GUIActionAdapter;
 
 /**
 KeySwitchMatrixManipulator is a decorator which allows the type of camera manipulator
-being used to be switched by pressing a key. E.g. '1' for a TrackballManipultor,
+being used to be switched by pressing a key. E.g. '1' for a TrackballManipulator,
 '2' for a DriveManipulator, '3' for a FlightManipulator. The manipulators available,
 and the associated switch keys, can be configured.
 */
@@ -114,6 +114,8 @@ class OSGGA_EXPORT KeySwitchMatrixManipulator : public CameraManipulator
         virtual void setAutoComputeHomePosition(bool flag);
 
         virtual void computeHomePosition();
+
+        virtual void finishAnimation();
 
         virtual void home(const GUIEventAdapter& ee,GUIActionAdapter& aa);
 

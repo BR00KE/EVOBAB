@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -15,7 +15,6 @@
 #define OSG_BLENDFUNC 1
 
 #include <osg/StateAttribute>
-
 
 #ifndef GL_VERSION_1_2
 #define GL_CONSTANT_COLOR                 0x8001
@@ -68,7 +67,7 @@ class OSG_EXPORT BlendFunc : public StateAttribute
     public :
 
         BlendFunc();
-        
+
         BlendFunc(GLenum source, GLenum destination);
         BlendFunc(GLenum source, GLenum destination, GLenum source_alpha, GLenum destination_alpha);
 
@@ -81,7 +80,7 @@ class OSG_EXPORT BlendFunc : public StateAttribute
             _destination_factor_alpha(trans._destination_factor_alpha) {}
 
         META_StateAttribute(osg, BlendFunc,BLENDFUNC);
-        
+
         /** Return -1 if *this < *rhs, 0 if *this==*rhs, 1 if *this>*rhs. */
         virtual int compare(const StateAttribute& sa) const
         {
@@ -146,7 +145,7 @@ class OSG_EXPORT BlendFunc : public StateAttribute
 
         void setSourceAlpha(GLenum source) { _source_factor_alpha = source; }
         inline GLenum getSourceAlpha() const { return _source_factor_alpha; }
-        
+
         void setDestination(GLenum destination) { _destination_factor = _destination_factor_alpha = destination; }
         inline GLenum getDestination() const { return _destination_factor; }
 
@@ -157,54 +156,6 @@ class OSG_EXPORT BlendFunc : public StateAttribute
         inline GLenum getDestinationAlpha() const { return _destination_factor_alpha; }
 
         virtual void apply(State& state) const;
-        /** Encapsulates queries of extension availability, obtains extension
-        * function pointers, and provides convenience wrappers for
-        * calling extension functions. */        
-        class OSG_EXPORT Extensions : public osg::Referenced
-        {
-        public:
-            Extensions(unsigned int contextID);
-
-            Extensions(const Extensions& rhs);
-
-            void lowestCommonDenominator(const Extensions& rhs);
-
-            void setupGLExtensions(unsigned int contextID);
-
-            void setBlendFuncSeparateSupported(bool flag) { _isBlendFuncSeparateSupported=flag; }
-            bool isBlendFuncSeparateSupported() const { return _isBlendFuncSeparateSupported; }
-
-            void glBlendFuncSeparate(GLenum sfactorRGB,
-                                     GLenum dfactorRGB,
-                                     GLenum sfactorAlpha,
-                                     GLenum dfactorAlpha) const;
-
-        protected:
-
-            ~Extensions() {}
-
-
-            typedef void (GL_APIENTRY * GLBlendFuncSeparateProc) (GLenum sfactorRGB,
-                                                               GLenum dfactorRGB,
-                                                               GLenum sfactorAlpha,
-                                                               GLenum dfactorAlpha);
-            bool                    _isBlendFuncSeparateSupported;
-            GLBlendFuncSeparateProc _glBlendFuncSeparate;
-
-        };
-
-        /** Returns the Extensions object for the given context.
-        * If createIfNotInitalized is true and the Extensions object doesn't
-        * exist, getExtensions() creates it on the given context.
-        * Returns NULL if createIfNotInitalized is false and the Extensions
-        * object doesn't exist. */
-        static Extensions* getExtensions(unsigned int contextID,bool createIfNotInitalized);
-
-        /** setExtensions() allows users to override the extensions across graphics contexts.
-        * Typically used when you have different extensions supported across graphics pipes,
-        * but need to ensure that they all use the same low common denominator extensions. */
-        static void setExtensions(unsigned int contextID,Extensions* extensions);
-
 
     protected :
 

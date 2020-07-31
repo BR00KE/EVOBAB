@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -21,8 +21,9 @@
 #include <osg/ref_ptr>
 #include <osg/Vec4>
 #include <osg/Vec4d>
+#include <osg/Vec4i>
 #include <osg/buffered_value>
-#include <osg/GL2Extensions>
+#include <osg/GLExtensions>
 
 #include <list>
 #include <map>
@@ -31,6 +32,12 @@
 // http://oss.sgi.com/projects/ogl-sample/registry/EXT/texture_filter_anisotropic.txt
 #ifndef GL_TEXTURE_MAX_ANISOTROPY_EXT
     #define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+#endif
+
+// If not defined, use the definition found in:
+// http://www.opengl.org/registry/specs/ARB/texture_swizzle.txt
+#ifndef GL_TEXTURE_SWIZZLE_RGBA
+    #define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #endif
 
 #ifndef GL_ARB_texture_compression
@@ -72,7 +79,7 @@
 #endif
 
 #ifndef GL_OES_compressed_ETC1_RGB8_texture
-    #define GL_ETC1_RGB8_OES                            0x8D64   
+    #define GL_ETC1_RGB8_OES                            0x8D64
 #endif
 
 #ifndef GL_ARB_INTERNAL_TEXTURE_FORMAT
@@ -90,8 +97,8 @@
     #define GL_LUMINANCE_ALPHA16F_ARB                0x881F
 #endif
 
-#ifndef GL_ARB_PIXEL_DATA
-    #define GL_HALF_FLOAT_ARB                        0x140B
+#ifndef GL_HALF_FLOAT
+    #define GL_HALF_FLOAT                            0x140B
 #endif
 
 #ifndef GL_NV_texture_shader
@@ -136,10 +143,6 @@
     #define GL_FLOAT_RGBA32_NV                      0x888B
 #endif
 
-#ifndef GL_NV_half_float
-    #define GL_HALF_FLOAT_NV                        0x140B
-#endif
-
 #ifndef GL_ATI_texture_float
     #define GL_RGBA_FLOAT32_ATI                     0x8814
     #define GL_RGB_FLOAT32_ATI                      0x8815
@@ -164,7 +167,7 @@
 #endif
 
 #ifndef GL_CLAMP
-    #define GL_CLAMP                          0x2900  
+    #define GL_CLAMP                          0x2900
 #endif
 
 #ifndef GL_CLAMP_TO_BORDER_ARB
@@ -185,17 +188,6 @@
     #define GL_TEXTURE_3D                     0x806F
 #endif
 
-#ifndef GL_TEXTURE_2D_ARRAY_EXT
-    #define GL_TEXTURE_2D_ARRAY_EXT           0x8C1A
-    #define GL_TEXTURE_2D_ARRAY_EXT                        0x8C1A
-    #define GL_PROXY_TEXTURE_2D_ARRAY_EXT                  0x8C1B
-    #define GL_TEXTURE_BINDING_2D_ARRAY_EXT                0x8C1D
-    #define GL_MAX_ARRAY_TEXTURE_LAYERS_EXT                0x88FF
-    #define GL_COMPARE_REF_DEPTH_TO_TEXTURE_EXT            0x884E
-    #define GL_SAMPLER_2D_ARRAY_EXT                        0x8DC1
-    #define GL_SAMPLER_2D_ARRAY_SHADOW_EXT                 0x8DC4
-    #define GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER_EXT    0x8CD4
-#endif
 
 #ifndef GL_TEXTURE_CUBE_MAP
     #define GL_TEXTURE_CUBE_MAP             0x8513
@@ -302,6 +294,117 @@
     #define GL_RGBA_INTEGER_MODE_EXT                           0x8D9E
 #endif
 
+#ifndef GL_VERSION_1_1
+#define GL_R3_G3_B2                       0x2A10
+#define GL_RGB4                           0x804F
+#define GL_RGB5                           0x8050
+#define GL_RGB8                           0x8051
+#define GL_RGB10                          0x8052
+#define GL_RGB12                          0x8053
+#define GL_RGB16                          0x8054
+#define GL_RGBA2                          0x8055
+#define GL_RGBA4                          0x8056
+#define GL_RGB5_A1                        0x8057
+#define GL_RGBA8                          0x8058
+#define GL_RGB10_A2                       0x8059
+#define GL_RGBA12                         0x805A
+#define GL_RGBA16                         0x805B
+#define GL_BGR_EXT                        0x80E0
+#define GL_BGRA_EXT                       0x80E1
+#endif
+
+#ifndef GL_ARB_texture_rg
+    #define GL_RG                             0x8227
+    #define GL_RG_INTEGER                     0x8228
+    #define GL_R8                             0x8229
+    #define GL_R16                            0x822A
+    #define GL_RG8                            0x822B
+    #define GL_RG16                           0x822C
+    #define GL_R16F                           0x822D
+    #define GL_R32F                           0x822E
+    #define GL_RG16F                          0x822F
+    #define GL_RG32F                          0x8230
+    #define GL_R8I                            0x8231
+    #define GL_R8UI                           0x8232
+    #define GL_R16I                           0x8233
+    #define GL_R16UI                          0x8234
+    #define GL_R32I                           0x8235
+    #define GL_R32UI                          0x8236
+    #define GL_RG8I                           0x8237
+    #define GL_RG8UI                          0x8238
+    #define GL_RG16I                          0x8239
+    #define GL_RG16UI                         0x823A
+    #define GL_RG32I                          0x823B
+    #define GL_RG32UI                         0x823C
+#endif
+
+#ifndef GL_ARB_shader_image_load_store
+    #define GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT 0x00000001
+    #define GL_ELEMENT_ARRAY_BARRIER_BIT      0x00000002
+    #define GL_UNIFORM_BARRIER_BIT            0x00000004
+    #define GL_TEXTURE_FETCH_BARRIER_BIT      0x00000008
+    #define GL_SHADER_IMAGE_ACCESS_BARRIER_BIT 0x00000020
+    #define GL_COMMAND_BARRIER_BIT            0x00000040
+    #define GL_PIXEL_BUFFER_BARRIER_BIT       0x00000080
+    #define GL_TEXTURE_UPDATE_BARRIER_BIT     0x00000100
+    #define GL_BUFFER_UPDATE_BARRIER_BIT      0x00000200
+    #define GL_FRAMEBUFFER_BARRIER_BIT        0x00000400
+    #define GL_TRANSFORM_FEEDBACK_BARRIER_BIT 0x00000800
+    #define GL_ATOMIC_COUNTER_BARRIER_BIT     0x00001000
+    #define GL_ALL_BARRIER_BITS               0xFFFFFFFF
+    #define GL_MAX_IMAGE_UNITS                0x8F38
+    #define GL_MAX_COMBINED_IMAGE_UNITS_AND_FRAGMENT_OUTPUTS 0x8F39
+    #define GL_IMAGE_BINDING_NAME             0x8F3A
+    #define GL_IMAGE_BINDING_LEVEL            0x8F3B
+    #define GL_IMAGE_BINDING_LAYERED          0x8F3C
+    #define GL_IMAGE_BINDING_LAYER            0x8F3D
+    #define GL_IMAGE_BINDING_ACCESS           0x8F3E
+    #define GL_IMAGE_1D                       0x904C
+    #define GL_IMAGE_2D                       0x904D
+    #define GL_IMAGE_3D                       0x904E
+    #define GL_IMAGE_2D_RECT                  0x904F
+    #define GL_IMAGE_CUBE                     0x9050
+    #define GL_IMAGE_BUFFER                   0x9051
+    #define GL_IMAGE_1D_ARRAY                 0x9052
+    #define GL_IMAGE_2D_ARRAY                 0x9053
+    #define GL_IMAGE_CUBE_MAP_ARRAY           0x9054
+    #define GL_IMAGE_2D_MULTISAMPLE           0x9055
+    #define GL_IMAGE_2D_MULTISAMPLE_ARRAY     0x9056
+    #define GL_INT_IMAGE_1D                   0x9057
+    #define GL_INT_IMAGE_2D                   0x9058
+    #define GL_INT_IMAGE_3D                   0x9059
+    #define GL_INT_IMAGE_2D_RECT              0x905A
+    #define GL_INT_IMAGE_CUBE                 0x905B
+    #define GL_INT_IMAGE_BUFFER               0x905C
+    #define GL_INT_IMAGE_1D_ARRAY             0x905D
+    #define GL_INT_IMAGE_2D_ARRAY             0x905E
+    #define GL_INT_IMAGE_CUBE_MAP_ARRAY       0x905F
+    #define GL_INT_IMAGE_2D_MULTISAMPLE       0x9060
+    #define GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY 0x9061
+    #define GL_UNSIGNED_INT_IMAGE_1D          0x9062
+    #define GL_UNSIGNED_INT_IMAGE_2D          0x9063
+    #define GL_UNSIGNED_INT_IMAGE_3D          0x9064
+    #define GL_UNSIGNED_INT_IMAGE_2D_RECT     0x9065
+    #define GL_UNSIGNED_INT_IMAGE_CUBE        0x9066
+    #define GL_UNSIGNED_INT_IMAGE_BUFFER      0x9067
+    #define GL_UNSIGNED_INT_IMAGE_1D_ARRAY    0x9068
+    #define GL_UNSIGNED_INT_IMAGE_2D_ARRAY    0x9069
+    #define GL_UNSIGNED_INT_IMAGE_CUBE_MAP_ARRAY 0x906A
+    #define GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE 0x906B
+    #define GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY 0x906C
+    #define GL_MAX_IMAGE_SAMPLES              0x906D
+    #define GL_IMAGE_BINDING_FORMAT           0x906E
+    #define GL_IMAGE_FORMAT_COMPATIBILITY_TYPE 0x90C7
+    #define GL_IMAGE_FORMAT_COMPATIBILITY_BY_SIZE 0x90C8
+    #define GL_IMAGE_FORMAT_COMPATIBILITY_BY_CLASS 0x90C9
+    #define GL_MAX_VERTEX_IMAGE_UNIFORMS      0x90CA
+    #define GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS 0x90CB
+    #define GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS 0x90CC
+    #define GL_MAX_GEOMETRY_IMAGE_UNIFORMS    0x90CD
+    #define GL_MAX_FRAGMENT_IMAGE_UNIFORMS    0x90CE
+    #define GL_MAX_COMBINED_IMAGE_UNIFORMS    0x90CF
+#endif
+
 namespace osg {
 
 
@@ -326,7 +429,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
 
         /** Fast alternative to dynamic_cast<> for determining if state attribute is a Texture.*/
         virtual Texture* asTexture() { return this; }
-        
+
         /** Fast alternative to dynamic_cast<> for determining if state attribute is a Texture.*/
         virtual const Texture* asTexture() const { return this; }
 
@@ -338,7 +441,9 @@ class OSG_EXPORT Texture : public osg::StateAttribute
 
         virtual bool getModeUsage(StateAttribute::ModeUsage& usage) const
         {
-            usage.usesTextureMode(getTextureTarget());
+            #ifdef OSG_GL_FIXED_FUNCTION_AVAILABLE
+                usage.usesTextureMode(getTextureTarget());
+            #endif
             return true;
         }
 
@@ -376,7 +481,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
 
         /** Sets the border width. */
         void setBorderWidth(GLint width) { _borderWidth = width; dirtyTextureParameters(); }
-        
+
         GLint getBorderWidth() const { return _borderWidth; }
 
         enum FilterParameter {
@@ -393,7 +498,6 @@ class OSG_EXPORT Texture : public osg::StateAttribute
             NEAREST_MIPMAP_NEAREST    = GL_NEAREST_MIPMAP_NEAREST
         };
 
-
         /** Sets the texture filter mode. */
         void setFilter(FilterParameter which, FilterMode filter);
 
@@ -406,9 +510,15 @@ class OSG_EXPORT Texture : public osg::StateAttribute
           * value of 1.0. Valid range is 1.0f upwards.  The maximum value
           * depends on the graphics system. */
         void setMaxAnisotropy(float anis);
-        
+
         /** Gets the maximum anisotropy value. */
         inline float getMaxAnisotropy() const { return _maxAnisotropy; }
+
+        /** Configure the source of texture swizzling for all channels */
+        inline void setSwizzle(const Vec4i& swizzle) { _swizzle = swizzle; dirtyTextureParameters(); };
+
+        /** Gets the source of texture swizzling for all channels */
+        inline const Vec4i& getSwizzle() const { return _swizzle; }
 
         /** Sets the hardware mipmap generation hint. If enabled, it will
           * only be used if supported in the graphics system. */
@@ -421,7 +531,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
           * data. If enabled, and the image data is only referenced by this
           * Texture, apply() will delete the image data. */
         inline void setUnRefImageDataAfterApply(bool flag) { _unrefImageDataAfterApply = flag; }
-        
+
         /** Gets whether or not apply() unreferences image data. */
         inline bool getUnRefImageDataAfterApply() const { return _unrefImageDataAfterApply; }
 
@@ -434,7 +544,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
         /** Gets whether to use client storage for the texture. */
         inline bool getClientStorageHint() const { return _clientStorageHint; }
 
-        /** Sets whether to force the texture to resize images that have dimensions 
+        /** Sets whether to force the texture to resize images that have dimensions
           * that are not a power of two. If enabled, NPOT images will be resized,
           * whether or not NPOT textures are supported by the hardware. If disabled,
           * NPOT images will not be resized if supported by hardware. */
@@ -453,6 +563,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
             USE_PVRTC_2BPP_COMPRESSION,
             USE_PVRTC_4BPP_COMPRESSION,
             USE_ETC_COMPRESSION,
+            USE_ETC2_COMPRESSION,
             USE_RGTC1_COMPRESSION,
             USE_RGTC2_COMPRESSION,
             USE_S3TC_DXT1c_COMPRESSION,
@@ -481,7 +592,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
 
         /** Gets the internal texture format. */
         inline GLint getInternalFormat() const { if (_internalFormat==0) computeInternalFormat(); return _internalFormat; }
-        
+
         /** Return true if the internal format is one of the compressed formats.*/
         bool isCompressedInternalFormat() const;
 
@@ -512,10 +623,10 @@ class OSG_EXPORT Texture : public osg::StateAttribute
             //! Unsigned integer value (see EXT_texture_integer)
             UNSIGNED_INTEGER = 0x4
         };
-        
+
         /** Get the internal texture format type. */
         inline InternalFormatType getInternalFormatType() const { return _internalFormatType; }
-        
+
         class TextureObject;
 
         /** Returns a pointer to the TextureObject for the current context. */
@@ -558,12 +669,43 @@ class OSG_EXPORT Texture : public osg::StateAttribute
           * min filter is used. */
         void allocateMipmapLevels();
 
+        /** Encapsulates texture image load/store attributes */
+        struct ImageAttachment
+        {
+            GLuint unit;
+            GLint level;
+            GLboolean layered;
+            GLint layer;
+            GLenum access;
+            GLenum format;
+
+            ImageAttachment()
+            : unit(0), level(0), layered(GL_FALSE), layer(0), access(0), format(0) {}
+        };
+
+        /** Type of access that will be performed on the texture image. */
+        enum ImageAccess
+        {
+             NOT_USED = 0,
+             READ_ONLY = GL_READ_ONLY_ARB,
+             WRITE_ONLY = GL_WRITE_ONLY_ARB,
+             READ_WRITE = GL_READ_WRITE_ARB
+        };
+
+        /** Bind texture to an image unit (available only if GL version is 4.2 or greater)
+          * The format parameter for the image unit need not exactly match the texture internal format,
+          * but if it is set to 0, the texture internal format will be used.
+          * See http://www.opengl.org/registry/specs/ARB/shader_image_load_store.txt */
+        void bindToImageUnit(unsigned int unit, GLenum access, GLenum format=0, int level=0, bool layered=false, int layer=0);
+
+        ImageAttachment& getImageAttachment() { return _imageAttachment; }
+        const ImageAttachment& getImageAttachment() const { return _imageAttachment; }
 
         /** Sets GL_TEXTURE_COMPARE_MODE_ARB to GL_COMPARE_R_TO_TEXTURE_ARB
           * See http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow.txt. */
         void setShadowComparison(bool flag) { _use_shadow_comparison = flag; }
         bool getShadowComparison() const { return _use_shadow_comparison; }
-        
+
         enum ShadowCompareFunc {
             NEVER = GL_NEVER,
             LESS = GL_LESS,
@@ -593,7 +735,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
           * http://oss.sgi.com/projects/ogl-sample/registry/ARB/shadow_ambient.txt. */
         void setShadowAmbient(float shadow_ambient) { _shadow_ambient = shadow_ambient; }
         float getShadowAmbient() const { return _shadow_ambient; }
-        
+
 
         /** Sets the texture image for the specified face. */
         virtual void setImage(unsigned int face, Image* image) = 0;
@@ -631,176 +773,10 @@ class OSG_EXPORT Texture : public osg::StateAttribute
           * for all graphics contexts. */
         virtual void releaseGLObjects(State* state=0) const;
 
-        /** Encapsulates queries of extension availability, obtains extension
-          * function pointers, and provides convenience wrappers for
-          * calling extension functions. */        
-        class OSG_EXPORT Extensions : public osg::Referenced
-        {
-            public:
-                Extensions(unsigned int contextID);
-
-                void setMultiTexturingSupported(bool flag) { _isMultiTexturingSupported=flag; }
-                bool isMultiTexturingSupported() const { return _isMultiTexturingSupported; }
-
-                void setTextureFilterAnisotropicSupported(bool flag) { _isTextureFilterAnisotropicSupported=flag; }
-                bool isTextureFilterAnisotropicSupported() const { return _isTextureFilterAnisotropicSupported; }
-                
-                void setTextureCompressionARBSupported(bool flag) { _isTextureCompressionARBSupported=flag; }
-                bool isTextureCompressionARBSupported() const { return _isTextureCompressionARBSupported; }
-
-                void setTextureCompressionS3TCSupported(bool flag) { _isTextureCompressionS3TCSupported=flag; }
-                bool isTextureCompressionS3TCSupported() const { return _isTextureCompressionS3TCSupported; }
-
-                void setTextureCompressionPVRTC2BPPSupported(bool flag) { _isTextureCompressionPVRTC2BPPSupported=flag; }
-                bool isTextureCompressionPVRTC2BPPSupported() const { return _isTextureCompressionPVRTC2BPPSupported; }
-                
-                void setTextureCompressionPVRTC4BPPSupported(bool flag) { _isTextureCompressionPVRTC4BPPSupported=flag; }
-                bool isTextureCompressionPVRTC4BPPSupported() const { return _isTextureCompressionPVRTC4BPPSupported; }
-                
-                void setTextureCompressionETCSupported(bool flag) { _isTextureCompressionETCSupported=flag; }
-                bool isTextureCompressionETCSupported() const { return _isTextureCompressionETCSupported; }
-
-                void setTextureCompressionRGTCSupported(bool flag) { _isTextureCompressionRGTCSupported=flag; }
-                bool isTextureCompressionRGTCSupported() const { return _isTextureCompressionRGTCSupported; }
-
-                void setTextureCompressionPVRTCSupported(bool flag) { _isTextureCompressionPVRTCSupported=flag; }
-                bool isTextureCompressionPVRTCSupported() const { return _isTextureCompressionPVRTCSupported; }
-
-                void setTextureMirroredRepeatSupported(bool flag) { _isTextureMirroredRepeatSupported=flag; }
-                bool isTextureMirroredRepeatSupported() const { return _isTextureMirroredRepeatSupported; }
-
-                void setTextureEdgeClampSupported(bool flag) { _isTextureEdgeClampSupported=flag; }
-                bool isTextureEdgeClampSupported() const { return _isTextureEdgeClampSupported; }
-
-                void setTextureBorderClampSupported(bool flag) { _isTextureBorderClampSupported=flag; }
-                bool isTextureBorderClampSupported() const { return _isTextureBorderClampSupported; }
-
-                void setGenerateMipMapSupported(bool flag) { _isGenerateMipMapSupported=flag; }
-                bool isGenerateMipMapSupported() const { return _isGenerateMipMapSupported; }
-
-                void setTextureMultisampledSupported(bool flag) { _isTextureMultisampledSupported=flag; }
-                bool isTextureMultisampledSupported() const { return _isTextureMultisampledSupported; }
-
-                void setShadowSupported(bool flag) { _isShadowSupported = flag; }
-                bool isShadowSupported() const { return _isShadowSupported; }
-
-                void setShadowAmbientSupported(bool flag) { _isShadowAmbientSupported = flag; }
-                bool isShadowAmbientSupported() const { return _isShadowAmbientSupported; }
-
-                void setTextureMaxLevelSupported(bool flag) { _isTextureMaxLevelSupported = flag; }
-                bool isTextureMaxLevelSupported() const { return _isTextureMaxLevelSupported; }
-
-                void setMaxTextureSize(GLint maxsize) { _maxTextureSize=maxsize; }
-                GLint maxTextureSize() const { return _maxTextureSize; }
-
-                void setNumTextureUnits(GLint nunits ) { _numTextureUnits=nunits; }
-                GLint numTextureUnits() const { return _numTextureUnits; }
-
-                bool isCompressedTexImage2DSupported() const { return _glCompressedTexImage2D!=0; }
-                bool isCompressedTexSubImage2DSupported() const { return _glCompressedTexSubImage2D!=0; }
-                
-                bool isClientStorageSupported() const { return _isClientStorageSupported; }
-
-                bool isNonPowerOfTwoTextureSupported(GLenum filter) const
-                {
-                    return (filter==GL_LINEAR || filter==GL_NEAREST) ? 
-                            _isNonPowerOfTwoTextureNonMipMappedSupported :
-                            _isNonPowerOfTwoTextureMipMappedSupported;
-                }
-
-                void setTextureIntegerSupported(bool flag) { _isTextureIntegerEXTSupported=flag; }
-                bool isTextureIntegerSupported() const { return _isTextureIntegerEXTSupported; }
-
-                void glCompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data) const
-                {
-                    _glCompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data);
-                }
-
-                void glCompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data) const
-                {
-                    _glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data);
-                }
-
-                void glGetCompressedTexImage(GLenum target, GLint level, GLvoid *data) const
-                {
-                    _glGetCompressedTexImage(target, level, data);
-                }
-
-                void glTexImage2DMultisample(GLenum target, GLsizei samples, GLint internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations) const
-                {
-                    _glTexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations);
-                }
-
-                void glTexParameterIiv(GLenum target, GLenum pname, const GLint* data) const
-                {
-                    _glTexParameterIiv(target, pname, data);
-                }
-
-                void glTexParameterIuiv(GLenum target, GLenum pname, const GLuint* data) const
-                {
-                    _glTexParameterIuiv(target, pname, data);
-                }
-
-            protected:
-
-                ~Extensions() {}
-                
-                typedef void (GL_APIENTRY * CompressedTexImage2DArbProc) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data);
-                typedef void (GL_APIENTRY * CompressedTexSubImage2DArbProc) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data);
-                typedef void (GL_APIENTRY * GetCompressedTexImageArbProc) (GLenum target, GLint level, GLvoid *data);
-                typedef void (GL_APIENTRY * TexImage2DMultisample)(GLenum target, GLsizei samples, GLint internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations);
-                typedef void (GL_APIENTRY * TexParameterIivProc)(GLenum target, GLenum pname, const GLint* data);
-                typedef void (GL_APIENTRY * TexParameterIuivProc)(GLenum target, GLenum pname, const GLuint* data);
-
-                CompressedTexImage2DArbProc     _glCompressedTexImage2D;
-                CompressedTexSubImage2DArbProc  _glCompressedTexSubImage2D;
-                GetCompressedTexImageArbProc    _glGetCompressedTexImage;
-                TexImage2DMultisample           _glTexImage2DMultisample;
-                TexParameterIivProc             _glTexParameterIiv;
-                TexParameterIuivProc            _glTexParameterIuiv;
-
-
-                bool    _isMultiTexturingSupported;
-                bool    _isTextureFilterAnisotropicSupported;
-                bool    _isTextureCompressionARBSupported;
-                bool    _isTextureCompressionS3TCSupported;
-                bool    _isTextureCompressionPVRTC2BPPSupported;
-                bool    _isTextureCompressionPVRTC4BPPSupported;
-                bool    _isTextureCompressionETCSupported;
-                bool    _isTextureCompressionRGTCSupported;
-                bool    _isTextureCompressionPVRTCSupported;
-                bool    _isTextureMirroredRepeatSupported;
-                bool    _isTextureEdgeClampSupported;
-                bool    _isTextureBorderClampSupported;
-                bool    _isGenerateMipMapSupported;
-                bool    _isTextureMultisampledSupported;
-                bool    _isShadowSupported;
-                bool    _isShadowAmbientSupported;
-                bool    _isClientStorageSupported;
-                bool    _isNonPowerOfTwoTextureMipMappedSupported;
-                bool    _isNonPowerOfTwoTextureNonMipMappedSupported;
-                bool    _isTextureIntegerEXTSupported;
-                bool    _isTextureMaxLevelSupported;
-
-                GLint   _maxTextureSize;
-                GLint   _numTextureUnits;
-        };
-        
-        /** Gets the extension for the specified context. Creates the
-          * Extensions object for that context if it doesn't exist.
-          * Returns NULL if the Extensions object for the context doesn't
-          * exist and the createIfNotInitalized flag is false. */
-        static Extensions* getExtensions(unsigned int contextID,bool createIfNotInitalized);
-
-        /** Overrides Extensions objects across graphics contexts. Typically
-          * used to ensure the same lowest common denominator of extensions
-          * on systems with different graphics pipes. */
-        static void setExtensions(unsigned int contextID,Extensions* extensions);
-
         /** Determine whether the given internalFormat is a compressed
           * image format. */
         static bool isCompressedInternalFormat(GLint internalFormat);
-        
+
         /** Determine the size of a compressed image, given the internalFormat,
           * the width, the height, and the depth of the image. The block size
           * and the size are output parameters. */
@@ -811,7 +787,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
           * texture binding. Note: Don't call this method directly unless
           * you're implementing a subload callback. */
         void applyTexImage2D_load(State& state, GLenum target, const Image* image, GLsizei width, GLsizei height,GLsizei numMipmapLevels) const;
-        
+
         /** Helper method. Subloads images into the texture, but doesn't set
           * or use a texture binding. Note: Don't call this method directly
           * unless you're implementing a subload callback. */
@@ -832,13 +808,13 @@ class OSG_EXPORT Texture : public osg::StateAttribute
         virtual ~Texture();
 
         virtual void computeInternalFormat() const = 0;
-        
+
         /** Computes the internal format from Image parameters. */
         void computeInternalFormatWithImage(const osg::Image& image) const;
 
         /** Computes the texture dimension for the given Image. */
         void computeRequiredTextureDimensions(State& state, const osg::Image& image,GLsizei& width, GLsizei& height,GLsizei& numMipmapLevels) const;
-        
+
         /** Computes the internal format type. */
         void computeInternalFormatType() const;
 
@@ -883,6 +859,7 @@ class OSG_EXPORT Texture : public osg::StateAttribute
         FilterMode      _min_filter;
         FilterMode      _mag_filter;
         float           _maxAnisotropy;
+        Vec4i           _swizzle;
         bool            _useHardwareMipMapGeneration;
         bool            _unrefImageDataAfterApply;
         bool            _clientStorageHint;
@@ -901,6 +878,8 @@ class OSG_EXPORT Texture : public osg::StateAttribute
         ShadowCompareFunc   _shadow_compare_func;
         ShadowTextureMode   _shadow_texture_mode;
         float               _shadow_ambient;
+
+        ImageAttachment _imageAttachment;
 
     public:
 
@@ -1122,8 +1101,8 @@ class OSG_EXPORT Texture : public osg::StateAttribute
             void discardAllDeletedTextureObjects();
             void flushDeletedTextureObjects(double currentTime, double& availableTime);
 
-            TextureObject* takeFromOrphans(Texture* texture);
-            TextureObject* takeOrGenerate(Texture* texture);
+            osg::ref_ptr<TextureObject> takeFromOrphans(Texture* texture);
+            osg::ref_ptr<TextureObject> takeOrGenerate(Texture* texture);
             void moveToBack(TextureObject* to);
             void addToBack(TextureObject* to);
             void orphan(TextureObject* to);
@@ -1140,8 +1119,8 @@ class OSG_EXPORT Texture : public osg::StateAttribute
 
             unsigned int computeNumTextureObjectsInList() const;
             unsigned int getNumOfTextureObjects() const { return _numOfTextureObjects; }
-            unsigned int getNumOrphans() const { return _orphanedTextureObjects.size(); }
-            unsigned int getNumPendingOrphans() const { return _pendingOrphanedTextureObjects.size(); }
+            unsigned int getNumOrphans() const { return static_cast<unsigned int>(_orphanedTextureObjects.size()); }
+            unsigned int getNumPendingOrphans() const { return static_cast<unsigned int>(_pendingOrphanedTextureObjects.size()); }
 
         protected:
 
@@ -1188,8 +1167,8 @@ class OSG_EXPORT Texture : public osg::StateAttribute
             bool hasSpace(unsigned int size) const { return (_currTexturePoolSize+size)<=_maxTexturePoolSize; }
             bool makeSpace(unsigned int size);
 
-            TextureObject* generateTextureObject(const Texture* texture, GLenum target);
-            TextureObject* generateTextureObject(const Texture* texture,
+            osg::ref_ptr<TextureObject> generateTextureObject(const Texture* texture, GLenum target);
+            osg::ref_ptr<TextureObject> generateTextureObject(const Texture* texture,
                                                         GLenum    target,
                                                         GLint     numMipmapLevels,
                                                         GLenum    internalFormat,
@@ -1252,9 +1231,9 @@ class OSG_EXPORT Texture : public osg::StateAttribute
 
         static osg::ref_ptr<Texture::TextureObjectManager>&  getTextureObjectManager(unsigned int contextID);
 
-        static TextureObject* generateTextureObject(const Texture* texture, unsigned int contextID,GLenum target);
+        static osg::ref_ptr<TextureObject> generateTextureObject(const Texture* texture, unsigned int contextID,GLenum target);
 
-        static TextureObject* generateTextureObject(const Texture* texture,
+        static osg::ref_ptr<TextureObject> generateTextureObject(const Texture* texture,
                                                      unsigned int contextID,
                                                      GLenum    target,
                                                      GLint     numMipmapLevels,
@@ -1263,6 +1242,17 @@ class OSG_EXPORT Texture : public osg::StateAttribute
                                                      GLsizei   height,
                                                      GLsizei   depth,
                                                      GLint     border);
+
+        TextureObject* generateAndAssignTextureObject(unsigned int contextID, GLenum target) const;
+
+        TextureObject* generateAndAssignTextureObject(unsigned int contextID,
+                                                     GLenum    target,
+                                                     GLint     numMipmapLevels,
+                                                     GLenum    internalFormat,
+                                                     GLsizei   width,
+                                                     GLsizei   height,
+                                                     GLsizei   depth,
+                                                     GLint     border) const;
 
         static void deleteAllTextureObjects(unsigned int contextID);
         static void discardAllTextureObjects(unsigned int contextID);

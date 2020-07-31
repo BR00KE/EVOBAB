@@ -40,7 +40,7 @@ class OSGVIEWER_EXPORT ViewerBase : public virtual osg::Object
         ViewerBase(const ViewerBase& vb);
 
 
-        /** Set the Stats object used for collect various frame related timing and scene graph stats.*/
+        /** Set the Stats object used to collect various frame related timing and scene graph stats.*/
         virtual void setViewerStats(osg::Stats* stats) = 0;
 
         /** Get the Viewers Stats object.*/
@@ -85,7 +85,7 @@ class OSGVIEWER_EXPORT ViewerBase : public virtual osg::Object
         /** Return true if viewer threads are running. */
         bool areThreadsRunning() const { return _threadsRunning; }
 
-        /** Stop any threads begin run by viewer.*/
+        /** Stop any threads being run by viewer.*/
         virtual void stopThreading();
 
         /** Start any threads required by the viewer.*/
@@ -107,6 +107,14 @@ class OSGVIEWER_EXPORT ViewerBase : public virtual osg::Object
         /** Get the end barrier position.*/
         BarrierPosition getEndBarrierPosition() const { return _endBarrierPosition; }
 
+        /** Set the end barrier operation. \c op may be one of GL_FLUSH, GL_FINISH,
+         * or NO_OPERATION. NO_OPERATION is the default. Per BarrierOperation::operator()(),
+         * a glFlush() command, glFinish() command, or no additional OpenGL command will be
+         * issued before entering the end barrier. */
+        void setEndBarrierOperation(osg::BarrierOperation::PreBlockOp op);
+
+        /** Get the end barrier operation. */
+        osg::BarrierOperation::PreBlockOp getEndBarrierOperation() const { return _endBarrierOperation; }
 
 
         /** Set the done flag to signal the viewer's work is done and should exit the frame loop.*/
@@ -140,7 +148,7 @@ class OSGVIEWER_EXPORT ViewerBase : public virtual osg::Object
         bool getQuitEventSetsDone() const { return _quitEventSetsDone; }
 
 
-        /** Hint to tell the renderingTraversals() method whether to call relaseContext() on the last
+        /** Hint to tell the renderingTraversals() method whether to call releaseContext() on the last
           * context that was made current by the thread calling renderingTraverals().  Note, when
           * running multi-threaded viewer no threads will be made current or release current.
           * Setting this hint to false can enable the frame loop to be lazy about calling makeCurrent
@@ -149,7 +157,7 @@ class OSGVIEWER_EXPORT ViewerBase : public virtual osg::Object
           * be left on, otherwise the wrong context could be left active, introducing errors in rendering.*/
         void setReleaseContextAtEndOfFrameHint(bool hint) { _releaseContextAtEndOfFrameHint = hint; }
 
-        /** Hint to tell the renderingTraversals() method whether to call relaseContext().*/
+        /** Hint to tell the renderingTraversals() method whether to call releaseContext().*/
         bool getReleaseContextAtEndOfFrameHint() const { return _releaseContextAtEndOfFrameHint; }
 
 
@@ -216,6 +224,9 @@ class OSGVIEWER_EXPORT ViewerBase : public virtual osg::Object
 
         /** check to see if the new frame is required, called by run(..) when FrameScheme is set to ON_DEMAND.*/
         virtual bool checkNeedToDoFrame() = 0;
+        
+        /** check to see if events have been received, return true if events are now available.*/
+        virtual bool checkEvents() = 0;
 
         /** Render a complete new frame.
           * Calls advance(), eventTraversal(), updateTraversal(), renderingTraversals(). */
@@ -309,6 +320,7 @@ class OSGVIEWER_EXPORT ViewerBase : public virtual osg::Object
 
 
         BarrierPosition                                     _endBarrierPosition;
+        osg::BarrierOperation::PreBlockOp                   _endBarrierOperation;
 
         osg::ref_ptr<osg::BarrierOperation>                 _startRenderingBarrier;
         osg::ref_ptr<osg::BarrierOperation>                 _endRenderingDispatchBarrier;
@@ -323,6 +335,12 @@ class OSGVIEWER_EXPORT ViewerBase : public virtual osg::Object
         osg::ref_ptr<osgUtil::IncrementalCompileOperation>  _incrementalCompileOperation;
 
         osg::observer_ptr<osg::GraphicsContext>             _currentContext;
+        
+    private:
+        
+        // Define private copy constructor
+        // otherwsie VS2015 will construct it's own which will call the private copy operator from osg::Object resulting in an compile error.
+        ViewerBase& operator = (const ViewerBase&) { return *this; }
 };
 
 }

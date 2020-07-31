@@ -1,34 +1,88 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
-#ifndef OSGGA_EVENT
-#define OSGGA_EVENT 1 
+#ifndef OSGGA_GUIEVENTADAPTER
+#define OSGGA_GUIEVENTADAPTER 1
 
 #include <osg/Object>
 #include <osg/Matrix>
 #include <osg/GraphicsContext>
-#include <osgGA/Export>
+
+#include <osgGA/Event>
 
 namespace osgGA{
+
+struct PointerData : public osg::Referenced
+{
+    PointerData():
+        object(0),
+        x(0.0f),
+        xMin(-1.0f),
+        xMax(1.0f),
+        y(0.0f),
+        yMin(-1.0f),
+        yMax(1.0f) {}
+
+    PointerData(osg::Object* obj, float in_x, float in_xMin, float in_xMax, float in_y, float in_yMin, float in_yMax):
+        object(obj),
+        x(in_x),
+        xMin(in_xMin),
+        xMax(in_xMax),
+        y(in_y),
+        yMin(in_yMin),
+        yMax(in_yMax) {}
+
+    PointerData(const PointerData& pd):
+        osg::Referenced(),
+        object(pd.object),
+        x(pd.x),
+        xMin(pd.xMin),
+        xMax(pd.xMax),
+        y(pd.y),
+        yMin(pd.yMin),
+        yMax(pd.yMax) {}
+
+    PointerData& operator = (const PointerData& pd)
+    {
+        if (&pd==this) return *this;
+
+        object = pd.object;
+        x = pd.x;
+        xMin = pd.xMin;
+        xMax = pd.xMax;
+        y = pd.y;
+        yMin = pd.yMin;
+        yMax = pd.yMax;
+
+        return *this;
+    }
+
+    osg::observer_ptr<osg::Object> object;
+    float x, xMin, xMax;
+    float y, yMin, yMax;
+
+    float getXnormalized() const { return (x-xMin)/(xMax-xMin)*2.0f-1.0f; }
+    float getYnormalized() const { return (y-yMin)/(yMax-yMin)*2.0f-1.0f; }
+};
 
 
 /** Event class for storing Keyboard, mouse and window events.
 */
-class OSGGA_EXPORT GUIEventAdapter : public osg::Object
+class OSGGA_EXPORT GUIEventAdapter : public Event
 {
 public:
 
-        enum MouseButtonMask { 
+        enum MouseButtonMask {
             LEFT_MOUSE_BUTTON    = 1<<0,
             MIDDLE_MOUSE_BUTTON  = 1<<1,
             RIGHT_MOUSE_BUTTON   = 1<<2
@@ -36,7 +90,7 @@ public:
 
         enum EventType {
             NONE                = 0,
-            PUSH                = 1<<0, 
+            PUSH                = 1<<0,
             RELEASE             = 1<<1,
             DOUBLECLICK         = 1<<2,
             DRAG                = 1<<3,
@@ -208,7 +262,7 @@ public:
             KEY_KP_7            = 0xFFB7,
             KEY_KP_8            = 0xFFB8,
             KEY_KP_9            = 0xFFB9,
-            
+
             /*
              * Auxiliary Functions; note the duplicate definitions for left and right
              * function keys;  Sun keyboards and a few other manufactures have such
@@ -302,7 +356,7 @@ public:
             Y_INCREASING_DOWNWARDS
         };
 
-        enum ScrollingMotion 
+        enum ScrollingMotion
         {
             SCROLL_NONE,
             SCROLL_LEFT,
@@ -312,15 +366,15 @@ public:
             SCROLL_2D
         };
 
-        enum TabletPointerType 
+        enum TabletPointerType
         {
             UNKNOWN = 0,
             PEN,
             PUCK,
             ERASER
         };
-        
-        enum TouchPhase 
+
+        enum TouchPhase
         {
             TOUCH_UNKNOWN,
             TOUCH_BEGAN,
@@ -328,54 +382,65 @@ public:
             TOUCH_STATIONERY,
             TOUCH_ENDED
         };
-        
-        class TouchData : public osg::Referenced {
+
+        class TouchData : public osg::Object {
         public:
+
             struct TouchPoint {
                 unsigned int id;
                 TouchPhase phase;
                 float x, y;
-                
+
                 unsigned int tapCount;
                 TouchPoint() : id(0), phase(TOUCH_UNKNOWN), x(0.0f), y(0.0f), tapCount(0) {}
-                TouchPoint(unsigned int in_id, TouchPhase in_phase, float in_x, float in_y, unsigned int in_tap_count) 
-                :    id(in_id), 
+                TouchPoint(unsigned int in_id, TouchPhase in_phase, float in_x, float in_y, unsigned int in_tap_count)
+                :    id(in_id),
                     phase(in_phase),
-                    x(in_x), 
-                    y(in_y), 
-                    tapCount(in_tap_count) 
+                    x(in_x),
+                    y(in_y),
+                    tapCount(in_tap_count)
                 {
                 }
             };
-                        
+
             typedef std::vector<TouchPoint> TouchSet;
-            
+
             typedef TouchSet::iterator iterator;
             typedef TouchSet::const_iterator const_iterator;
-            
-            TouchData() : osg::Referenced() {}
-            
-            unsigned int getNumTouchPoints() const { return _touches.size(); }
-                        
+
+            TouchData() : osg::Object() {}
+
+            TouchData(const TouchData& td, const osg::CopyOp& copyop):
+                osg::Object(td,copyop),
+                _touches(td._touches) {}
+
+
+            META_Object(osgGA, TouchData);
+
+
+            unsigned int getNumTouchPoints() const { return static_cast<unsigned int>(_touches.size()); }
+
             iterator begin() { return _touches.begin(); }
             const_iterator begin() const { return _touches.begin(); }
-            
+
             iterator end() { return _touches.end(); }
             const_iterator end() const { return _touches.end(); }
-            
+
             const TouchPoint get(unsigned int i) const { return _touches[i]; }
-                    
+
         protected:
-            
+
+            virtual ~TouchData() {}
+
             void addTouchPoint(unsigned int id, TouchPhase phase, float x, float y, unsigned int tap_count) {
                 _touches.push_back(TouchPoint(id, phase, x, y, tap_count));
             }
-            
+
             TouchSet _touches;
-            
-        friend class GUIEventAdapter;    
+
+        friend class GUIEventAdapter;
         };
-        
+
     public:
 
         GUIEventAdapter();
@@ -383,7 +448,10 @@ public:
         GUIEventAdapter(const GUIEventAdapter& rhs, const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
         META_Object(osgGA, GUIEventAdapter);
-        
+
+        virtual GUIEventAdapter* asGUIEventAdapter() { return this; }
+        virtual const GUIEventAdapter* asGUIEventAdapter() const { return this; }
+
 
         /** Get the accumulated event state singleton.
           * Typically all EventQueue will share this single GUIEventAdapter object for tracking
@@ -391,43 +459,44 @@ public:
         static osg::ref_ptr<GUIEventAdapter>& getAccumulatedEventState();
 
 
-        /** Set whether this event has been handled by an event handler or not.*/
-        void setHandled(bool handled) const { _handled = handled; }
-
-        /** Get whether this event has been handled by an event handler or not.*/
-        bool getHandled() const { return _handled; }
-
         /** set the event type. */
         void setEventType(EventType Type) { _eventType = Type; }
 
         /** get the event type. */
         virtual EventType getEventType() const { return _eventType; }
 
-        /** set time in seconds of event. */
-        void setTime(double time) { _time = time; }
-
-        /** get time in seconds of event. */
-        double getTime() const { return _time; }
-
         /** deprecated function for getting time of event. */
         double time() const { return _time; }
 
 
         void setGraphicsContext(osg::GraphicsContext* context) { _context = context; }
+        osg::GraphicsContext* getGraphicsContext() { return _context.get(); }
         const osg::GraphicsContext* getGraphicsContext() const { return _context.get(); }
-        
+
 
         /** set window rectangle. */
         void setWindowRectangle(int x, int y, int width, int height, bool updateMouseRange = true);
 
+        /** set window x origin.*/
+        void setWindowX(int v) { _windowX = v; }
+
         /** get window x origin.*/
         int getWindowX() const { return _windowX; }
+
+        /** set window x origin.*/
+        void setWindowY(int v) { _windowY = v; }
 
         /** get window y origin.*/
         int getWindowY() const { return _windowY; }
 
+        /** set window width.*/
+        void setWindowWidth(int v) { _windowWidth = v; }
+
         /** get window width.*/
         int getWindowWidth() const { return _windowWidth; }
+
+        /** set window height.*/
+        void setWindowHeight(int v) { _windowHeight = v; }
 
         /** get window height.*/
         int getWindowHeight() const { return _windowHeight; }
@@ -441,10 +510,10 @@ public:
 
         /** set virtual key pressed. */
         void setUnmodifiedKey(int key) { _unmodifiedKey = key; }
-        
+
         /** get virtual key pressed. */
         int getUnmodifiedKey() const { return _unmodifiedKey; }
-        
+
         /** set button pressed/released.*/
         void setButton(int button) { _button = button; }
 
@@ -455,14 +524,26 @@ public:
         /** set mouse input range. */
         void setInputRange(float Xmin, float Ymin, float Xmax, float Ymax);
 
+        /** set mouse minimum x. */
+        void setXmin(float v) { _Xmin = v; }
+
         /** get mouse minimum x. */
         float getXmin() const { return _Xmin; }
+
+        /** set mouse maximum x. */
+        void setXmax(float v) { _Xmax = v; }
 
         /** get mouse maximum x. */
         float getXmax() const { return _Xmax; }
 
+        /** set mouse minimum x. */
+        void setYmin(float v) { _Ymin = v; }
+
         /** get mouse minimum y. */
         float getYmin() const { return _Ymin; }
+
+        /** set mouse maximum y. */
+        void setYmax(float v) { _Ymax = v; }
 
         /** get mouse maximum y. */
         float getYmax() const { return _Ymax; }
@@ -479,10 +560,25 @@ public:
         /** get current mouse y position.*/
         float getY() const { return _my; }
 
+#if 1
+        inline float getXnormalized() const
+        {
+            return _pointerDataList.size()>=1 ?
+                   _pointerDataList[_pointerDataList.size()-1]->getXnormalized():
+                   2.0f*(getX()-getXmin())/(getXmax()-getXmin())-1.0f;
+        }
+
+        inline float getYnormalized() const
+        {
+            if (_pointerDataList.size()>=1) return _pointerDataList[_pointerDataList.size()-1]->getYnormalized();
+            if (_mouseYOrientation==Y_INCREASING_UPWARDS) return 2.0f*(getY()-getYmin())/(getYmax()-getYmin())-1.0f;
+            else return -(2.0f*(getY()-getYmin())/(getYmax()-getYmin())-1.0f);
+        }
+#else
         /**
          * return the current mouse x value normalized to the range of -1 to 1.
          * -1 would be the left hand side of the window.
-         * 0.0 would be the middle of the window. 
+         * 0.0 would be the middle of the window.
          * +1 would be the right hand side of the window.
          */
         inline float getXnormalized() const { return 2.0f*(getX()-getXmin())/(getXmax()-getXmin())-1.0f; }
@@ -490,7 +586,7 @@ public:
         /**
          * return the current mouse y value normalized to the range of -1 to 1.
          * -1 would be the bottom of the window.
-         * 0.0 would be the middle of the window. 
+         * 0.0 would be the middle of the window.
          * +1 would be the top of the window.
          */
         inline float getYnormalized() const
@@ -498,12 +594,16 @@ public:
             if (_mouseYOrientation==Y_INCREASING_UPWARDS) return 2.0f*(getY()-getYmin())/(getYmax()-getYmin())-1.0f;
             else return -(2.0f*(getY()-getYmin())/(getYmax()-getYmin())-1.0f);
         }
+#endif
 
         /// set mouse-Y orientation (mouse-Y increases upwards or downwards).
         void setMouseYOrientation(MouseYOrientation myo) { _mouseYOrientation = myo; }
 
         /// get mouse-Y orientation (mouse-Y increases upwards or downwards).
         MouseYOrientation getMouseYOrientation() const { return _mouseYOrientation; }
+
+        /// set mouse-Y orientation (mouse-Y increases upwards or downwards) and recompute variables
+        void setMouseYOrientationAndUpdateCoords(MouseYOrientation myo);
 
         /// set current mouse button state.
         void setButtonMask(int mask) { _buttonMask = mask; }
@@ -530,8 +630,14 @@ public:
             _scrolling.deltaY = y;
         }
 
+        /// set the scrolling x-delta.
+        void setScrollingDeltaX(float v) { _scrolling.deltaX = v; }
+
         /// get the scrolling x-delta.
         float getScrollingDeltaX() const { return _scrolling.deltaX; }
+
+        /// set the scrolling y-delta.
+        void setScrollingDeltaY(float v) { _scrolling.deltaY = v; }
 
         /// get the scrolling y-delta.
         float getScrollingDeltaY() const { return _scrolling.deltaY; }
@@ -571,18 +677,43 @@ public:
         const osg::Matrix getPenOrientation() const;
 
         void addTouchPoint(unsigned int id, TouchPhase phase, float x, float y, unsigned int tapCount = 0);
-        
+
+        void setTouchData(TouchData* td) { _touchData = td; }
         TouchData* getTouchData() const { return _touchData.get(); }
         bool isMultiTouchEvent() const { return (_touchData.valid()); }
-        
+
+        inline float getTouchPointNormalizedX(unsigned int ndx) const {
+            return (getTouchData()->get(ndx).x-_Xmin)/(_Xmax-_Xmin)*2.0f-1.0f;
+        }
+
+        inline float getTouchPointNormalizedY(unsigned int ndx) const {
+            if (_mouseYOrientation==Y_INCREASING_UPWARDS)
+                return (getTouchData()->get(ndx).y-_Ymin)/(_Ymax-_Ymin)*2.0f-1.0f;
+            else
+                return -((getTouchData()->get(ndx).y-_Ymin)/(_Ymax-_Ymin)*2.0f-1.0f);
+        }
+
+        typedef std::vector< osg::ref_ptr<PointerData> > PointerDataList;
+        void setPointerDataList(const PointerDataList& pdl) { _pointerDataList = pdl; }
+        PointerDataList& getPointerDataList() { return _pointerDataList; }
+        const PointerDataList& getPointerDataList() const { return _pointerDataList; }
+
+        unsigned int getNumPointerData() const { return static_cast<unsigned int>(_pointerDataList.size()); }
+        PointerData* getPointerData(unsigned int i) { return _pointerDataList[i].get(); }
+        const PointerData* getPointerData(unsigned int i) const { return _pointerDataList[i].get(); }
+
+        PointerData* getPointerData(osg::Object* obj) { for(unsigned int i=0;i<_pointerDataList.size(); ++i) { if (_pointerDataList[i]->object==obj) return _pointerDataList[i].get(); } return 0; }
+        const PointerData* getPointerData(osg::Object* obj) const { for(unsigned int i=0;i<_pointerDataList.size(); ++i) { if (_pointerDataList[i]->object==obj) return _pointerDataList[i].get(); } return 0; }
+        void addPointerData(PointerData* pd) { _pointerDataList.push_back(pd); }
+
+        void copyPointerDataFrom(const osgGA::GUIEventAdapter& sourceEvent);
+
     protected:
 
         /** Force users to create on heap, so that multiple referencing is safe.*/
         virtual ~GUIEventAdapter();
 
-        mutable bool _handled;        
         EventType _eventType;
-        double _time;
 
         osg::observer_ptr<osg::GraphicsContext> _context;
         int _windowX;
@@ -621,8 +752,11 @@ public:
             TabletPen(const TabletPen& rhs) : pressure(rhs.pressure), tiltX(rhs.tiltX), tiltY(rhs.tiltY), rotation(rhs.rotation), tabletPointerType(rhs.tabletPointerType) {}
         };
         TabletPen _tabletPen;
-                
-        osg::ref_ptr<TouchData> _touchData; 
+
+        osg::ref_ptr<TouchData> _touchData;
+
+
+        PointerDataList _pointerDataList;
 };
 
 }

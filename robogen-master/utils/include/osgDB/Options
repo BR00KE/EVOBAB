@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -15,6 +15,7 @@
 #define OSGDB_OPTIONS 1
 
 #include <osgDB/Callbacks>
+#include <osgDB/ObjectCache>
 #include <osg/ObserverNodePath>
 
 #include <deque>
@@ -138,6 +139,13 @@ class OSGDB_EXPORT Options : public osg::Object
         /** Get whether the Registry::ObjectCache should be used by default.*/
         CacheHintOptions getObjectCacheHint() const { return _objectCacheHint; }
 
+        /** Set the ObjectCache that is used to cache previously loaded data.*/
+        void setObjectCache(ObjectCache* objectCache) { _objectCache = objectCache; }
+
+        /** Get the ObjectCache that is used to cache previously loaded data.*/
+        ObjectCache* getObjectCache() const { return _objectCache.get(); }
+
+
         /** Set which geometry attributes plugins should import at double precision. */
         void setPrecisionHint(PrecisionHint hint) { _precisionHint = hint; }
 
@@ -173,9 +181,9 @@ class OSGDB_EXPORT Options : public osg::Object
 
         /** Remove a value from the PluginData */
         void removePluginData(const std::string& s) const { _pluginData.erase(s); }
-        
+
         /** Get number of PluginData values */
-        unsigned int getNumPluginData() const { return _pluginData.size(); }
+        unsigned int getNumPluginData() const { return static_cast<unsigned int>(_pluginData.size()); }
 
 
         /** Sets a plugindata value PluginData with a string */
@@ -195,7 +203,7 @@ class OSGDB_EXPORT Options : public osg::Object
         void removePluginStringData(const std::string& s) const { _pluginStringData.erase(s); }
 
         /** Get number of PluginStrData values */
-        unsigned int getNumPluginStringData() const { return _pluginStringData.size(); }
+        unsigned int getNumPluginStringData() const { return static_cast<unsigned int>(_pluginStringData.size()); }
 
         /** Parse string into plugin string data. This will be automatically done in Options(const std::string&) */
         void parsePluginStringData(const std::string& str, char separator1=' ', char separator2='=');
@@ -241,6 +249,11 @@ class OSGDB_EXPORT Options : public osg::Object
         /** Get the terrain observer_ptr, use to decorate any osgTerrain subgraphs.*/
         const osg::observer_ptr<osg::Node>& getTerrain() const { return _terrain; }
 
+        /** Set the parentGroup observer_ptr, where the loaded model is intended to be added */
+        void setParentGroup(osg::observer_ptr<osg::Group>& parentGroup) { _parentGroup= parentGroup; }
+
+        /** Get the parentGroup observer_ptr, where the loaded model is intended to be added */
+        const osg::observer_ptr<osg::Group>& getParentGroup() const { return _parentGroup; }
 
     protected:
 
@@ -248,7 +261,10 @@ class OSGDB_EXPORT Options : public osg::Object
 
         std::string                     _str;
         FilePathList                    _databasePaths;
+
         CacheHintOptions                _objectCacheHint;
+        osg::ref_ptr<ObjectCache>       _objectCache;
+
         PrecisionHint                   _precisionHint;
         BuildKdTreesHint                _buildKdTreesHint;
         osg::ref_ptr<AuthenticationMap> _authenticationMap;
@@ -266,6 +282,7 @@ class OSGDB_EXPORT Options : public osg::Object
         osg::ref_ptr<FileCache>             _fileCache;
 
         osg::observer_ptr<osg::Node>        _terrain;
+        osg::observer_ptr<osg::Group>       _parentGroup; // Set by the DatabasePager to the node where the requested file will be inserted. NOTE: observer since prent can be dettached whilst DB thread is loading the object
 };
 
 }

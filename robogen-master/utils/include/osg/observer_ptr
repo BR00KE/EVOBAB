@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -27,9 +27,9 @@ namespace osg {
   * To use the observer_ptr<> robustly in multi-threaded applications it is recommend to access the pointer via
   * the lock() method that passes back a ref_ptr<> that safely takes a reference to the object to prevent deletion
   * during usage of the object.  In certain conditions it may be safe to use the pointer directly without using lock(),
-  * which will confer a perfomance advantage, the conditions are:
+  * which will confer a performance advantage, the conditions are:
   *   1) The data structure is only accessed/deleted in single threaded/serial way.
-  *   2) The data strucutre is guarenteed by high level management of data strucutures and threads which avoid
+  *   2) The data strucutre is guaranteed by high level management of data strucutures and threads which avoid
   *      possible situations where the observer_ptr<>'s object may be deleted by one thread whilst being accessed
   *      by another.
   * If you are in any doubt about whether it is safe to access the object safe then use the

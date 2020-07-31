@@ -37,44 +37,41 @@ class Scale2DCommand;
 class ScaleUniformCommand;
 class Rotate3DCommand;
 
-/** Computes the nodepath from the given node all the way upto the root. */
+/** Computes the nodepath from the given node all the way up to the root. */
 extern OSGMANIPULATOR_EXPORT void computeNodePathToRoot(osg::Node& node, osg::NodePath& np);
 
-class DraggerCallback : virtual public osg::Object
-{
-    public:
-        DraggerCallback():
-            osg::Object(true) {}
-
-        DraggerCallback(const DraggerCallback&, const osg::CopyOp& copyop = osg::CopyOp::SHALLOW_COPY):
-            osg::Object(true) {}
-
-        META_Object(osgManipulator, DraggerCallback);
-
-        /**
-         * Receive motion commands. Returns true on success.
-         */
-        virtual bool receive(const MotionCommand&) { return false; }
-        virtual bool receive(const TranslateInLineCommand& command)  { return receive((MotionCommand&)command); }
-        virtual bool receive(const TranslateInPlaneCommand& command) { return receive((MotionCommand&)command); }
-        virtual bool receive(const Scale1DCommand& command)          { return receive((MotionCommand&)command); }
-        virtual bool receive(const Scale2DCommand& command)          { return receive((MotionCommand&)command); }
-        virtual bool receive(const ScaleUniformCommand& command)     { return receive((MotionCommand&)command); }
-        virtual bool receive(const Rotate3DCommand& command)         { return receive((MotionCommand&)command); }
-};
 
 class OSGMANIPULATOR_EXPORT DraggerTransformCallback : public DraggerCallback
 {
     public:
 
-        DraggerTransformCallback(osg::MatrixTransform* transform);
+        enum HandleCommandMask
+        {
+            HANDLE_TRANSLATE_IN_LINE    = 1<<0,
+            HANDLE_TRANSLATE_IN_PLANE   = 1<<1,
+            HANDLE_SCALED_1D            = 1<<2,
+            HANDLE_SCALED_2D            = 1<<3,
+            HANDLE_SCALED_UNIFORM       = 1<<4,
+            HANDLE_ROTATE_3D            = 1<<5,
+            HANDLE_ALL                  = 0x8ffffff
+        };
+
+        DraggerTransformCallback(osg::MatrixTransform* transform, int handleCommandMask = HANDLE_ALL);
 
         virtual bool receive(const MotionCommand&);
+        virtual bool receive(const TranslateInLineCommand& command);
+        virtual bool receive(const TranslateInPlaneCommand& command);
+        virtual bool receive(const Scale1DCommand& command);
+        virtual bool receive(const Scale2DCommand& command);
+        virtual bool receive(const ScaleUniformCommand& command);
+        virtual bool receive(const Rotate3DCommand& command);
 
         osg::MatrixTransform* getTransform() { return _transform.get(); }
         const osg::MatrixTransform* getTransform() const { return _transform.get(); }
 
     protected:
+
+        unsigned int _handleCommandMask;
 
         osg::observer_ptr<osg::MatrixTransform> _transform;
         osg::Matrix _startMotionMatrix;
@@ -223,6 +220,9 @@ class OSGMANIPULATOR_EXPORT Dragger : public osg::MatrixTransform
         void setActivationModKeyMask(unsigned int mask) { _activationModKeyMask = mask; }
         unsigned int getActivationModKeyMask() const { return _activationModKeyMask; }
 
+        void setActivationMouseButtonMask(unsigned int mask) { _activationMouseButtonMask = mask; }
+        unsigned int getActivationMouseButtonMask() const { return _activationMouseButtonMask; }
+
         void setActivationKeyEvent(int key) { _activationKeyEvent = key; }
         int getActivationKeyEvent() const { return _activationKeyEvent; }
 
@@ -250,17 +250,24 @@ class OSGMANIPULATOR_EXPORT Dragger : public osg::MatrixTransform
         DraggerCallbacks& getDraggerCallbacks() { return _draggerCallbacks; }
         const DraggerCallbacks& getDraggerCallbacks() const { return _draggerCallbacks; }
 
-        void addTransformUpdating(MatrixTransform* transform);
+        void addTransformUpdating(MatrixTransform* transform, int handleCommandMask = DraggerTransformCallback::HANDLE_ALL);
         void removeTransformUpdating(MatrixTransform* transform);
 
         /** Setup default geometry for dragger. */
         virtual void setupDefaultGeometry() {}
 
         virtual bool receive(const MotionCommand& command);
-        void dispatch(MotionCommand& command);
+        virtual void dispatch(MotionCommand& command);
 
         void setDraggerActive(bool active) { _draggerActive = active; }
         bool getDraggerActive() const { return _draggerActive; }
+
+        /**
+         * Set/Get the traversal mask used by this dragger when looking for intersections during event handling.
+         * This is useful to "hide" some geometry during event handling.
+         */
+        virtual void setIntersectionMask(osg::Node::NodeMask intersectionMask) { _intersectionMask = intersectionMask; }
+        osg::Node::NodeMask getIntersectionMask() const { return _intersectionMask; }
 
     protected:
 
@@ -274,8 +281,10 @@ class OSGMANIPULATOR_EXPORT Dragger : public osg::MatrixTransform
         bool                            _draggerActive;
 
         unsigned int                    _activationModKeyMask;
+        unsigned int                    _activationMouseButtonMask;
         int                             _activationKeyEvent;
         bool                            _activationPermittedByModKeyMask;
+        bool                            _activationPermittedByMouseButtonMask;
         bool                            _activationPermittedByKeyEvent;
 
         osgManipulator::PointerInfo     _pointer;
@@ -285,6 +294,7 @@ class OSGMANIPULATOR_EXPORT Dragger : public osg::MatrixTransform
         osg::ref_ptr<DraggerCallback>   _selfUpdater;
         Constraints                     _constraints;
         DraggerCallbacks                _draggerCallbacks;
+        osg::Node::NodeMask             _intersectionMask;
 
 };
 
@@ -316,6 +326,8 @@ class OSGMANIPULATOR_EXPORT CompositeDragger : public Dragger
         const Dragger* getDragger(unsigned int i) const { return _draggerList[i].get(); }
         bool containsDragger(const Dragger* dragger) const;
         DraggerList::iterator findDragger(const Dragger* dragger);
+
+        virtual void setIntersectionMask(osg::Node::NodeMask intersectionMask);
 
     protected:
 

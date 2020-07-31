@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2008 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2008 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -27,7 +27,7 @@ namespace osgWidget {
 class Window;
 class WindowManager;
 
-// A Widget is a rectangular region that recieves events about the state of various input
+// A Widget is a rectangular region that receives events about the state of various input
 // devices such as the pointer and keyboard. It is aware of it's width, height, and origin but
 // nothing else. It is the job of higher-level container objects to organize layouts and
 // the like, and to contextualize the meaning of the widgets "origin" (whether it is absolute
@@ -69,7 +69,7 @@ public:
         enum CoordinateMode {
             CM_ABSOLUTE,
             CM_RELATIVE
-        };        
+        };
 
 
         Widget (const std::string& = "", point_type = 0.0f, point_type = 0.0f);
@@ -454,7 +454,7 @@ public:
 
         friend class Window;
 
-        // TODO: Because of the current class design, I don't think it's possible to 
+        // TODO: Because of the current class design, I don't think it's possible to
         // have a ref_ptr here. :(
         Window* _parent;
 
@@ -468,7 +468,7 @@ public:
         point_type _padTop;
         point_type _padBottom;
 
-        // The alignments are used in conjuction when the widget is NOT set to fill.
+        // The alignments are used in conjunction when the widget is NOT set to fill.
         VerticalAlignment _valign;
         HorizontalAlignment _halign;
 
@@ -533,7 +533,7 @@ struct NotifyWidget: public Widget {
             return false;
         }
 
-        bool mouseEnter(double, double, const WindowManager*) { 
+        bool mouseEnter(double, double, const WindowManager*) {
             osg::notify(osg::NOTICE) << _name << " > mouseEnter called" << std::endl;
 
             return false;
@@ -609,7 +609,7 @@ struct NullWidget: public Widget {
             return true;
         }
 
-        bool mouseEnter(double, double, const WindowManager*) { 
+        bool mouseEnter(double, double, const WindowManager*) {
             return true;
         }
 

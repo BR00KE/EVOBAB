@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -29,7 +29,25 @@
 
 namespace osgDB {
 
-struct basic_type_wrapper;
+/** basic structure for custom runtime inheritance checking */
+struct basic_type_wrapper {
+    virtual ~basic_type_wrapper() {}
+    virtual bool matches(const osg::Object *proto) const = 0;
+};
+
+/** a class template that checks inheritance between a given
+    Object's class and a class defined at compile time through
+        the template parameter T.
+        This is used in conjunction with readObjectOfType() to
+        specify an abstract class as reference type.
+**/
+template<class T>
+struct type_wrapper: basic_type_wrapper {
+    bool matches(const osg::Object *proto) const
+    {
+        return dynamic_cast<const T*>(proto) != 0;
+    }
+};
 
 /** deprecated. */
 class OSGDB_EXPORT Field
@@ -248,12 +266,19 @@ class OSGDB_EXPORT Input : public FieldReaderIterator
 
         Input();
         virtual ~Input();
-        
+
         void setOptions(const Options* options) { _options = options; }
         const Options* getOptions() const { return _options.get(); }
 
         virtual osg::Object*         readObjectOfType(const osg::Object& compObj);
         virtual osg::Object*         readObjectOfType(const basic_type_wrapper &btw);
+
+
+        template<typename T>
+        inline T* readObjectOfType()
+        {
+            return dynamic_cast<T*>(readObjectOfType(osgDB::type_wrapper<T>()));
+        }
 
         virtual osg::Object*         readObject();
         virtual osg::Image*          readImage();
@@ -267,7 +292,7 @@ class OSGDB_EXPORT Input : public FieldReaderIterator
         virtual osg::Image*          readImage(const std::string& fileName);
         virtual osg::Node*           readNode(const std::string& fileName);
         virtual osg::Shader*         readShader(const std::string& fileName);
-        
+
         virtual osg::Object*         getObjectForUniqueID(const std::string& uniqueID);
         virtual void                 registerUniqueIDForObject(const std::string& uniqueID,osg::Object* obj);
 
@@ -293,10 +318,10 @@ class OSGDB_EXPORT Input : public FieldReaderIterator
         bool read(const char* str, Parameter value1, Parameter value2, Parameter value3, Parameter value4, Parameter value5, Parameter value6, Parameter value7, Parameter value8);
 
     private:
-    
+
         typedef std::map< std::string, osg::ref_ptr<osg::Object> > UniqueIDToObjectMapping;
         UniqueIDToObjectMapping _uniqueIDToObjectMap;
-        
+
         osg::ref_ptr<const Options> _options;
 
 };

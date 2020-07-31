@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -70,10 +70,10 @@ extern OSG_EXPORT GLint gluBuild2DMipmaps (GLenum target, GLint internalFormat, 
 
 typedef void (GL_APIENTRY * GLTexImage3DProc)      ( GLenum target, GLint level, GLenum internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
 
-/** Small variation on normal gluBuild3DMipmapLevels as we pass in the function pointer to glTexImage3D rather than rely on GLU style querry for this functon pointer.*/
+/** Small variation on normal gluBuild3DMipmapLevels as we pass in the function pointer to glTexImage3D rather than rely on GLU style query for this function pointer.*/
 extern OSG_EXPORT GLint gluBuild3DMipmapLevels (GLTexImage3DProc glTextImage3DProc, GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLint level, GLint base, GLint max, const void *data);
 
-/** Small variation on normal gluBuild3DMipmapLevels as we pass in the function pointer to glTexImage3D rather than rely on GLU style querry for this functon pointer.*/
+/** Small variation on normal gluBuild3DMipmapLevels as we pass in the function pointer to glTexImage3D rather than rely on GLU style query for this function pointer.*/
 extern OSG_EXPORT GLint gluBuild3DMipmaps (GLTexImage3DProc glTextImage3DProc, GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const void *data);
 
 /* ErrorCode */

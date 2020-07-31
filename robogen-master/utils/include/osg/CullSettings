@@ -1,13 +1,13 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
- * This library is open source and may be redistributed and/or modified under  
- * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or 
+ * This library is open source and may be redistributed and/or modified under
+ * the terms of the OpenSceneGraph Public License (OSGPL) version 0.0 or
  * (at your option) any later version.  The full license is in LICENSE file
  * included with this distribution, and on the openscenegraph.org website.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
 
@@ -44,7 +44,7 @@ class OSG_EXPORT CullSettings
         CullSettings(const CullSettings& cs);
 
         virtual ~CullSettings() {}
-        
+
         CullSettings& operator = (const CullSettings& settings)
         {
             if (this==&settings) return *this;
@@ -55,7 +55,7 @@ class OSG_EXPORT CullSettings
 
         virtual void setDefaults();
 
-        
+
         enum VariablesMask
         {
             COMPUTE_NEAR_FAR_MODE                   = (0x1 << 0),
@@ -89,7 +89,7 @@ class OSG_EXPORT CullSettings
 
         /** Get the inheritance mask used in inheritCullSettings to control which variables get overwritten by the passed in CullSettings object.*/
         InheritanceMask getInheritanceMask() const { return _inheritanceMask; }
-        
+
         /** Set the local cull settings values from specified CullSettings object.*/
         void setCullSettings(const CullSettings& settings);
 
@@ -111,7 +111,7 @@ class OSG_EXPORT CullSettings
             DISABLE_ASSOCIATED_INHERITANCE_MASK_BIT,
             DO_NOT_MODIFY_INHERITANCE_MASK
         };
-        
+
         void setInheritanceMaskActionOnAttributeSetting(InheritanceMaskActionOnAttributeSetting action) { _inheritanceMaskActionOnAttributeSetting = action; }
         InheritanceMaskActionOnAttributeSetting getInheritanceMaskActionOnAttributeSetting() const { return _inheritanceMaskActionOnAttributeSetting; }
 
@@ -161,11 +161,12 @@ class OSG_EXPORT CullSettings
         {
             DO_NOT_COMPUTE_NEAR_FAR = 0,
             COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES,
-            COMPUTE_NEAR_FAR_USING_PRIMITIVES
+            COMPUTE_NEAR_FAR_USING_PRIMITIVES,
+            COMPUTE_NEAR_USING_PRIMITIVES
         };
 
-        void setComputeNearFarMode(ComputeNearFarMode cnfm) { _computeNearFar=cnfm; applyMaskAction(COMPUTE_NEAR_FAR_MODE); } 
-        ComputeNearFarMode getComputeNearFarMode() const { return _computeNearFar;} 
+        void setComputeNearFarMode(ComputeNearFarMode cnfm) { _computeNearFar=cnfm; applyMaskAction(COMPUTE_NEAR_FAR_MODE); }
+        ComputeNearFarMode getComputeNearFarMode() const { return _computeNearFar;}
 
         void setNearFarRatio(double ratio) { _nearFarRatio = ratio; applyMaskAction(NEAR_FAR_RATIO); }
         double getNearFarRatio() const { return _nearFarRatio; }
@@ -191,12 +192,12 @@ class OSG_EXPORT CullSettings
                                           SHADOW_OCCLUSION_CULLING|
                                           CLUSTER_CULLING
         };
-        
+
         typedef int CullingMode;
 
         /** Set the culling mode for the CullVisitor to use.*/
         void setCullingMode(CullingMode mode) { _cullingMode = mode; applyMaskAction(CULLING_MODE); }
-        
+
         /** Returns the current CullingMode.*/
         CullingMode getCullingMode() const { return _cullingMode; }
 
@@ -212,11 +213,12 @@ class OSG_EXPORT CullSettings
 
         /** Set the LOD bias for the CullVisitor to use.*/
         void setLODScale(float scale) { _LODScale = scale; applyMaskAction(LOD_SCALE); }
-        
+
         /** Get the LOD bias.*/
         float getLODScale() const { return _LODScale; }
 
-        /** Set the Small Feature Culling Pixel Size.*/
+        /** Threshold at which small features are culled.
+        \param value Bounding volume size in screen space. Default is 2.0. */
         void setSmallFeatureCullingPixelSize(float value) { _smallFeatureCullingPixelSize=value; applyMaskAction(SMALL_FEATURE_CULLING_PIXEL_SIZE); }
 
         /** Get the Small Feature Culling Pixel Size.*/
@@ -232,7 +234,7 @@ class OSG_EXPORT CullSettings
             virtual bool clampProjectionMatrixImplementation(osg::Matrixf& projection, double& znear, double& zfar) const = 0;
             virtual bool clampProjectionMatrixImplementation(osg::Matrixd& projection, double& znear, double& zfar) const = 0;
         };
-        
+
         /** set the ClampProjectionMatrixCallback.*/
         void setClampProjectionMatrixCallback(ClampProjectionMatrixCallback* cpmc) { _clampProjectionMatrixCallback = cpmc; applyMaskAction(CLAMP_PROJECTION_MATRIX_CALLBACK); }
         /** get the non const ClampProjectionMatrixCallback.*/
@@ -259,12 +261,12 @@ class OSG_EXPORT CullSettings
         bool                                        _impostorActive;
         bool                                        _depthSortImpostorSprites;
         float                                       _impostorPixelErrorThreshold;
-        int                                         _numFramesToKeepImpostorSprites;    
+        int                                         _numFramesToKeepImpostorSprites;
 
         Node::NodeMask                              _cullMask;
         Node::NodeMask                              _cullMaskLeft;
         Node::NodeMask                              _cullMaskRight;
- 
+
 
 };
 

@@ -34,9 +34,13 @@ class IsoSurfaceProperty;
 class MaximumIntensityProjectionProperty;
 class LightingProperty;
 class AlphaFuncProperty;
+class SampleRatioProperty;
+class SampleRatioWhenMovingProperty;
 class SampleDensityProperty;
 class SampleDensityWhenMovingProperty;
 class TransparencyProperty;
+class ExteriorTransparencyFactorProperty;
+class VolumeSettings;
 
 class OSGVOLUME_EXPORT PropertyVisitor
 {
@@ -46,21 +50,24 @@ class OSGVOLUME_EXPORT PropertyVisitor
 
         virtual ~PropertyVisitor() {}
 
-        virtual void apply(Property&) {}
+        virtual void apply(Property&);
         virtual void apply(CompositeProperty&);
         virtual void apply(SwitchProperty&);
-        virtual void apply(TransferFunctionProperty&) {}
-        virtual void apply(ScalarProperty&) {}
-        virtual void apply(IsoSurfaceProperty&) {}
-        virtual void apply(AlphaFuncProperty&) {}
-        virtual void apply(MaximumIntensityProjectionProperty&) {}
-        virtual void apply(LightingProperty&) {}
-        virtual void apply(SampleDensityProperty&) {}
-        virtual void apply(SampleDensityWhenMovingProperty&) {}
-        virtual void apply(TransparencyProperty&) {}
+        virtual void apply(TransferFunctionProperty&);
+        virtual void apply(ScalarProperty&);
+        virtual void apply(IsoSurfaceProperty&);
+        virtual void apply(AlphaFuncProperty&);
+        virtual void apply(MaximumIntensityProjectionProperty&);
+        virtual void apply(LightingProperty&);
+        virtual void apply(SampleRatioProperty&);
+        virtual void apply(SampleRatioWhenMovingProperty&);
+        virtual void apply(SampleDensityProperty&);
+        virtual void apply(SampleDensityWhenMovingProperty&);
+        virtual void apply(TransparencyProperty&);
+        virtual void apply(ExteriorTransparencyFactorProperty&);
+        virtual void apply(VolumeSettings&);
 
         bool _traverseOnlyActiveChildren;
-
 };
 
 
@@ -75,11 +82,19 @@ class OSGVOLUME_EXPORT Property : public osg::Object
 
         META_Object(osgVolume, Property);
 
+        void dirty() { ++_modifiedCount; }
+
+        void setModifiedCount(unsigned int c) { _modifiedCount = c; }
+        unsigned int getModifiedCount() const { return _modifiedCount; }
+
         virtual void accept(PropertyVisitor& pv) { pv.apply(*this); }
+        virtual void traverse(PropertyVisitor& pv) {}
 
     protected:
 
         virtual ~Property();
+
+        unsigned int _modifiedCount;
 };
 
 class OSGVOLUME_EXPORT CompositeProperty : public Property
@@ -95,6 +110,16 @@ class OSGVOLUME_EXPORT CompositeProperty : public Property
 
         virtual void accept(PropertyVisitor& pv) { pv.apply(*this); }
 
+        virtual void traverse(PropertyVisitor& pv)
+        {
+            for(Properties::iterator itr = _properties.begin();
+                itr != _properties.end();
+                ++itr)
+            {
+                (*itr)->accept(pv);
+            }
+        }
+
         void clear();
 
         typedef std::vector< osg::ref_ptr<Property> > Properties;
@@ -105,7 +130,7 @@ class OSGVOLUME_EXPORT CompositeProperty : public Property
 
         const Property* getProperty(unsigned int i) const { return i<_properties.size() ? _properties[i].get() : 0; }
 
-        void addProperty(Property* property) { _properties.push_back(property); }
+        void addProperty(Property* property) { _properties.push_back(property); dirty(); }
 
         void removeProperty(unsigned int i) { _properties.erase(_properties.begin()+i); }
 
@@ -133,9 +158,25 @@ class OSGVOLUME_EXPORT SwitchProperty : public CompositeProperty
 
         virtual void accept(PropertyVisitor& pv) { pv.apply(*this); }
 
+        virtual void traverse(PropertyVisitor& pv)
+        {
+            if (pv._traverseOnlyActiveChildren)
+            {
+                if (_activeProperty>=0 && static_cast<unsigned int>(_activeProperty)<=getNumProperties())
+                {
+                    _properties[_activeProperty]->accept(pv);
+                }
+            }
+            else
+            {
+                CompositeProperty::traverse(pv);
+            }
+        }
+
+
         /** Set which child property is active.
           * -1 disables all children.*/
-        void setActiveProperty(int i) { _activeProperty = i; }
+        void setActiveProperty(int i) { _activeProperty = i; dirty(); }
 
         /** Get the active property.*/
         int getActiveProperty() const { return _activeProperty; }
@@ -191,7 +232,7 @@ class OSGVOLUME_EXPORT ScalarProperty : public Property
         virtual void accept(PropertyVisitor& pv) { pv.apply(*this); }
 
         /** Set the value.*/
-        virtual void setValue(float v) { _uniform->set(v); }
+        virtual void setValue(float v) { _uniform->set(v); dirty(); }
 
         /** Get the value.*/
         float getValue() const { float v; _uniform->get(v); return v; }
@@ -216,7 +257,7 @@ class OSGVOLUME_EXPORT IsoSurfaceProperty : public ScalarProperty
 {
     public:
 
-        IsoSurfaceProperty(float value=1.0);
+        IsoSurfaceProperty(float value=1.0f);
 
         IsoSurfaceProperty(const IsoSurfaceProperty& isp,const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
@@ -233,7 +274,7 @@ class OSGVOLUME_EXPORT AlphaFuncProperty : public ScalarProperty
 {
     public:
 
-        AlphaFuncProperty(float value=1.0);
+        AlphaFuncProperty(float value=1.0f);
 
         AlphaFuncProperty(const AlphaFuncProperty& isp,const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
@@ -296,7 +337,7 @@ class OSGVOLUME_EXPORT SampleDensityProperty : public ScalarProperty
 {
     public:
 
-        SampleDensityProperty(float value=1.0);
+        SampleDensityProperty(float value=1.0f);
 
         SampleDensityProperty(const SampleDensityProperty& isp,const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
@@ -314,7 +355,7 @@ class OSGVOLUME_EXPORT SampleDensityWhenMovingProperty : public ScalarProperty
 {
     public:
 
-        SampleDensityWhenMovingProperty(float value=1.0);
+        SampleDensityWhenMovingProperty(float value=1.0f);
 
         SampleDensityWhenMovingProperty(const SampleDensityWhenMovingProperty& isp,const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
@@ -327,11 +368,48 @@ class OSGVOLUME_EXPORT SampleDensityWhenMovingProperty : public ScalarProperty
         virtual ~SampleDensityWhenMovingProperty() {}
 };
 
+/** Sample ratioto use when the volume is static relative to the eye point or when moving if no SampleRatioWhenMovingProperty is assigned.*/
+class OSGVOLUME_EXPORT SampleRatioProperty : public ScalarProperty
+{
+    public:
+
+        SampleRatioProperty(float value=1.0f);
+
+        SampleRatioProperty(const SampleRatioProperty& isp,const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
+
+        META_Object(osgVolume, SampleRatioProperty);
+
+        virtual void accept(PropertyVisitor& pv) { pv.apply(*this); }
+
+    protected:
+
+        virtual ~SampleRatioProperty() {}
+};
+
+/** Sample density to use when the volume is moving relative to the eye point.*/
+class OSGVOLUME_EXPORT SampleRatioWhenMovingProperty : public ScalarProperty
+{
+    public:
+
+        SampleRatioWhenMovingProperty(float value=1.0f);
+
+        SampleRatioWhenMovingProperty(const SampleRatioWhenMovingProperty& isp,const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
+
+        META_Object(osgVolume, SampleRatioWhenMovingProperty);
+
+        virtual void accept(PropertyVisitor& pv) { pv.apply(*this); }
+
+    protected:
+
+        virtual ~SampleRatioWhenMovingProperty() {}
+};
+
+
 class OSGVOLUME_EXPORT TransparencyProperty : public ScalarProperty
 {
     public:
 
-        TransparencyProperty(float value=1.0);
+        TransparencyProperty(float value=1.0f);
 
         TransparencyProperty(const TransparencyProperty& isp,const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
 
@@ -344,6 +422,23 @@ class OSGVOLUME_EXPORT TransparencyProperty : public ScalarProperty
         virtual ~TransparencyProperty() {}
 };
 
+class OSGVOLUME_EXPORT ExteriorTransparencyFactorProperty : public ScalarProperty
+{
+    public:
+
+        ExteriorTransparencyFactorProperty(float value=0.0f);
+
+        ExteriorTransparencyFactorProperty(const ExteriorTransparencyFactorProperty& isp,const osg::CopyOp& copyop=osg::CopyOp::SHALLOW_COPY);
+
+        META_Object(osgVolume, ExteriorTransparencyFactorProperty);
+
+        virtual void accept(PropertyVisitor& pv) { pv.apply(*this); }
+
+    protected:
+
+        virtual ~ExteriorTransparencyFactorProperty() {}
+};
+
 
 class OSGVOLUME_EXPORT CollectPropertiesVisitor : public osgVolume::PropertyVisitor
 {
@@ -351,7 +446,6 @@ class OSGVOLUME_EXPORT CollectPropertiesVisitor : public osgVolume::PropertyVisi
 
         CollectPropertiesVisitor(bool traverseOnlyActiveChildren=true);
 
-        virtual void apply(Property&);
         virtual void apply(TransferFunctionProperty&);
         virtual void apply(ScalarProperty&);
         virtual void apply(IsoSurfaceProperty& iso);
@@ -360,7 +454,10 @@ class OSGVOLUME_EXPORT CollectPropertiesVisitor : public osgVolume::PropertyVisi
         virtual void apply(LightingProperty& lp);
         virtual void apply(SampleDensityProperty& sdp);
         virtual void apply(SampleDensityWhenMovingProperty& sdp);
+        virtual void apply(SampleRatioProperty& sdp);
+        virtual void apply(SampleRatioWhenMovingProperty& sdp);
         virtual void apply(TransparencyProperty& tp);
+        virtual void apply(ExteriorTransparencyFactorProperty& tp);
 
         osg::ref_ptr<TransferFunctionProperty>              _tfProperty;
         osg::ref_ptr<IsoSurfaceProperty>                    _isoProperty;
@@ -369,7 +466,10 @@ class OSGVOLUME_EXPORT CollectPropertiesVisitor : public osgVolume::PropertyVisi
         osg::ref_ptr<LightingProperty>                      _lightingProperty;
         osg::ref_ptr<SampleDensityProperty>                 _sampleDensityProperty;
         osg::ref_ptr<SampleDensityWhenMovingProperty>       _sampleDensityWhenMovingProperty;
+        osg::ref_ptr<SampleRatioProperty>                   _sampleRatioProperty;
+        osg::ref_ptr<SampleRatioWhenMovingProperty>         _sampleRatioWhenMovingProperty;
         osg::ref_ptr<TransparencyProperty>                  _transparencyProperty;
+        osg::ref_ptr<ExteriorTransparencyFactorProperty>    _exteriorTransparencyFactorProperty;
 
 };
 
@@ -381,7 +481,9 @@ class OSGVOLUME_EXPORT PropertyAdjustmentCallback : public osgGA::GUIEventHandle
 
         PropertyAdjustmentCallback(const PropertyAdjustmentCallback&,const osg::CopyOp&);
 
-        META_Object(osgVolume,PropertyAdjustmentCallback);
+        META_Object(osgVolume, PropertyAdjustmentCallback);
+
+        virtual bool run(osg::Object* object, osg::Object* data) { return osgGA::GUIEventHandler::run(object, data); }
 
         void setKeyEventCycleForward(int key) { _cyleForwardKey = key; }
         int getKeyEventCycleForward() const { return _cyleForwardKey; }
@@ -391,6 +493,9 @@ class OSGVOLUME_EXPORT PropertyAdjustmentCallback : public osgGA::GUIEventHandle
 
         void setKeyEventActivatesTransparencyAdjustment(int key) { _transparencyKey = key; }
         int getKeyEventActivatesTransparencyAdjustment() const { return _transparencyKey; }
+
+        void setKeyEventActivatesExteriorTransparencyFactorAdjustment(int key) { _exteriorTransparencyFactorKey = key; }
+        int getKeyEventActivatesExteriorTransparencyFactorAdjustment() const { return _exteriorTransparencyFactorKey; }
 
         void setKeyEventActivatesSampleDensityAdjustment(int key) { _sampleDensityKey = key; }
         int getKeyEventActivatesSampleDensityAdjustment() const { return _sampleDensityKey; }
@@ -403,10 +508,12 @@ class OSGVOLUME_EXPORT PropertyAdjustmentCallback : public osgGA::GUIEventHandle
         int     _cyleForwardKey;
         int     _cyleBackwardKey;
         int     _transparencyKey;
+        int     _exteriorTransparencyFactorKey;
         int     _alphaFuncKey;
         int     _sampleDensityKey;
 
         bool    _updateTransparency;
+        bool    _updateExteriorTransparencyFactor;
         bool    _updateAlphaCutOff;
         bool    _updateSampleDensity;
 };

@@ -1,12 +1,12 @@
-/* -*-c++-*- Present3D - Copyright (C) 1999-2006 Robert Osfield 
+/* -*-c++-*- Present3D - Copyright (C) 1999-2006 Robert Osfield
  *
- * This software is open source and may be redistributed and/or modified under  
+ * This software is open source and may be redistributed and/or modified under
  * the terms of the GNU General Public License (GPL) version 2.0.
  * The full license is in LICENSE.txt file included with this distribution,.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * include LICENSE.txt for more details.
 */
 
@@ -15,41 +15,31 @@
 
 #include <osg/Vec3>
 #include <osg/Vec4>
+#include <osg/ImageUtils>
 #include <osg/Group>
 #include <osg/ClearNode>
 #include <osg/Switch>
 #include <osg/AnimationPath>
 #include <osg/TransferFunction>
 #include <osg/ImageStream>
+#include <osg/ImageSequence>
+#include <osg/ScriptEngine>
 #include <osgText/Text>
 #include <osgGA/GUIEventAdapter>
 
 #include <osgDB/FileUtils>
 
+#include <osgVolume/VolumeTile>
+#include <osgVolume/VolumeSettings>
+
 #include <osgPresentation/AnimationMaterial>
 #include <osgPresentation/SlideEventHandler>
+#include <osgPresentation/PropertyManager>
+#include <osgPresentation/Timeout>
 
 namespace osgPresentation
 {
 
-class OSGPRESENTATION_EXPORT HUDSettings : public osg::Referenced
-{
-    public:
-        HUDSettings(double slideDistance, float eyeOffset, unsigned int leftMask, unsigned int rightMask);
-
-        virtual bool getModelViewMatrix(osg::Matrix& matrix, osg::NodeVisitor* nv) const;
-
-        virtual bool getInverseModelViewMatrix(osg::Matrix& matrix, osg::NodeVisitor* nv) const;
-
-        double          _slideDistance;
-        double          _eyeOffset;
-        unsigned int    _leftMask;
-        unsigned int    _rightMask;
-
-protected:
-
-        virtual ~HUDSettings();
-};
 
 
 class OSGPRESENTATION_EXPORT HUDTransform : public osg::Transform
@@ -74,17 +64,18 @@ class OSGPRESENTATION_EXPORT SlideShowConstructor
 {
 public:
 
-    
+
     enum CoordinateFrame { SLIDE, MODEL };
 
-    
+
+
     LayerAttributes* getOrCreateLayerAttributes(osg::Node* node);
-    
+
     void setDuration(osg::Node* node,double duration)
     {
         getOrCreateLayerAttributes(node)->setDuration(duration);
     }
-    
+
     void addKey(osg::Node* node,const KeyPosition& kp)
     {
         getOrCreateLayerAttributes(node)->addKey(kp);
@@ -95,20 +86,20 @@ public:
         getOrCreateLayerAttributes(node)->addRunString(runString);
     }
 
-    void setJump(osg::Node* node, bool relativeJump, int slideNum, int layerNum)
+    void setJump(osg::Node* node, const JumpData& jumpData)
     {
-        getOrCreateLayerAttributes(node)->setJump(relativeJump, slideNum, layerNum);
+        getOrCreateLayerAttributes(node)->setJump(jumpData);
     }
 
     void addPresentationKey(const KeyPosition& kp)
     {
-        if (!_presentationSwitch) createPresentation();            
+        if (!_presentationSwitch) createPresentation();
         if (_presentationSwitch.valid()) addKey( _presentationSwitch.get(), kp);
     }
 
     void addPresentationRunString(const std::string& runString)
     {
-        if (!_presentationSwitch) createPresentation();            
+        if (!_presentationSwitch) createPresentation();
         if (_presentationSwitch.valid()) addRunString( _presentationSwitch.get(),runString);
     }
 
@@ -117,17 +108,17 @@ public:
         if (!_slide) addSlide();
         if (_slide.valid()) addKey(_slide.get(),kp);
     }
-    
+
     void addSlideRunString(const std::string& runString)
     {
         if (!_slide) addSlide();
         if (_slide.valid()) addRunString(_slide.get(),runString);
     }
-    
-    void setSlideJump(bool relativeJump, int switchNum, int layerNum)
+
+    void setSlideJump(const JumpData& jumpData)
     {
         if (!_slide) addSlide();
-        if (_slide.valid()) setJump(_slide.get(),relativeJump, switchNum, layerNum);
+        if (_slide.valid()) setJump(_slide.get(),jumpData);
     }
 
     void addLayerKey(const KeyPosition& kp)
@@ -141,12 +132,12 @@ public:
         if (!_currentLayer) addLayer();
         if (_currentLayer.valid()) addRunString(_currentLayer.get(),runString);
     }
-    
 
-    void setLayerJump(bool relativeJump, int switchNum, int layerNum)
+
+    void setLayerJump(const JumpData& jumpData)
     {
         if (!_currentLayer) addLayer();
-        if (_currentLayer.valid()) setJump(_currentLayer.get(),relativeJump, switchNum, layerNum);
+        if (_currentLayer.valid()) setJump(_currentLayer.get(),jumpData);
     }
 
 
@@ -222,10 +213,11 @@ public:
 
     struct ModelData
     {
-        ModelData():
-            effect("") {}
-            
+        ModelData() {}
+
+        std::string region;
         std::string effect;
+        std::string options;
     };
 
     struct ImageData
@@ -238,8 +230,20 @@ public:
             texcoord_rotate(0.0f),
             loopingMode(osg::ImageStream::NO_LOOPING),
             page(-1),
-            backgroundColor(1.0f,1.0f,1.0f,1.0f) {}
-            
+            backgroundColor(1.0f,1.0f,1.0f,1.0f),
+            fps(30.0),
+            duration(-1.0),
+            imageSequence(false),
+            imageSequencePagingMode(osg::ImageSequence::PAGE_AND_DISCARD_USED_IMAGES),
+            imageSequenceInteractionMode(PLAY_AUTOMATICALLY_LIKE_MOVIE),
+            blendingHint(USE_IMAGE_ALPHA),
+            delayTime(0.0),
+            startTime(0.0),
+            stopTime(-1.0),
+            volume("")
+        {}
+
+        std::string                     options;
         float                           width;
         float                           height;
         osg::Vec4                       region;
@@ -248,42 +252,82 @@ public:
         osg::ImageStream::LoopingMode   loopingMode;
         int                             page;
         osg::Vec4                       backgroundColor;
+        double                          fps;
+        double                          duration;
+
+        bool                            imageSequence;
+        osg::ImageSequence::Mode        imageSequencePagingMode;
+
+        enum ImageSequenceInteractionMode
+        {
+            PLAY_AUTOMATICALLY_LIKE_MOVIE,
+            USE_MOUSE_X_POSITION,
+            USE_MOUSE_Y_POSITION
+        };
+        ImageSequenceInteractionMode imageSequenceInteractionMode;
+
+        enum BlendingHint
+        {
+            USE_IMAGE_ALPHA,
+            OFF,
+            ON
+        };
+
+        BlendingHint    blendingHint;
+
+        double          delayTime;
+        double          startTime;
+        double          stopTime;
+        std::string     volume;
+
     };
 
     struct VolumeData
     {
-        enum ShadingModel
-        {
-            Standard,
-            Light,
-            Isosurface,
-            MaximumIntensityProjection
-        };
+        typedef osgVolume::VolumeSettings::ShadingModel ShadingModel;
+        typedef osgVolume::VolumeSettings::Technique Technique;
 
         VolumeData():
-            shadingModel(Standard),
+            shadingModel(osgVolume::VolumeSettings::Standard),
             useTabbedDragger(false),
             useTrackballDragger(false),
             region_in_pixel_coords(false),
-            alphaValue(1.0),
-            cutoffValue(0.1),
-            sampleDensityValue(0.005),
-            sampleDensityWhenMovingValue(0.0)
+            alphaValue(),
+            cutoffValue(),
+            exteriorTransparencyFactorValue(),
+            sampleDensityValue(),
+            sampleRatioValue(),
+            colorSpaceOperation(osg::NO_COLOR_SPACE_OPERATION),
+            colorModulate(1.0f,1.0f,1.0f,1.0f),
+            technique(osgVolume::VolumeSettings::RayTraced)
         {
-            region[0] = region[1] = region[2] = 0.0f;
-            region[3] = region[4] = region[5] = 1.0f;
+            hullPositionData.position = osg::Vec3(0.0,0.0,0.0);
+            hullPositionData.frame = osgPresentation::SlideShowConstructor::MODEL;
         }
 
+        osg::ref_ptr<osgVolume::VolumeSettings> volumeSettings;
+
+        std::string                             options;
         ShadingModel                            shadingModel;
         osg::ref_ptr<osg::TransferFunction1D>   transferFunction;
         bool                                    useTabbedDragger;
         bool                                    useTrackballDragger;
-        float                                   region[6];
+        std::string                             region;
         bool                                    region_in_pixel_coords;
-        float                                   alphaValue;
-        float                                   cutoffValue;
-        float                                   sampleDensityValue;
-        float                                   sampleDensityWhenMovingValue;
+        std::string                             alphaValue;
+        std::string                             cutoffValue;
+        std::string                             exteriorTransparencyFactorValue;
+        std::string                             sampleDensityValue;
+        std::string                             sampleDensityWhenMovingValue;
+
+        std::string                             sampleRatioValue;
+        std::string                             sampleRatioWhenMovingValue;
+
+        osg::ColorSpaceOperation                colorSpaceOperation;
+        osg::Vec4                               colorModulate;
+        Technique                               technique;
+        std::string                             hull;
+        PositionData                            hullPositionData;
     };
 
 
@@ -311,28 +355,50 @@ public:
         osg::Vec4                           color;
     };
 
+    enum ScriptCallbackType
+    {
+        UPDATE_SCRIPT,
+        EVENT_SCRIPT
+    };
+
+    typedef std::pair<ScriptCallbackType, std::string> ScriptPair;
+
+    struct ScriptData
+    {
+        ScriptData() {}
+
+        typedef std::vector<ScriptPair> Scripts;
+        Scripts scripts;
+
+        bool hasScripts() const { return !scripts.empty(); }
+    };
 
     SlideShowConstructor(osgDB::Options* options);
 
     void createPresentation();
-    
+
     void setBackgroundColor(const osg::Vec4& color, bool updateClearNode);
     const osg::Vec4& getBackgroundColor() const { return _backgroundColor; }
-    
+
     void setTextColor(const osg::Vec4& color);
     const osg::Vec4& getTextColor() const { return _textFontDataDefault.color; }
-    
+
     void setPresentationName(const std::string& name);
-    
+
     void setPresentationAspectRatio(float aspectRatio);
 
     void setPresentationAspectRatio(const std::string& str);
-    
+
     void setPresentationDuration(double duration);
 
+    void addScriptEngine(const std::string& scriptEngineName);
+
+    void addScriptFile(const std::string& name, const std::string& filename);
+
+    void addScript(const std::string& name, const std::string& language, const std::string& script);
 
     void addSlide();
-    
+
     void selectSlide(int slideNum);
 
 
@@ -345,17 +411,18 @@ public:
 
     void setSlideBackgrondHUD(bool hud) { _slideBackgroundAsHUD = hud; }
     void setSlideBackground(const std::string& name) { _slideBackgroundImageFileName = name; }
-    
+
     void setSlideDuration(double duration);
 
+    Timeout* addTimeout();
 
     void addLayer(bool inheritPreviousLayers=true, bool defineAsBaseLayer=false);
-    
+
     void selectLayer(int layerNum);
-    
+
     void setLayerDuration(double duration);
 
-    
+
     // title settings
     FontData& getTitleFontData() { return _titleFontData; }
     FontData& getTitleFontDataDefault() { return _titleFontDataDefault; }
@@ -366,7 +433,7 @@ public:
     // text settings
     FontData& getTextFontData() { return _textFontData; }
     FontData& getTextFontDataDefault() { return _textFontDataDefault; }
-    
+
     PositionData& getTextPositionData() { return _textPositionData; }
     PositionData& getTextPositionDataDefault() { return _textPositionDataDefault; }
 
@@ -381,38 +448,67 @@ public:
     PositionData& getModelPositionDataDefault() { return _modelPositionDataDefault; }
 
 
-    void layerClickToDoOperation(Operation operation, bool relativeJump=true, int slideNum=0, int layerNum=0);
-    void layerClickToDoOperation(const std::string& command, Operation operation, bool relativeJump=true, int slideNum=0, int layerNum=0);
-    void layerClickEventOperation(const KeyPosition& keyPos, bool relativeJump=true, int slideNum=0, int layerNum=0);
+    enum PresentationContext {
+        CURRENT_PRESENTATION,
+        CURRENT_SLIDE,
+        CURRENT_LAYER
+    };
 
-    void addBullet(const std::string& bullet, PositionData& positionData, FontData& fontData);
-    
-    void addParagraph(const std::string& paragraph, PositionData& positionData, FontData& fontData);
-    
-    void addImage(const std::string& filename,const PositionData& positionData, const ImageData& imageData);
+    void addEventHandler(PresentationContext presentationContext, osg::ref_ptr<osgGA::GUIEventHandler> handler);
 
-    void addStereoImagePair(const std::string& filenameLeft, const ImageData& imageDataLeft, const std::string& filenameRight,const ImageData& imageDataRight, const PositionData& positionData);
+    void keyToDoOperation(PresentationContext presentationContext, int key, Operation operation, const JumpData& jumpData=JumpData());
+    void keyToDoOperation(PresentationContext presentationContext, int key, const std::string& command, Operation operation,  const JumpData& jumpData=JumpData());
+    void keyEventOperation(PresentationContext presentationContext, int key, const KeyPosition& keyPos,  const JumpData& jumpData=JumpData());
 
-    void addGraph(const std::string& filename,const std::string& options,const PositionData& positionData, const ImageData& imageData);
-    void addVNC(const std::string& filename,const PositionData& positionData, const ImageData& imageData);
-    void addBrowser(const std::string& filename,const PositionData& positionData, const ImageData& imageData);
-    void addPDF(const std::string& filename,const PositionData& positionData, const ImageData& imageData);
-    osg::Image* addInteractiveImage(const std::string& filename,const PositionData& positionData, const ImageData& imageData);
+    void layerClickToDoOperation(Operation operation,  const JumpData& jumpData=JumpData());
+    void layerClickToDoOperation(const std::string& command, Operation operation,  const JumpData& jumpData=JumpData());
+    void layerClickEventOperation(const KeyPosition& keyPos,  const JumpData& jumpData=JumpData());
 
-    void addModel(osg::Node* subgraph, const PositionData& positionData, const ModelData& modelData);
+    void addPropertyAnimation(PresentationContext presentationContext, PropertyAnimation* propertyAnimation);
 
-    void addModel(const std::string& filename, const PositionData& positionData, const ModelData& modelData);
-    
-    void addVolume(const std::string& filename, const PositionData& positionData, const VolumeData& volumeData);
+    void addScriptCallback(PresentationContext presentationContext, ScriptCallbackType scriptCallbackType, const std::string& functionName);
+
+    void addScriptToNode(ScriptCallbackType scriptCallbackType, const std::string& name, osg::Node* node);
+
+    void addScriptsToNode(const ScriptData& scriptData, osg::Node* node);
+
+    void addToCurrentLayer(osg::Node* subgraph);
+
+    void addBullet(const std::string& bullet, PositionData& positionData, FontData& fontData, const ScriptData& scriptData);
+
+    void addParagraph(const std::string& paragraph, PositionData& positionData, FontData& fontData, const ScriptData& scriptData);
+
+    osg::Image* readImage(const std::string& filename, const ImageData& imageData);
+
+    void addImage(const std::string& filename,const PositionData& positionData, const ImageData& imageData, const ScriptData& scriptData);
+
+    void addStereoImagePair(const std::string& filenameLeft, const ImageData& imageDataLeft, const std::string& filenameRight,const ImageData& imageDataRight, const PositionData& positionData, const ScriptData& scriptData);
+
+    void addGraph(const std::string& filename,const PositionData& positionData, const ImageData& imageData, const ScriptData& scriptData);
+    void addVNC(const std::string& filename,const PositionData& positionData, const ImageData& imageData, const std::string& password, const ScriptData& scriptData);
+    void addBrowser(const std::string& filename,const PositionData& positionData, const ImageData& imageData, const ScriptData& scriptData);
+    void addPDF(const std::string& filename,const PositionData& positionData, const ImageData& imageData, const ScriptData& scriptData);
+    osg::Image* addInteractiveImage(const std::string& filename,const PositionData& positionData, const ImageData& imageData, const ScriptData& scriptData);
+
+    void addModel(osg::Node* subgraph, const PositionData& positionData, const ModelData& modelData, const ScriptData& scriptData);
+
+    void addModel(const std::string& filename, const PositionData& positionData, const ModelData& modelData, const ScriptData& scriptData);
+
+    void setUpVolumeScalarProperty(osgVolume::VolumeTile* tile, osgVolume::ScalarProperty* property, const std::string& source);
+
+    void addVolume(const std::string& filename, const PositionData& positionData, const VolumeData& volumeData, const ScriptData& scriptData);
 
     osg::Group* takePresentation() { return _root.release(); }
-    
+
     osg::Group* getPresentation() { return _root.get(); }
 
     osg::Switch* getPresentationSwitch() { return _presentationSwitch.get(); }
 
     osg::Switch* getCurrentSlide() { return _slide.get(); }
-    
+
+    void pushCurrentLayer(osg::Group* newLayerGroup);
+    void popCurrentLayer();
+
     osg::Group* getCurrentLayer() { return _currentLayer.get(); }
 
     void setLoopPresentation(bool loop) { _loopPresentation = loop; }
@@ -425,24 +521,26 @@ public:
     HUDSettings* getHUDSettings() { return _hudSettings.get(); }
     const HUDSettings* getHUDSettings() const { return _hudSettings.get(); }
 
+    osg::ScriptEngine* getOrCreateScriptEngine(const std::string& language);
 
 protected:
 
     void findImageStreamsAndAddCallbacks(osg::Node* node);
 
     osg::Geometry* createTexturedQuadGeometry(const osg::Vec3& pos, const osg::Vec4& rotation, float width,float height, osg::Image* image, bool& usedTextureRectangle);
+    void setUpMovieVolume(osg::Node* subgraph, osg::ImageStream* imageStream, const ImageData& imageData);
 
     osg::Vec3 computePositionInModelCoords(const PositionData& positionData) const;
     void updatePositionFromInModelCoords(const osg::Vec3& vertex, PositionData& positionData) const;
-    
+
     osg::Vec3 convertSlideToModel(const osg::Vec3& position) const;
     osg::Vec3 convertModelToSlide(const osg::Vec3& position) const;
 
     osg::AnimationPathCallback* getAnimationPathCallback(const PositionData& positionData);
-    
+
     osg::Node* attachMaterialAnimation(osg::Node* model, const PositionData& positionData);
     bool attachTexMat(osg::StateSet* stateset, const ImageData& imageData, float s, float t, bool textureRectangle);
-    
+
     osg::StateSet* createTransformStateSet()
     {
         osg::StateSet* stateset = new osg::StateSet;
@@ -453,6 +551,7 @@ protected:
     }
 
     osg::Node* decorateSubgraphForPosition(osg::Node* node, PositionData& positionData);
+    osg::Node* decorateSubgraphForPositionAndAnimation(osg::Node* node, const PositionData& positionData);
 
     osg::ref_ptr<osgDB::Options> _options;
 
@@ -465,7 +564,7 @@ protected:
     unsigned int _rightEyeMask;
 
     osg::ref_ptr<HUDSettings> _hudSettings;
-    
+
     // title settings
     FontData        _titleFontData;
     FontData        _titleFontDataDefault;
@@ -476,7 +575,7 @@ protected:
     // text settings
     FontData        _textFontData;
     FontData        _textFontDataDefault;
-    
+
     PositionData    _textPositionData;
     PositionData    _textPositionDataDefault;
 
@@ -495,22 +594,39 @@ protected:
     std::string _presentationName;
     double      _presentationDuration;
 
+    osg::ref_ptr<osgPresentation::PropertyManager> _propertyManager;
+    osg::ref_ptr<osgPresentation::PropertyEventCallback> _propertyEventCallback;
+
     osg::ref_ptr<osg::Group>        _root;
     osg::ref_ptr<osg::Switch>       _presentationSwitch;
-    
+
+    typedef std::map< std::string, osg::ref_ptr<osg::ScriptEngine> > ScriptEngineMap;
+    ScriptEngineMap _scriptEngines;
+
+    typedef std::map< std::string, osg::ref_ptr<osg::Script> > ScriptMap;
+    ScriptMap                        _scripts;
+
     osg::ref_ptr<osg::ClearNode>    _slideClearNode;
     osg::ref_ptr<osg::Switch>       _slide;
     std::string                     _slideTitle;
     std::string                     _slideBackgroundImageFileName;
     bool                            _slideBackgroundAsHUD;
-    
+
     osg::ref_ptr<osg::Group>        _previousLayer;
     osg::ref_ptr<osg::Group>        _currentLayer;
-    
+    typedef std::vector< osg::ref_ptr<osg::Group> > LayerStack;
+    LayerStack                      _layerStack;
+
     osg::ref_ptr<FilePathData>      _filePathData;
-    
+
+    osg::ref_ptr<osg::Group>                _layerToApplyEventCallbackTo;
+
+    typedef std::list< osg::ref_ptr<osgGA::GUIEventHandler> > EventHandlerList;
+    EventHandlerList _currentEventCallbacksToApply;
+
+
     std::string findFileAndRecordPath(const std::string& filename);
-    
+
     void recordOptionsFilePath(const osgDB::Options* options);
 
 };

@@ -15,6 +15,7 @@
 #define OSG_STATE 1
 
 #include <osg/Export>
+#include <osg/GLExtensions>
 #include <osg/StateSet>
 #include <osg/Matrix>
 #include <osg/Uniform>
@@ -50,16 +51,6 @@
         #define GL_SECONDARY_COLOR_ARRAY GL_SECONDARY_COLOR_ARRAY_EXT
     #else
         #define GL_SECONDARY_COLOR_ARRAY 0x845E
-    #endif
-#endif
-
-#if !defined(GL_EXT_timer_query) && !defined(OSG_GL3_AVAILABLE)
-    #ifdef _WIN32
-        typedef          __int64 GLint64EXT;
-        typedef unsigned __int64 GLuint64EXT;
-    #else
-        typedef long long int GLint64EXT;
-        typedef unsigned long long int GLuint64EXT;
     #endif
 #endif
 
@@ -122,7 +113,7 @@ class VertexAttribAlias
   *   which typically stall the graphics pipeline (see, for instance,
   *   \c captureCurrentState() and \c getModelViewMatrix()).
   */
-class OSG_EXPORT State : public Referenced, public Observer
+class OSG_EXPORT State : public Referenced
 {
     public :
 
@@ -141,16 +132,16 @@ class OSG_EXPORT State : public Referenced, public Observer
 
         /** Set the current OpenGL context uniqueID.
          *  The ContextID is used by classes like osg::StateAttribute's and osg::Drawable's to
-         *  help manage seperate OpenGL objects, such as display lists, vertex buffer objects
-         *  and texture object for each graphics context. The ContextID simply acts as an index 
+         *  help manage separate OpenGL objects, such as display lists, vertex buffer objects
+         *  and texture object for each graphics context. The ContextID simply acts as an index
          *  into arrays that these classes maintain for the purpose of storing GL object handles.
-         * 
+         *
          *  Note, osgViewer::GraphicsWindow will automatically set up the ContextID for you,
          *  so you will rearely need to set this yourself.
-         * 
+         *
          *  The exception is when creating your own graphics context, where you should set
          *  the ContextID uniquely for each graphics context.
-         * 
+         *
          *  Typical settings for ContextID are 0,1,2,3... up to the maximum
          *  number of graphics contexts you have set up. By default contextID is 0.
          */
@@ -158,6 +149,37 @@ class OSG_EXPORT State : public Referenced, public Observer
 
         /** Get the current OpenGL context unique ID.*/
         inline unsigned int getContextID() const { return _contextID; }
+
+
+        // ExtensionMap contains GL Extentsions objects used by StateAttribue to call OpenGL extensions/advanced features
+        typedef std::map<const std::type_info*, osg::ref_ptr<osg::Referenced> > ExtensionMap;
+        ExtensionMap _extensionMap;
+
+        /** Get a specific GL extensions object, initialize if not already present.
+          * Note, must only be called from a the graphics context thread associated with this osg::State. */
+        template<typename T>
+        T* get()
+        {
+            const std::type_info* id(&typeid(T));
+            osg::ref_ptr<osg::Referenced>& ptr = _extensionMap[id];
+            if (!ptr)
+            {
+                ptr = new T(_contextID);
+            }
+            return static_cast<T*>(ptr.get());
+        }
+
+        /** Get a specific GL extensions object if it already exists in the extension map.
+          * Note, safe to call outwith a the graphics context thread associated with this osg::State.
+          * Returns NULL if the desired extension object has not been created yet.*/
+        template<typename T>
+        const T* get() const
+        {
+            const std::type_info* id(&typeid(T));
+            ExtensionMap::const_iterator itr = _extensionMap.find(id);
+            if (itr==_extensionMap.end()) return 0;
+            else return itr->second.get();
+        }
 
 
         /* Set whether shader composition is enabled.*/
@@ -178,7 +200,7 @@ class OSG_EXPORT State : public Referenced, public Observer
         /** Get the unform list in which to inject any uniforms that StateAttribute::apply(State&) methods provide.*/
         StateSet::UniformList& getCurrentShaderCompositionUniformList() { return _currentShaderCompositionUniformList; }
 
-        /** Convinience method for StateAttribute:::apply(State&) methods to pass on their uniforms to osg::State so it can apply them at the appropriate point.*/
+        /** Convenience method for StateAttribute:::apply(State&) methods to pass on their uniforms to osg::State so it can apply them at the appropriate point.*/
         void applyShaderCompositionUniform(const osg::Uniform* uniform, StateAttribute::OverrideValue value=StateAttribute::ON)
         {
             StateSet::RefUniformPair& up = _currentShaderCompositionUniformList[uniform->getName()];
@@ -218,9 +240,11 @@ class OSG_EXPORT State : public Referenced, public Observer
         /** Copy the modes and attributes which capture the current state.*/
         void captureCurrentState(StateSet& stateset) const;
 
+        /** Release all OpenGL objects associated cached by this osg::State object.*/
+        void releaseGLObjects();
+
         /** reset the state object to an empty stack.*/
         void reset();
-
 
         inline const Viewport* getCurrentViewport() const
         {
@@ -263,14 +287,35 @@ class OSG_EXPORT State : public Referenced, public Observer
 
         typedef std::vector<VertexAttribAlias> VertexAttribAliasList;
 
+        /** Reset the vertex attribute aliasing to osg's default. This method needs to be called before render anything unless you really know what you're doing !*/
+        void resetVertexAttributeAlias(bool compactAliasing=true, unsigned int numTextureUnits=8);
+
+        /** Set the vertex attribute aliasing for "vertex". This method needs to be called before render anything unless you really know what you're doing !*/
+        void setVertexAlias(const VertexAttribAlias& alias) { _vertexAlias = alias; }
         const VertexAttribAlias& getVertexAlias() { return _vertexAlias; }
+
+        /** Set the vertex attribute aliasing for "normal". This method needs to be called before render anything unless you really know what you're doing !*/
+        void setNormalAlias(const VertexAttribAlias& alias) { _normalAlias = alias; }
         const VertexAttribAlias& getNormalAlias() { return _normalAlias; }
+
+        /** Set the vertex attribute aliasing for "color". This method needs to be called before render anything unless you really know what you're doing !*/
+        void setColorAlias(const VertexAttribAlias& alias) { _colorAlias = alias; }
         const VertexAttribAlias& getColorAlias() { return _colorAlias; }
+
+        /** Set the vertex attribute aliasing for "secondary color". This method needs to be called before render anything unless you really know what you're doing !*/
+        void setSecondaryColorAlias(const VertexAttribAlias& alias) { _secondaryColorAlias = alias; }
         const VertexAttribAlias& getSecondaryColorAlias() { return _secondaryColorAlias; }
+
+        /** Set the vertex attribute aliasing for "fog coord". This method needs to be called before render anything unless you really know what you're doing !*/
+        void setFogCoordAlias(const VertexAttribAlias& alias) { _fogCoordAlias = alias; }
         const VertexAttribAlias& getFogCoordAlias() { return _fogCoordAlias; }
+
+        /** Set the vertex attribute aliasing list for texture coordinates. This method needs to be called before render anything unless you really know what you're doing !*/
+        void setTexCoordAliasList(const VertexAttribAliasList& aliasList) { _texCoordAliasList = aliasList; }
         const VertexAttribAliasList& getTexCoordAliasList() { return _texCoordAliasList; }
 
-
+        /** Set the vertex attribute binding list. This method needs to be called before render anything unless you really know what you're doing !*/
+        void  setAttributeBindingList(const Program::AttribBindingList& attribBindingList) { _attributeBindingList = attribBindingList; }
         const Program::AttribBindingList&  getAttributeBindingList() { return _attributeBindingList; }
 
         bool convertVertexShaderSourceToOsgBuiltIns(std::string& source) const;
@@ -407,8 +452,8 @@ class OSG_EXPORT State : public Referenced, public Observer
         /** Attribute has been applied externally, update state to reflect this setting.*/
         void haveAppliedAttribute(const StateAttribute* attribute);
 
-        /** Attribute has been applied externally, 
-          * and therefore this attribute type has been dirtied 
+        /** Attribute has been applied externally,
+          * and therefore this attribute type has been dirtied
           * and will need to be re-applied on next osg::State.apply(..).
           * note, if you have an osg::StateAttribute which you have applied externally
           * then use the have_applied(attribute) method as this will cause the osg::State to
@@ -614,16 +659,16 @@ class OSG_EXPORT State : public Referenced, public Observer
         {
             if (array)
             {
-                GLBufferObject* vbo = array->getOrCreateGLBufferObject(_contextID);
+                GLBufferObject* vbo = isVertexBufferObjectSupported() ? array->getOrCreateGLBufferObject(_contextID) : 0;
                 if (vbo)
                 {
                     bindVertexBufferObject(vbo);
-                    setVertexPointer(array->getDataSize(),array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                    setVertexPointer(array->getDataSize(),array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())),array->getNormalize());
                 }
                 else
                 {
                     unbindVertexBufferObject();
-                    setVertexPointer(array->getDataSize(),array->getDataType(),0,array->getDataPointer());
+                    setVertexPointer(array->getDataSize(),array->getDataType(),0,array->getDataPointer(),array->getNormalize());
                 }
             }
         }
@@ -631,12 +676,12 @@ class OSG_EXPORT State : public Referenced, public Observer
         /** wrapper around glEnableClientState(GL_VERTEX_ARRAY);glVertexPointer(..);
           * note, only updates values that change.*/
         inline void setVertexPointer( GLint size, GLenum type,
-                                      GLsizei stride, const GLvoid *ptr )
+                                      GLsizei stride, const GLvoid *ptr, GLboolean normalized=GL_FALSE )
         {
         #ifdef OSG_GL_VERTEX_ARRAY_FUNCS_AVAILABLE
             if (_useVertexAttributeAliasing)
             {
-                setVertexAttribPointer(_vertexAlias._location, size, type, GL_FALSE, stride, ptr);
+                setVertexAttribPointer(_vertexAlias._location, size, type, normalized, stride, ptr);
             }
             else
             {
@@ -652,9 +697,10 @@ class OSG_EXPORT State : public Referenced, public Observer
                 }
                 _vertexArray._lazy_disable = false;
                 _vertexArray._dirty = false;
+                _vertexArray._normalized = normalized;
             }
         #else
-            setVertexAttribPointer(_vertexAlias._location, size, type, GL_FALSE, stride, ptr);
+            setVertexAttribPointer(_vertexAlias._location, size, type, normalized, stride, ptr);
         #endif
         }
 
@@ -705,16 +751,16 @@ class OSG_EXPORT State : public Referenced, public Observer
         {
             if (array)
             {
-                GLBufferObject* vbo = array->getOrCreateGLBufferObject(_contextID);
+                GLBufferObject* vbo = isVertexBufferObjectSupported() ? array->getOrCreateGLBufferObject(_contextID) : 0;
                 if (vbo)
                 {
                     bindVertexBufferObject(vbo);
-                    setNormalPointer(array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                    setNormalPointer(array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())),array->getNormalize());
                 }
                 else
                 {
                     unbindVertexBufferObject();
-                    setNormalPointer(array->getDataType(),0,array->getDataPointer());
+                    setNormalPointer(array->getDataType(),0,array->getDataPointer(),array->getNormalize());
                 }
             }
         }
@@ -722,12 +768,12 @@ class OSG_EXPORT State : public Referenced, public Observer
         /** wrapper around glEnableClientState(GL_NORMAL_ARRAY);glNormalPointer(..);
           * note, only updates values that change.*/
         inline void setNormalPointer( GLenum type, GLsizei stride,
-                                      const GLvoid *ptr )
+                                      const GLvoid *ptr, GLboolean normalized=GL_FALSE )
         {
         #ifdef OSG_GL_VERTEX_ARRAY_FUNCS_AVAILABLE
             if (_useVertexAttributeAliasing)
             {
-                setVertexAttribPointer(_normalAlias._location, 3, type, GL_FALSE, stride, ptr);
+                setVertexAttribPointer(_normalAlias._location, 3, type, normalized, stride, ptr);
             }
             else
             {
@@ -743,9 +789,10 @@ class OSG_EXPORT State : public Referenced, public Observer
                 }
                 _normalArray._lazy_disable = false;
                 _normalArray._dirty = false;
+                _normalArray._normalized = normalized;
             }
         #else
-            setVertexAttribPointer(_normalAlias._location, 3, type, GL_FALSE, stride, ptr);
+            setVertexAttribPointer(_normalAlias._location, 3, type, normalized, stride, ptr);
         #endif
         }
 
@@ -795,16 +842,16 @@ class OSG_EXPORT State : public Referenced, public Observer
         {
             if (array)
             {
-                GLBufferObject* vbo = array->getOrCreateGLBufferObject(_contextID);
+                GLBufferObject* vbo = isVertexBufferObjectSupported() ? array->getOrCreateGLBufferObject(_contextID) : 0;
                 if (vbo)
                 {
                     bindVertexBufferObject(vbo);
-                    setColorPointer(array->getDataSize(),array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                    setColorPointer(array->getDataSize(),array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())),array->getNormalize());
                 }
                 else
                 {
                     unbindVertexBufferObject();
-                    setColorPointer(array->getDataSize(),array->getDataType(),0,array->getDataPointer());
+                    setColorPointer(array->getDataSize(),array->getDataType(),0,array->getDataPointer(),array->getNormalize());
                 }
             }
         }
@@ -813,12 +860,12 @@ class OSG_EXPORT State : public Referenced, public Observer
         /** wrapper around glEnableClientState(GL_COLOR_ARRAY);glColorPointer(..);
           * note, only updates values that change.*/
         inline void setColorPointer( GLint size, GLenum type,
-                                     GLsizei stride, const GLvoid *ptr )
+                                     GLsizei stride, const GLvoid *ptr, GLboolean normalized=GL_TRUE )
         {
         #ifdef OSG_GL_VERTEX_ARRAY_FUNCS_AVAILABLE
             if (_useVertexAttributeAliasing)
             {
-                setVertexAttribPointer(_colorAlias._location, size, type, GL_FALSE, stride, ptr);
+                setVertexAttribPointer(_colorAlias._location, size, type, normalized, stride, ptr);
             }
             else
             {
@@ -834,9 +881,10 @@ class OSG_EXPORT State : public Referenced, public Observer
                 }
                 _colorArray._lazy_disable = false;
                 _colorArray._dirty = false;
+                _colorArray._normalized = normalized;
             }
         #else
-            setVertexAttribPointer(_colorAlias._location, size, type, GL_FALSE, stride, ptr);
+            setVertexAttribPointer(_colorAlias._location, size, type, normalized, stride, ptr);
         #endif
         }
 
@@ -890,23 +938,23 @@ class OSG_EXPORT State : public Referenced, public Observer
         {
             if (array)
             {
-                GLBufferObject* vbo = array->getOrCreateGLBufferObject(_contextID);
+                GLBufferObject* vbo = isVertexBufferObjectSupported() ? array->getOrCreateGLBufferObject(_contextID) : 0;
                 if (vbo)
                 {
                     bindVertexBufferObject(vbo);
-                    setSecondaryColorPointer(array->getDataSize(),array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                    setSecondaryColorPointer(array->getDataSize(),array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())),array->getNormalize());
                 }
                 else
                 {
                     unbindVertexBufferObject();
-                    setSecondaryColorPointer(array->getDataSize(),array->getDataType(),0,array->getDataPointer());
+                    setSecondaryColorPointer(array->getDataSize(),array->getDataType(),0,array->getDataPointer(),array->getNormalize());
                 }
             }
         }
 
         /** wrapper around glEnableClientState(GL_SECONDARY_COLOR_ARRAY);glSecondayColorPointer(..);
           * note, only updates values that change.*/
-        void setSecondaryColorPointer( GLint size, GLenum type, GLsizei stride, const GLvoid *ptr );
+        void setSecondaryColorPointer( GLint size, GLenum type, GLsizei stride, const GLvoid *ptr, GLboolean normalized=GL_TRUE );
 
         /** wrapper around glDisableClientState(GL_SECONDARY_COLOR_ARRAY);
           * note, only updates values that change.*/
@@ -957,16 +1005,16 @@ class OSG_EXPORT State : public Referenced, public Observer
         {
             if (array)
             {
-                GLBufferObject* vbo = array->getOrCreateGLBufferObject(_contextID);
+                GLBufferObject* vbo = isVertexBufferObjectSupported() ? array->getOrCreateGLBufferObject(_contextID) : 0;
                 if (vbo)
                 {
                     bindVertexBufferObject(vbo);
-                    setFogCoordPointer(array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                    setFogCoordPointer(array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())),array->getNormalize());
                 }
                 else
                 {
                     unbindVertexBufferObject();
-                    setFogCoordPointer(array->getDataType(),0,array->getDataPointer());
+                    setFogCoordPointer(array->getDataType(),0,array->getDataPointer(),array->getNormalize());
                 }
             }
         }
@@ -974,7 +1022,7 @@ class OSG_EXPORT State : public Referenced, public Observer
 
         /** wrapper around glEnableClientState(GL_FOG_COORDINATE_ARRAY);glFogCoordPointer(..);
           * note, only updates values that change.*/
-        void setFogCoordPointer( GLenum type, GLsizei stride, const GLvoid *ptr );
+        void setFogCoordPointer( GLenum type, GLsizei stride, const GLvoid *ptr, GLboolean normalized=GL_FALSE );
 
         /** wrapper around glDisableClientState(GL_FOG_COORDINATE_ARRAY);
           * note, only updates values that change.*/
@@ -1024,16 +1072,16 @@ class OSG_EXPORT State : public Referenced, public Observer
         {
             if (array)
             {
-                GLBufferObject* vbo = array->getOrCreateGLBufferObject(_contextID);
+                GLBufferObject* vbo = isVertexBufferObjectSupported() ? array->getOrCreateGLBufferObject(_contextID) : 0;
                 if (vbo)
                 {
                     bindVertexBufferObject(vbo);
-                    setTexCoordPointer(unit, array->getDataSize(),array->getDataType(),0, (const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                    setTexCoordPointer(unit, array->getDataSize(),array->getDataType(),0, (const GLvoid *)(vbo->getOffset(array->getBufferIndex())),array->getNormalize());
                 }
                 else
                 {
                     unbindVertexBufferObject();
-                    setTexCoordPointer(unit, array->getDataSize(),array->getDataType(),0,array->getDataPointer());
+                    setTexCoordPointer(unit, array->getDataSize(),array->getDataType(),0,array->getDataPointer(),array->getNormalize());
                 }
             }
         }
@@ -1042,12 +1090,12 @@ class OSG_EXPORT State : public Referenced, public Observer
           * note, only updates values that change.*/
         inline void setTexCoordPointer( unsigned int unit,
                                         GLint size, GLenum type,
-                                        GLsizei stride, const GLvoid *ptr )
+                                        GLsizei stride, const GLvoid *ptr, GLboolean normalized=GL_FALSE )
         {
         #ifdef OSG_GL_VERTEX_ARRAY_FUNCS_AVAILABLE
             if (_useVertexAttributeAliasing)
             {
-                setVertexAttribPointer(_texCoordAliasList[unit]._location, size, type, GL_FALSE, stride, ptr);
+                setVertexAttribPointer(_texCoordAliasList[unit]._location, size, type, normalized, stride, ptr);
             }
             else
             {
@@ -1068,10 +1116,11 @@ class OSG_EXPORT State : public Referenced, public Observer
                     }
                     eap._lazy_disable = false;
                     eap._dirty = false;
+                    eap._normalized = normalized;
                 }
             }
         #else
-            setVertexAttribPointer(_texCoordAliasList[unit]._location, size, type, GL_FALSE, stride, ptr);
+            setVertexAttribPointer(_texCoordAliasList[unit]._location, size, type, normalized, stride, ptr);
         #endif
         }
 
@@ -1086,12 +1135,12 @@ class OSG_EXPORT State : public Referenced, public Observer
             }
             else
             {
-                if (setClientActiveTextureUnit(unit))
-                {
-                    if ( unit >= _texCoordArrayList.size()) _texCoordArrayList.resize(unit+1);
-                    EnabledArrayPair& eap = _texCoordArrayList[unit];
+                if ( unit >= _texCoordArrayList.size()) _texCoordArrayList.resize(unit+1);
+                EnabledArrayPair& eap = _texCoordArrayList[unit];
 
-                    if (eap._enabled || eap._dirty)
+                if (eap._enabled || eap._dirty)
+                {
+                    if(setClientActiveTextureUnit(unit))
                     {
                         eap._lazy_disable = false;
                         eap._enabled = false;
@@ -1178,11 +1227,18 @@ class OSG_EXPORT State : public Referenced, public Observer
         }
 
 
+        /// For GL>=2.0 uses GL_MAX_TEXTURE_COORDS, for GL<2 uses GL_MAX_TEXTURE_UNITS
+        inline GLint getMaxTextureCoords() const { return _glMaxTextureCoords; }
+
+        /// For GL>=2.0 uses GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, for GL<2 uses GL_MAX_TEXTURE_UNITS
+        inline GLint getMaxTextureUnits() const { return _glMaxTextureUnits; }
+
+
         /** Set the current texture unit, return true if selected,
           * false if selection failed such as when multi texturing is not supported.
           * note, only updates values that change.*/
         inline bool setActiveTextureUnit( unsigned int unit );
-        
+
         /** Get the current texture unit.*/
         unsigned int getActiveTextureUnit() const { return _currentActiveTextureUnit; }
 
@@ -1195,7 +1251,26 @@ class OSG_EXPORT State : public Referenced, public Observer
         unsigned int getClientActiveTextureUnit() const { return _currentClientActiveTextureUnit; }
 
         /** Set the vertex attrib pointer using an osg::Array, and manage any VBO that are required.*/
-        inline void setVertexAttribPointer(unsigned int unit, const Array* array, GLboolean normalized)
+        inline void setVertexAttribPointer(unsigned int unit, const Array* array)
+        {
+            if (array)
+            {
+                GLBufferObject* vbo = isVertexBufferObjectSupported() ? array->getOrCreateGLBufferObject(_contextID) : 0;
+                if (vbo)
+                {
+                    bindVertexBufferObject(vbo);
+                    setVertexAttribPointer(unit, array->getDataSize(),array->getDataType(),array->getNormalize(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                }
+                else
+                {
+                    unbindVertexBufferObject();
+                    setVertexAttribPointer(unit, array->getDataSize(),array->getDataType(),array->getNormalize(),0,array->getDataPointer());
+                }
+            }
+        }
+
+        /** Set the vertex attrib pointer using an osg::Array, and manage any VBO that are required.*/
+        inline void setVertexAttribLPointer(unsigned int unit, const Array* array)
         {
             if (array)
             {
@@ -1203,12 +1278,31 @@ class OSG_EXPORT State : public Referenced, public Observer
                 if (vbo)
                 {
                     bindVertexBufferObject(vbo);
-                    setVertexAttribPointer(unit, array->getDataSize(),array->getDataType(),normalized,0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                    setVertexAttribLPointer(unit, array->getDataSize(),array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
                 }
                 else
                 {
                     unbindVertexBufferObject();
-                    setVertexAttribPointer(unit, array->getDataSize(),array->getDataType(),normalized,0,array->getDataPointer());
+                    setVertexAttribLPointer(unit, array->getDataSize(),array->getDataType(),0,array->getDataPointer());
+                }
+            }
+        }
+
+        /** Set the vertex attrib pointer using an osg::Array, and manage any VBO that are required.*/
+        inline void setVertexAttribIPointer(unsigned int unit, const Array* array)
+        {
+            if (array)
+            {
+                GLBufferObject* vbo = array->getOrCreateGLBufferObject(_contextID);
+                if (vbo)
+                {
+                    bindVertexBufferObject(vbo);
+                    setVertexAttribIPointer(unit, array->getDataSize(),array->getDataType(),0,(const GLvoid *)(vbo->getOffset(array->getBufferIndex())));
+                }
+                else
+                {
+                    unbindVertexBufferObject();
+                    setVertexAttribIPointer(unit, array->getDataSize(),array->getDataType(),0,array->getDataPointer());
                 }
             }
         }
@@ -1218,6 +1312,18 @@ class OSG_EXPORT State : public Referenced, public Observer
         void setVertexAttribPointer( unsigned int index,
                                      GLint size, GLenum type, GLboolean normalized,
                                      GLsizei stride, const GLvoid *ptr );
+
+        /** wrapper around glEnableVertexAttribArrayARB(index);glVertexAttribIPointer(..);
+          * note, only updates values that change.*/
+        void setVertexAttribIPointer( unsigned int index,
+                                      GLint size, GLenum type,
+                                      GLsizei stride, const GLvoid *ptr );
+
+        /** wrapper around glEnableVertexAttribArrayARB(index);glVertexAttribLPointer(..);
+          * note, only updates values that change.*/
+        void setVertexAttribLPointer( unsigned int index,
+                                      GLint size, GLenum type,
+                                      GLsizei stride, const GLvoid *ptr );
 
         /** wrapper around DisableVertexAttribArrayARB(index);
           * note, only updates values that change.*/
@@ -1254,11 +1360,6 @@ class OSG_EXPORT State : public Referenced, public Observer
             if (_lastAppliedProgramObject!=program)
             {
                 _lastAppliedProgramObject = program;
-                if (program && _appliedProgramObjectSet.count(program)==0)
-                {
-                    _appliedProgramObjectSet.insert(program);
-                    program->addObserver(this);
-                }
             }
         }
         inline const Program::PerContextProgram* getLastAppliedProgramObject() const { return _lastAppliedProgramObject; }
@@ -1268,8 +1369,8 @@ class OSG_EXPORT State : public Referenced, public Observer
           * Alternative version of getUniformLocation( unsigned int uniformNameID )
           * retrofited into OSG for backward compatibility with osgCal,
           * after uniform ids were refactored from std::strings to GLints in OSG version 2.9.10.
-          * 
-          * Drawbacks: This method is not particularly fast. It has to access mutexed static 
+          *
+          * Drawbacks: This method is not particularly fast. It has to access mutexed static
           * map of uniform ids. So don't overuse it or your app performance will suffer.
         */
         inline GLint getUniformLocation( const std::string & uniformName ) const { return _lastAppliedProgramObject ? _lastAppliedProgramObject->getUniformLocation(uniformName) : -1; }
@@ -1338,8 +1439,8 @@ class OSG_EXPORT State : public Referenced, public Observer
 
         /** Get the number of dynamic objects that will be rendered in this graphics context this frame.*/
         unsigned int getDynamicObjectCount() const { return _dynamicObjectCount; }
-        
-        /** Decrement the number of dynamic objects left to render this frame, and once the count goes to zero call the 
+
+        /** Decrement the number of dynamic objects left to render this frame, and once the count goes to zero call the
           * DynamicObjectRenderingCompletedCallback to inform of completion.*/
         inline void decrementDynamicObjectCount()
         {
@@ -1360,9 +1461,9 @@ class OSG_EXPORT State : public Referenced, public Observer
         enum CheckForGLErrors
         {
             /** NEVER_CHECK_GL_ERRORS hints that OpenGL need not be checked for, this
-                is the fastest option since checking for errors does incurr a small overhead.*/
+                is the fastest option since checking for errors does incur a small overhead.*/
             NEVER_CHECK_GL_ERRORS,
-            /** ONCE_PER_FRAME means that OpenGl errors will be checked for once per
+            /** ONCE_PER_FRAME means that OpenGL errors will be checked for once per
                 frame, the overhead is still small, but at least OpenGL errors that are occurring
                 will be caught, the reporting isn't fine grained enough for debugging purposes.*/
             ONCE_PER_FRAME,
@@ -1387,8 +1488,6 @@ class OSG_EXPORT State : public Referenced, public Observer
 
         /** Initialize extension used by osg:::State.*/
         void initializeExtensionProcs();
-
-        virtual void objectDeleted(void* object);
 
         /** Get the GL adapter object used to map OpenGL 1.0 glBegin/glEnd usage to vertex arrays.*/
         inline GLBeginEndAdapter& getGLBeginEndAdapter() { return _glBeginEndAdapter; }
@@ -1420,9 +1519,9 @@ class OSG_EXPORT State : public Referenced, public Observer
         {
             return osg::Timer::instance()->delta_s(_startTick, _gpuTick);
         }
-        GLuint64EXT getGpuTimestamp() const { return _gpuTimestamp; }
+        GLuint64 getGpuTimestamp() const { return _gpuTimestamp; }
 
-        void setGpuTimestamp(Timer_t tick, GLuint64EXT timestamp)
+        void setGpuTimestamp(Timer_t tick, GLuint64 timestamp)
         {
             _gpuTick = tick;
             _gpuTimestamp = timestamp;
@@ -1432,6 +1531,112 @@ class OSG_EXPORT State : public Referenced, public Observer
 
         /** called by the GraphicsContext just before GraphicsContext::swapBuffersImplementation().*/
         virtual void frameCompleted();
+
+
+        struct ModeStack
+        {
+            typedef std::vector<StateAttribute::GLModeValue> ValueVec;
+
+            ModeStack()
+            {
+                valid = true;
+                changed = false;
+                last_applied_value = false;
+                global_default_value = false;
+            }
+
+            void print(std::ostream& fout) const;
+
+            bool        valid;
+            bool        changed;
+            bool        last_applied_value;
+            bool        global_default_value;
+            ValueVec    valueVec;
+        };
+
+        struct AttributeStack
+        {
+            AttributeStack()
+            {
+                changed = false;
+                last_applied_attribute = 0L;
+                last_applied_shadercomponent = 0L;
+                global_default_attribute = 0L;
+
+            }
+
+            void print(std::ostream& fout) const;
+
+            /** apply an attribute if required, passing in attribute and appropriate attribute stack */
+            bool                    changed;
+            const StateAttribute*   last_applied_attribute;
+            const ShaderComponent*  last_applied_shadercomponent;
+            ref_ptr<const StateAttribute> global_default_attribute;
+            AttributeVec            attributeVec;
+        };
+
+
+        struct UniformStack
+        {
+            typedef std::pair<const Uniform*,StateAttribute::OverrideValue>         UniformPair;
+            typedef std::vector<UniformPair>                                        UniformVec;
+
+            UniformStack() {}
+
+            void print(std::ostream& fout) const;
+
+            UniformVec              uniformVec;
+        };
+
+        struct DefineStack
+        {
+            typedef std::vector<StateSet::DefinePair> DefineVec;
+
+            DefineStack():
+                changed(false) {}
+
+            void print(std::ostream& fout) const;
+
+            bool                   changed;
+            DefineVec              defineVec;
+        };
+
+        struct DefineMap
+        {
+            DefineMap():
+                changed(false) {}
+
+            typedef std::map<std::string, DefineStack> DefineStackMap;
+            DefineStackMap map;
+            bool changed;
+            StateSet::DefineList currentDefines;
+
+            bool updateCurrentDefines();
+
+        };
+
+        typedef std::map<StateAttribute::GLMode,ModeStack>              ModeMap;
+        typedef std::vector<ModeMap>                                    TextureModeMapList;
+
+        typedef std::map<StateAttribute::TypeMemberPair,AttributeStack> AttributeMap;
+        typedef std::vector<AttributeMap>                               TextureAttributeMapList;
+
+        typedef std::map<std::string, UniformStack>                     UniformMap;
+
+
+        typedef std::vector< ref_ptr<const Matrix> >                     MatrixStack;
+
+        inline const ModeMap&                                           getModeMap() const {return _modeMap;}
+        inline const AttributeMap&                                      getAttributeMap() const {return _attributeMap;}
+        inline const UniformMap&                                        getUniformMap() const {return _uniformMap;}
+        inline DefineMap&                                               getDefineMap() {return _defineMap;}
+        inline const DefineMap&                                         getDefineMap() const {return _defineMap;}
+        inline const TextureModeMapList&                                getTextureModeMapList() const {return _textureModeMapList;}
+        inline const TextureAttributeMapList&                           getTextureAttributeMapList() const {return _textureAttributeMapList;}
+
+        std::string getDefineString(const osg::ShaderDefines& shaderDefines);
+        bool supportsShaderRequirements(const osg::ShaderDefines& shaderRequirements);
+        bool supportsShaderRequirement(const std::string& shaderRequirement);
 
     protected:
 
@@ -1479,64 +1684,6 @@ class OSG_EXPORT State : public Referenced, public Observer
         Program::AttribBindingList  _attributeBindingList;
 
         void setUpVertexAttribAlias(VertexAttribAlias& alias, GLuint location, const std::string glName, const std::string osgName, const std::string& declaration);
-
-
-        struct ModeStack
-        {
-            typedef std::vector<StateAttribute::GLModeValue> ValueVec;
-
-            ModeStack()
-            {
-                valid = true;
-                changed = false;
-                last_applied_value = false;
-                global_default_value = false;
-            }
-
-            void print(std::ostream& fout) const;
-
-            bool        valid;
-            bool        changed;
-            bool        last_applied_value;
-            bool        global_default_value;
-            ValueVec    valueVec;
-        };
-
-        struct AttributeStack
-        {
-            AttributeStack()
-            {
-                changed = false;
-                last_applied_attribute = 0L;
-                last_applied_shadercomponent = 0L;
-                global_default_attribute = 0L;
-                
-            }
-
-            void print(std::ostream& fout) const;
-
-            /** apply an attribute if required, passing in attribute and appropriate attribute stack */
-            bool                    changed;
-            const StateAttribute*   last_applied_attribute;
-            const ShaderComponent*  last_applied_shadercomponent;
-            ref_ptr<const StateAttribute> global_default_attribute;
-            AttributeVec            attributeVec;
-        };
-
-
-        struct UniformStack
-        {
-            typedef std::pair<const Uniform*,StateAttribute::OverrideValue>         UniformPair;
-            typedef std::vector<UniformPair>                                        UniformVec;
-
-            UniformStack() {}
-
-            void print(std::ostream& fout) const;
-
-            UniformVec              uniformVec;
-        };
-
-
         /** Apply an OpenGL mode if required, passing in mode, enable flag and
           * appropriate mode stack. This is a wrapper around \c glEnable() and
           * \c glDisable(), that just actually calls these functions if the
@@ -1690,27 +1837,14 @@ class OSG_EXPORT State : public Referenced, public Observer
                 return false;
         }
 
-
-        typedef std::map<StateAttribute::GLMode,ModeStack>              ModeMap;
-        typedef std::vector<ModeMap>                                    TextureModeMapList;
-
-        typedef std::map<StateAttribute::TypeMemberPair,AttributeStack> AttributeMap;
-        typedef std::vector<AttributeMap>                               TextureAttributeMapList;
-
-        typedef std::map<std::string,UniformStack>                      UniformMap;
-
-        typedef std::vector<ref_ptr<const Matrix> >                     MatrixStack;
-
-        typedef std::set<const Program::PerContextProgram* >            AppliedProgramObjectSet;
-
         ModeMap                                                         _modeMap;
         AttributeMap                                                    _attributeMap;
         UniformMap                                                      _uniformMap;
+        DefineMap                                                       _defineMap;
 
         TextureModeMapList                                              _textureModeMapList;
         TextureAttributeMapList                                         _textureAttributeMapList;
 
-        AppliedProgramObjectSet                                         _appliedProgramObjectSet;
         const Program::PerContextProgram*                               _lastAppliedProgramObject;
 
         StateSetStack                                                   _stateStateStack;
@@ -1766,14 +1900,17 @@ class OSG_EXPORT State : public Referenced, public Observer
         inline void pushModeList(ModeMap& modeMap,const StateSet::ModeList& modeList);
         inline void pushAttributeList(AttributeMap& attributeMap,const StateSet::AttributeList& attributeList);
         inline void pushUniformList(UniformMap& uniformMap,const StateSet::UniformList& uniformList);
+        inline void pushDefineList(DefineMap& defineMap,const StateSet::DefineList& defineList);
 
         inline void popModeList(ModeMap& modeMap,const StateSet::ModeList& modeList);
         inline void popAttributeList(AttributeMap& attributeMap,const StateSet::AttributeList& attributeList);
         inline void popUniformList(UniformMap& uniformMap,const StateSet::UniformList& uniformList);
+        inline void popDefineList(DefineMap& uniformMap,const StateSet::DefineList& defineList);
 
         inline void applyModeList(ModeMap& modeMap,const StateSet::ModeList& modeList);
         inline void applyAttributeList(AttributeMap& attributeMap,const StateSet::AttributeList& attributeList);
         inline void applyUniformList(UniformMap& uniformMap,const StateSet::UniformList& uniformList);
+        inline void applyDefineList(DefineMap& uniformMap,const StateSet::DefineList& defineList);
 
         inline void applyModeMap(ModeMap& modeMap);
         inline void applyAttributeMap(AttributeMap& attributeMap);
@@ -1814,6 +1951,8 @@ class OSG_EXPORT State : public Referenced, public Observer
         typedef void (GL_APIENTRY * VertexAttrib4fProc)(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
         typedef void (GL_APIENTRY * VertexAttrib4fvProc)(GLuint index, const GLfloat *v);
         typedef void (GL_APIENTRY * VertexAttribPointerProc) (unsigned int, GLint, GLenum, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+        typedef void (GL_APIENTRY * VertexAttribIPointerProc) (unsigned int, GLint, GLenum, GLsizei stride, const GLvoid *pointer);
+        typedef void (GL_APIENTRY * VertexAttribLPointerProc) (unsigned int, GLint, GLenum, GLsizei stride, const GLvoid *pointer);
         typedef void (GL_APIENTRY * EnableVertexAttribProc) (unsigned int);
         typedef void (GL_APIENTRY * DisableVertexAttribProc) (unsigned int);
         typedef void (GL_APIENTRY * BindBufferProc) (GLenum target, GLuint buffer);
@@ -1832,11 +1971,15 @@ class OSG_EXPORT State : public Referenced, public Observer
         FogCoordPointerProc         _glFogCoordPointer;
         SecondaryColorPointerProc   _glSecondaryColorPointer;
         VertexAttribPointerProc     _glVertexAttribPointer;
+        VertexAttribIPointerProc    _glVertexAttribIPointer;
+        VertexAttribLPointerProc    _glVertexAttribLPointer;
         EnableVertexAttribProc      _glEnableVertexAttribArray;
         DisableVertexAttribProc     _glDisableVertexAttribArray;
         BindBufferProc              _glBindBuffer;
         DrawArraysInstancedProc     _glDrawArraysInstanced;
         DrawElementsInstancedProc   _glDrawElementsInstanced;
+
+        osg::ref_ptr<GLExtensions>  _glExtensions;
 
         unsigned int                                            _dynamicObjectCount;
         osg::ref_ptr<DynamicObjectRenderingCompletedCallback>   _completeDynamicObjectRenderingCallback;
@@ -1845,11 +1988,11 @@ class OSG_EXPORT State : public Referenced, public Observer
         ArrayDispatchers            _arrayDispatchers;
 
         osg::ref_ptr<GraphicsCostEstimator> _graphicsCostEstimator;
-        
+
         Timer_t                      _startTick;
         Timer_t                      _gpuTick;
-        GLuint64EXT                 _gpuTimestamp;
-        int                         _timestampBits;
+        GLuint64                     _gpuTimestamp;
+        int                          _timestampBits;
 };
 
 inline void State::pushModeList(ModeMap& modeMap,const StateSet::ModeList& modeList)
@@ -1937,6 +2080,44 @@ inline void State::pushUniformList(UniformMap& uniformMap,const StateSet::Unifor
     }
 }
 
+inline void State::pushDefineList(DefineMap& defineMap,const StateSet::DefineList& defineList)
+{
+    for(StateSet::DefineList::const_iterator aitr=defineList.begin();
+        aitr!=defineList.end();
+        ++aitr)
+    {
+        // get the attribute stack for incoming type {aitr->first}.
+        DefineStack& ds = defineMap.map[aitr->first];
+        DefineStack::DefineVec& dv = ds.defineVec;
+        if (dv.empty())
+        {
+            // first pair so simply push incoming pair to back.
+            dv.push_back(StateSet::DefinePair(aitr->second.first,aitr->second.second));
+
+            ds.changed = true;
+            defineMap.changed = true;
+        }
+        else if ((ds.defineVec.back().second & StateAttribute::OVERRIDE) && !(aitr->second.second & StateAttribute::PROTECTED)) // check the existing override flag
+        {
+            // push existing back since override keeps the previous value.
+            ds.defineVec.push_back(ds.defineVec.back());
+        }
+        else
+        {
+            // no override on so simply push incoming pair to back.
+            dv.push_back(StateSet::DefinePair(aitr->second.first,aitr->second.second));
+
+            // if the back of the stack has changed since the last then mark it as changed.
+            bool changed = (dv[dv.size()-2].first==dv[dv.size()-1].first);
+            if (changed)
+            {
+                ds.changed = true;
+                defineMap.changed = true;
+            }
+        }
+    }
+}
+
 inline void State::popModeList(ModeMap& modeMap,const StateSet::ModeList& modeList)
 {
     for(StateSet::ModeList::const_iterator mitr=modeList.begin();
@@ -1980,6 +2161,28 @@ inline void State::popUniformList(UniformMap& uniformMap,const StateSet::Uniform
         if (!us.uniformVec.empty())
         {
             us.uniformVec.pop_back();
+        }
+    }
+}
+
+inline void State::popDefineList(DefineMap& defineMap,const StateSet::DefineList& defineList)
+{
+    for(StateSet::DefineList::const_iterator aitr=defineList.begin();
+        aitr!=defineList.end();
+        ++aitr)
+    {
+        // get the attribute stack for incoming type {aitr->first}.
+        DefineStack& ds = defineMap.map[aitr->first];
+        DefineStack::DefineVec& dv = ds.defineVec;
+        if (!dv.empty())
+        {
+            // if the stack has less than 2 entries or new back vs old back are different then mark the DefineStack as changed
+            if ((dv.size()<2) || (dv[dv.size()-2].first!=dv.back().first))
+            {
+                ds.changed = true;
+                defineMap.changed = true;
+            }
+            dv.pop_back();
         }
     }
 }
@@ -2538,6 +2741,74 @@ inline void State::applyUniformList(UniformMap& uniformMap,const StateSet::Unifo
 
 }
 
+inline void State::applyDefineList(DefineMap& defineMap, const StateSet::DefineList& defineList)
+{
+    StateSet::DefineList::const_iterator dl_itr = defineList.begin();
+    DefineMap::DefineStackMap::iterator dm_itr = defineMap.map.begin();
+
+    defineMap.changed = false;
+    defineMap.currentDefines.clear();
+
+    while (dm_itr!=defineMap.map.end() && dl_itr!=defineList.end())
+    {
+        if (dm_itr->first<dl_itr->first)
+        {
+            DefineStack& ds = dm_itr->second;
+            DefineStack::DefineVec& dv = ds.defineVec;
+            if (!dv.empty() && (dv.back().second & StateAttribute::ON)!=0) defineMap.currentDefines[dm_itr->first] = dv.back();
+
+            ++dm_itr;
+        }
+        else if (dl_itr->first<dm_itr->first)
+        {
+            if ((dl_itr->second.second & StateAttribute::ON)!=0) defineMap.currentDefines[dl_itr->first] = dl_itr->second;
+
+            ++dl_itr;
+        }
+        else
+        {
+            // this_mitr & ds_mitr refer to the same mode, check the override
+            // if any otherwise just apply the incoming mode.
+
+            DefineStack& ds = dm_itr->second;
+            DefineStack::DefineVec& dv = ds.defineVec;
+
+            if (!dv.empty() && (dv.back().second & StateAttribute::OVERRIDE)!=0 && !(dl_itr->second.second & StateAttribute::PROTECTED))
+            {
+                // override is on, just treat as a normal apply on modes.
+                if ((dv.back().second & StateAttribute::ON)!=0) defineMap.currentDefines[dm_itr->first] = dv.back();
+            }
+            else
+            {
+                // no override on or no previous entry, therefore consider incoming mode.
+                if ((dl_itr->second.second & StateAttribute::ON)!=0) defineMap.currentDefines[dl_itr->first] = dl_itr->second;
+            }
+
+            ++dm_itr;
+            ++dl_itr;
+        }
+    }
+
+    // iterator over the remaining state modes to apply any previous changes.
+    for(;
+        dm_itr!=defineMap.map.end();
+        ++dm_itr)
+    {
+        // note GLMode = this_mitr->first
+        DefineStack& ds = dm_itr->second;
+        DefineStack::DefineVec& dv = ds.defineVec;
+        if (!dv.empty() && (dv.back().second & StateAttribute::ON)!=0) defineMap.currentDefines[dm_itr->first] = dv.back();
+    }
+
+    // iterator over the remaining incoming modes to apply any new mode.
+    for(;
+        dl_itr!=defineList.end();
+        ++dl_itr)
+    {
+        if ((dl_itr->second.second & StateAttribute::ON)!=0) defineMap.currentDefines[dl_itr->first] = dl_itr->second;
+    }
+}
+
 inline void State::applyModeMap(ModeMap& modeMap)
 {
     for(ModeMap::iterator mitr=modeMap.begin();
@@ -2670,6 +2941,10 @@ inline bool State::setActiveTextureUnit( unsigned int unit )
     }
     return true;
 }
+
+// forward declare speciailization of State::get() method
+template<> inline GLExtensions* State::get<GLExtensions>() { return _glExtensions.get(); }
+template<> inline const GLExtensions* State::get<GLExtensions>() const { return _glExtensions.get(); }
 
 }
 

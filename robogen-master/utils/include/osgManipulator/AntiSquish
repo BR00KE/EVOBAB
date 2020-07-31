@@ -17,20 +17,15 @@
 
 #include <osgManipulator/Export>
 
-#include <osg/Matrix>
-#include <osg/CopyOp>
-#include <osg/NodeVisitor>
-#include <osg/NodeCallback>
-#include <osg/MatrixTransform>
-#include <osg/Quat>
-#include <osg/Vec3>
+#include <osg/Transform>
+#include <OpenThreads/Mutex>
 
 namespace osgManipulator {
 
 /**
  * Class that performs the Anti Squish by making the scaling uniform along all axes.
  */
-class OSGMANIPULATOR_EXPORT AntiSquish: public osg::MatrixTransform
+class OSGMANIPULATOR_EXPORT AntiSquish: public osg::Transform
 {
     public :
         AntiSquish();
@@ -44,11 +39,16 @@ class OSGMANIPULATOR_EXPORT AntiSquish: public osg::MatrixTransform
 
         virtual bool isSameKindAs(const osg::Object* obj) const { return dynamic_cast<const AntiSquish *>(obj)!=NULL; }
 
+        virtual const char* libraryName() const { return "osgManipulator"; }
+
+        virtual const char* className() const { return "AntiSquish"; }
+
+
         void setPivot(const osg::Vec3d& pvt)
         {
             _pivot = pvt;
-            _usePivot = true; 
-            _dirty = true;
+            _usePivot = true;
+            _cacheDirty = true;
         }
 
         const osg::Vec3d& getPivot() const { return _pivot; }
@@ -56,19 +56,20 @@ class OSGMANIPULATOR_EXPORT AntiSquish: public osg::MatrixTransform
         void setPosition(const osg::Vec3d& pos)
         {
             _position = pos;
-            _usePosition = true; 
-            _dirty = true;
+            _usePosition = true;
+            _cacheDirty = true;
         }
 
         const osg::Vec3d& getPosition() const { return _position; }
-                    
-        virtual ~AntiSquish();
 
-        osg::Matrix computeUnSquishedMatrix(const osg::Matrix&, bool& flag);
+        bool computeLocalToWorldMatrix(osg::Matrix& matrix,osg::NodeVisitor*) const;
+        bool computeWorldToLocalMatrix(osg::Matrix& matrix,osg::NodeVisitor*) const;
 
     protected:
 
-        osg::NodeCallback* _asqCallback;
+        virtual ~AntiSquish();
+
+        bool computeUnSquishedMatrix(osg::Matrix&) const;
 
         osg::Vec3d _pivot;
         bool _usePivot;
@@ -76,9 +77,11 @@ class OSGMANIPULATOR_EXPORT AntiSquish: public osg::MatrixTransform
         osg::Vec3d _position;
         bool _usePosition;
 
-        bool _dirty;
-        osg::Matrix _cachedLocalToWorld;
-}; 
+        mutable OpenThreads::Mutex _cacheLock;
+        mutable bool _cacheDirty;
+        mutable osg::Matrix _cacheLocalToWorld;
+        mutable osg::Matrix _cache;
+};
 
 }
 #endif

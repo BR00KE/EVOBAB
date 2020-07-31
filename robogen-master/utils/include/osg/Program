@@ -1,4 +1,4 @@
-/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield 
+/* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  * Copyright (C) 2003-2005 3Dlabs Inc. Ltd.
  * Copyright (C) 2004-2005 Nathan Cournia
  * Copyright (C) 2008 Zebra Imaging
@@ -7,7 +7,7 @@
  * This application is open source and may be redistributed and/or modified
  * freely and without restriction, both in commercial and non commercial
  * applications, as long as this copyright notice is maintained.
- * 
+ *
  * This application is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -99,12 +99,13 @@ class OSG_EXPORT Program : public osg::StateAttribute
         void setParameter( GLenum pname, GLint value );
         GLint getParameter( GLenum pname ) const;
 
-        void setParameterfv( GLenum pname, const GLfloat* value );
-        const GLfloat* getParameterfv( GLenum pname ) const;
+        /** Set/get compute shader work groups */
+        void setComputeGroups( GLint numGroupsX, GLint numGroupsY, GLint numGroupsZ );
+        void getComputeGroups( GLint& numGroupsX, GLint& numGroupsY, GLint& numGroupsZ ) const;
 
         /** Add an attribute location binding. */
         void addBindAttribLocation( const std::string& name, GLuint index );
-        
+
         /** Remove an attribute location binding. */
         void removeBindAttribLocation( const std::string& name );
 
@@ -122,6 +123,40 @@ class OSG_EXPORT Program : public osg::StateAttribute
 
         /** Remove a uniform block binding. */
         void removeBindUniformBlock(const std::string& name);
+
+        /** Remove a TransformFeedBackVarying. */
+        void removeTransformFeedBackVarying(const std::string& name)
+        {
+            for(std::vector<std::string>::iterator i=_feedbackout.begin(); i!=_feedbackout.end(); i++)
+            {
+                if (*i == name) {_feedbackout.erase(i);break; }
+            }
+        }
+
+        /** Add a TransformFeedBack Varying Name. */
+        void addTransformFeedBackVarying(const std::string& outname)
+        {
+            _feedbackout.push_back(outname);
+        }
+
+        /** Get number of TransformFeedBack Varyings. */
+        inline unsigned int getNumTransformFeedBackVaryings() const { return _feedbackout.size(); }
+
+        /** Get const TransformFeedBack Varying at index i. */
+        inline const std::string& getTransformFeedBackVarying(unsigned int i) const { return _feedbackout[i]; }
+
+        /** Set TransformFeedBack Mode. */
+        void setTransformFeedBackMode(GLenum e) {_feedbackmode=e;}
+
+        /** Get TransformFeedBack Mode. */
+        GLenum getTransformFeedBackMode() const {return _feedbackmode;}
+
+        /** Experimental. */
+        void setShaderDefines(const ShaderDefines& shaderDefs) { _shaderDefines = shaderDefs; }
+        ShaderDefines& getShaderDefines() { return _shaderDefines; }
+        const ShaderDefines& getShaderDefines() const { return _shaderDefines; }
+
+
 
         /** Simple class for wrapping up the data used in glProgramBinary and glGetProgramBinary.
           * On the first run of your application Programs should be assigned an empty ProgramBinary.
@@ -154,7 +189,7 @@ class OSG_EXPORT Program : public osg::StateAttribute
                 GLenum getFormat() const {return _format;}
 
                 /** Get the size of the program binary data.*/
-                unsigned int getSize() const { return _data.size(); }
+                unsigned int getSize() const { return static_cast<unsigned int>(_data.size()); }
 
                 /** Get a ptr to the program binary data.*/
                 unsigned char* getData() { return _data.empty() ? 0 : &(_data.front()); }
@@ -171,13 +206,13 @@ class OSG_EXPORT Program : public osg::StateAttribute
         /** Set the Program using a ProgramBinary. If a ProgramBinary is not yet
          * available then setting an empty one signals that compileProgramBinary
          * will be called later.*/
-        void setProgramBinary(ProgramBinary* programBinary) { _programBinary = programBinary; } 
+        void setProgramBinary(ProgramBinary* programBinary) { _programBinary = programBinary; }
 
         /** Get the Program's ProgramBinary, return NULL if none is assigned. */
-        ProgramBinary* getProgramBinary() { return _programBinary.get(); } 
+        ProgramBinary* getProgramBinary() { return _programBinary.get(); }
 
         /** Get the const Program's ProgramBinary, return NULL if none is assigned. */
-        const ProgramBinary* getProgramBinary() const { return _programBinary.get(); } 
+        const ProgramBinary* getProgramBinary() const { return _programBinary.get(); }
 
         typedef std::map<std::string,GLuint> AttribBindingList;
         typedef std::map<std::string,GLuint> FragDataBindingList;
@@ -217,8 +252,8 @@ class OSG_EXPORT Program : public osg::StateAttribute
         };
         typedef std::map< unsigned int, ActiveVarInfo > ActiveUniformMap;
         typedef std::map< std::string, ActiveVarInfo > ActiveVarInfoMap;
-        const ActiveUniformMap& getActiveUniforms(unsigned int contextID) const;
-        const ActiveVarInfoMap& getActiveAttribs(unsigned int contextID) const;
+        //const ActiveUniformMap& getActiveUniforms(unsigned int contextID) const;
+        //const ActiveVarInfoMap& getActiveAttribs(unsigned int contextID) const;
         struct UniformBlockInfo
         {
             UniformBlockInfo() : _index(GL_INVALID_INDEX), _size(0) {}
@@ -230,7 +265,8 @@ class OSG_EXPORT Program : public osg::StateAttribute
             GLsizei _size;
         };
         typedef std::map<std::string, UniformBlockInfo> UniformBlockMap;
-        const UniformBlockMap& getUniformBlocks(unsigned contextID) const;
+
+        //const UniformBlockMap& getUniformBlocks(unsigned contextID) const;
     public:
 
         // make PerContextProgram a friend to allow it access Program's protected
@@ -242,16 +278,22 @@ class OSG_EXPORT Program : public osg::StateAttribute
         class OSG_EXPORT PerContextProgram : public osg::Referenced
         {
             public:
-                PerContextProgram(const Program* program, unsigned int contextID);
+                /** Use "0" as programHandle to let the PeContextProgram execute "glCreateProgram"and "glDeleteProgram" */
+                PerContextProgram(const Program* program, unsigned int contextID, GLuint programHandle=0);
 
                 GLuint getHandle() const {return _glProgramHandle;}
 
+                const osg::Program* getProgram() const { return _program; }
+
+                void setDefineString(const std::string& defStr) { _defineStr = defStr; }
+                const std::string& getDefineString() const { return _defineStr; }
+
                 void requestLink();
-                void linkProgram(osg::State& state);
-                bool validateProgram();
+                virtual void linkProgram(osg::State& state);
+                virtual bool validateProgram();
                 bool needsLink() const {return _needsLink;}
                 bool isLinked() const {return _isLinked;}
-                bool getInfoLog( std::string& infoLog ) const;
+                virtual bool getInfoLog( std::string& infoLog ) const;
 
                 /** Was glProgramBinary called successfully? */
                 bool loadedBinary() const {return _loadedBinary;}
@@ -262,28 +304,21 @@ class OSG_EXPORT Program : public osg::StateAttribute
                  * compileProgramBinary should be called after the program has been
                  * "exercised" by rendering with it. The ProgramBinary can then be saved
                  * to disk for faster subsequent compiling. */
-                ProgramBinary* compileProgramBinary(osg::State& state);
+                virtual ProgramBinary* compileProgramBinary(osg::State& state);
 
-                void useProgram() const;
+                virtual void useProgram() const;
 
                 void resetAppliedUniforms() const
                 {
-                    for(LastAppliedUniformList::iterator itr=_lastAppliedUniformList.begin();
-                        itr!=_lastAppliedUniformList.end();
-                        ++itr)
-                    {
-                        (*itr).first = 0;
-                        (*itr).second = 0;
-                    }
+                    _lastAppliedUniformList.clear();
                 }
-                
-                
+
+
                 inline void apply(const Uniform& uniform) const
                 {
                     GLint location = getUniformLocation(uniform.getNameID());
                     if (location>=0)
                     {
-                        if ((unsigned int)location>=_lastAppliedUniformList.size()) _lastAppliedUniformList.resize(location+1);
                         const Uniform* lastAppliedUniform = _lastAppliedUniformList[location].first.get();
                         if (lastAppliedUniform != &uniform)
                         {
@@ -311,8 +346,8 @@ class OSG_EXPORT Program : public osg::StateAttribute
                   * Alternative version of getUniformLocation( unsigned int uniformNameID )
                   * retrofited into OSG for backward compatibility with osgCal,
                   * after uniform ids were refactored from std::strings to GLints in OSG version 2.9.10.
-                  * 
-                  * Drawbacks: This method is not particularly fast. It has to access mutexed static 
+                  *
+                  * Drawbacks: This method is not particularly fast. It has to access mutexed static
                   * map of uniform ids. So don't overuse it or your app performance will suffer.
                 */
                 inline GLint getUniformLocation( const std::string & uniformName ) const { return getUniformLocation( Uniform::getNameID( uniformName ) ); }
@@ -328,33 +363,42 @@ class OSG_EXPORT Program : public osg::StateAttribute
                 {
                     _shadersToDetach.push_back(shader);
                 }
-      
+
             protected:        /*methods*/
-                ~PerContextProgram();
+                virtual ~PerContextProgram();
 
             protected:        /*data*/
                 /** Pointer to our parent Program */
                 const Program* _program;
                 /** Pointer to this context's extension functions */
-                osg::ref_ptr<GL2Extensions> _extensions;
+                osg::ref_ptr<GLExtensions> _extensions;
+
                 /** Handle to the actual OpenGL glProgram */
                 GLuint _glProgramHandle;
+
+                /** Define string passed on to Shaders to help configure them.*/
+                std::string _defineStr;
+
                 /** Does our glProgram need to be linked? */
                 bool _needsLink;
                 /** Is our glProgram successfully linked? */
                 bool _isLinked;
                 /** Was glProgramBinary called successfully? */
                 bool _loadedBinary;
+
                 const unsigned int _contextID;
+
+                /** Does the glProgram handle belongs to this class? */
+                bool _ownsProgramHandle;
 
                 ActiveUniformMap _uniformInfoMap;
                 ActiveVarInfoMap _attribInfoMap;
                 UniformBlockMap _uniformBlockMap;
-                
+
                 typedef std::pair<osg::ref_ptr<const osg::Uniform>, unsigned int> UniformModifiedCountPair;
-                typedef std::vector<UniformModifiedCountPair> LastAppliedUniformList;
+                typedef std::map<unsigned int, UniformModifiedCountPair> LastAppliedUniformList;
                 mutable LastAppliedUniformList _lastAppliedUniformList;
-      
+
                 typedef std::vector< ref_ptr<Shader> > ShaderList;
                 ShaderList _shadersToDetach;
                 ShaderList _shadersToAttach;
@@ -365,15 +409,33 @@ class OSG_EXPORT Program : public osg::StateAttribute
                 PerContextProgram& operator=(const PerContextProgram&);        // disallowed
         };
 
+        struct OSG_EXPORT ProgramObjects : public osg::Referenced
+        {
+            typedef std::vector< osg::ref_ptr<PerContextProgram> > PerContextPrograms;
+
+            ProgramObjects(const Program* program, unsigned int contextID);
+
+            unsigned int        _contextID;
+            const Program*      _program;
+            mutable PerContextPrograms  _perContextPrograms;
+
+            PerContextProgram* getPCP(const std::string& defineStr) const;
+            PerContextProgram* createPerContextProgram(const std::string& defineStr);
+            void requestLink();
+            void addShaderToAttach(Shader* shader);
+            void addShaderToDetach(Shader* shader);
+            bool getGlProgramInfoLog(std::string& log) const;
+        };
+
         /** Get the PCP for a particular GL context */
-        PerContextProgram* getPCP(unsigned int contextID) const;
+        PerContextProgram* getPCP(State& state) const;
 
     protected:        /*methods*/
         virtual ~Program();
 
     protected:        /*data*/
 
-        mutable osg::buffered_value< osg::ref_ptr<PerContextProgram> > _pcpList;
+        mutable osg::buffered_value< osg::ref_ptr<ProgramObjects> > _pcpList;
         AttribBindingList _attribBindingList;
         FragDataBindingList _fragDataBindingList;
         UniformBlockBindingList _uniformBlockBindingList;
@@ -388,13 +450,18 @@ class OSG_EXPORT Program : public osg::StateAttribute
         GLint _geometryInputType;
         GLint _geometryOutputType;
 
-        /** Parameter maintained with glPatchParameteri */
-        GLint _patchVertices;
 
-        /** Parameter maintained with glPatchParameterfv */
-        // todo add tessellation default level
-        //GLfloat _patchDefaultInnerLevel[2];
-        //GLfloat _patchDefaultOuterLevel[4];
+        /** Parameter maintained with glDispatchCompute */
+        GLint _numGroupsX;
+        GLint _numGroupsY;
+        GLint _numGroupsZ;
+
+        /**TransformFeedBack**/
+        GLenum _feedbackmode;
+        std::vector<std::string> _feedbackout;
+
+        ShaderDefines _shaderDefines;
+
 
     private:
         Program& operator=(const Program&);        // disallowed
