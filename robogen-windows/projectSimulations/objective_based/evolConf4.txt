@@ -1,6 +1,6 @@
 simulatorConfFile=sim_configs\conf4.txt
-mu=5
-lambda=5
+mu=20
+lambda=20
 selection=deterministic-tournament
 replacement=plus
 tournamentSize=2
@@ -18,4 +18,5 @@ pSubtreeDuplicate=0.1
 pSubtreeSwap=0.1
 pNodeRemove=0.1
 pParameterModify=0.1
+evolutionaryAlgorithm=basic
 socket=127.0.0.1:8004
