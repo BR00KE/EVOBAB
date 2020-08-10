@@ -1,0 +1,337 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\PartList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\Robogen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\Robot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\Simulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\arduino\ArduinoNNCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\brain\NeuralNetwork.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\config\ConfigurationReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\config\EvolverConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\config\StartPosition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\engine\BodyVerifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\engine\EvolverLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\engine\IndividualContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\engine\Mutator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\engine\Population.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\engine\neat\NeatContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\engine\selectors\DeterministicTournament.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\Genome.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\Innovation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\NeuralNetwork.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\Parameters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\PhenotypeBehavior.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\Population.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\PythonBindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\Random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\Species.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\Substrate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\neat\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\representation\NeuralNetworkRepresentation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\representation\NeuronRepresentation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\representation\PartRepresentation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\evolution\representation\RobotRepresentation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\AbstractBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\CompositeBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\Connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\Joint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\SimpleBody.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\CardanModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\HingeModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\ParametricBrickModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\PassiveWheelModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\actuated\ActiveCardanModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\actuated\ActiveHingeModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\actuated\ActiveWheelModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\actuated\ActiveWhegModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\actuated\RotateJointModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\perceptive\CoreComponentModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\perceptive\IrSensorModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\perceptive\LightSensorModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\components\perceptive\TouchSensorModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\motors\Motor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\motors\RotationMotor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\motors\ServoMotor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\objects\BoxObstacle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\objects\LightSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\sensors\ImuSensor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\sensors\IrSensor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\sensors\LightSensor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\model\sensors\TouchSensor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\printing\BodyCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\RenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\callback\ActiveCardanCrossCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\callback\BodyCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\callback\CardanCrossCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\callback\PositionObservableCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\ActiveCardanRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\ActiveHingeRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\ActiveWheelRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\ActiveWhegRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\CardanRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\CoreComponentRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\HingeRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\IrSensorRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\LightSensorRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\ParametricBrickRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\PassiveWheelRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\RotateJointRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\components\TouchSensorRenderModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\objects\BoxObstacleRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\objects\LightSourceRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\render\objects\TerrainRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scenario\ChasingScenario.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scenario\Environment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scenario\JSScenario.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scenario\QScriptScenario.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scenario\RacingScenario.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scenario\Scenario.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scenario\ScenarioFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scenario\Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\scripting\QBindings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\JSUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\QScriptUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\RobogenCollision.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\RobogenUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\json2pb\json2pb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\network\FakeJSSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\network\Socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\network\SocketIOConnectionListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\utils\network\TcpSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\viewer\FileViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\viewer\FileViewerLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\viewer\JSViewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\viewer\Viewer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\viewer\WebGLLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\build\robogen.pb.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\build\CMakeFiles\aa1bf42b39dfb51d09c0c253fa33b6d7\robogen.pb.h.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Brooke\OneDrive\Documents\Honours2020\EVOBAB\EVOBAB\robogen-master\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{61E31CB3-CF09-3A2B-9F6A-4B657B5F61AC}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{5E1890E8-5379-3CDB-A38A-1F5988587813}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
