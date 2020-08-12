@@ -1,0 +1,16 @@
+# Ignore all backup files
+*~
+
+# Ignore pyc files
+*.pyc
+
+# Ignore NeuralNetwork template
+NeuralNetwork.template
+
+# Ignore eclipse project files
+.cproject
+.project
+
+# Don't ignore this file
+!.gitignore
+
