@@ -365,5 +365,5 @@ robogen-windows/Cart-Robot/*
 robogen-windows/run/results/*
 
 #robogen-CMAKE
-robogen/build/CMakeFiles/
+robogen/build/CMakeFiles/*
 robogen/build/CMakeCache.txt
