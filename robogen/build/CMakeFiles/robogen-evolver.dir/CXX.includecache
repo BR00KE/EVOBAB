@@ -6,8 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/brooke_ste/EVOBAB/EVOBAB/robogen/build/robogen-evolver_autogen/mocs_compilation.cpp
-
 /home/brooke_ste/EVOBAB/EVOBAB/robogen/src/Evolver.cpp
 boost/shared_ptr.hpp
 -
