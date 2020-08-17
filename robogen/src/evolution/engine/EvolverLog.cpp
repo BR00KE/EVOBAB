@@ -173,10 +173,14 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 
 
 	if(saveAll_) {
+		//make a folder to store individuals for each generation
+		
+		boost::filesystem::path genPath(logPath_+"/Generation-"+ std::to_string(generation));
+		boost::filesystem::create_directory(genPath);
 		for(unsigned int i = 0; i<population.size(); ++i) {
 			std::stringstream ss;
-			ss << logPath_ + "/Generation-" << generation << "-Guy-" << (i+1)
-					<< ".json";
+			//ss << logPath_ + "/Generation-" << generation << "-Guy-" << (i+1) << ".json";
+			ss << logPath_+"/Generation-"+ std::to_string(generation) + "/Indivindual-" << (i+1) << ".json";
 			saveRobotJson(population[i], ss.str());
 		}
 	}
