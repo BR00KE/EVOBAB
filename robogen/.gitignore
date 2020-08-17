@@ -15,9 +15,11 @@ NeuralNetwork.template
 !.gitignore
 
 build/CMakeFiles/*
+build/cmake_install.cmake
 build/CMakeCache.txt
 build/CMakeFiles/robogen-evolver.dir/CXX.includecache
 build/CMakeFiles/robogen.dir/C.includecache
 build/CMakeFiles/robogen.dir/CXX.includecache
 build/CMakeFiles/robogen.dir/evolution/engine/EvolverLog.cpp.o
 build/CMakeFiles/robogen_autogen.dir/ParseCache.txt
+build/results/*
