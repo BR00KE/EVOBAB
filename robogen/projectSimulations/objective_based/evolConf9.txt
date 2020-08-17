@@ -1,4 +1,4 @@
-simulatorConfFile=sim_configs\conf9.txt
+simulatorConfFile=sim_configs/conf9.txt
 mu=20
 lambda=20
 selection=deterministic-tournament

@@ -1,7 +1,7 @@
 #medium friction, low obstacles
 #Simulator Configuration File
 
-scenario=objective_locomotion.js
+scenario=novelty_locomotion.js
 
 #optionally specify the name of another file where obstacles are defined 
 obstaclesConfigFile= obstacles1.txt

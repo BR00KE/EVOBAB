@@ -1,4 +1,4 @@
-simulatorConfFile=sim_configs/conf0.txt
+simulatorConfFile=sim_configs/conf11.txt
 mu=20
 lambda=20
 selection=deterministic-tournament
@@ -19,4 +19,4 @@ pSubtreeSwap=0.1
 pNodeRemove=0.1
 pParameterModify=0.1
 evolutionaryAlgorithm=basic
-socket=127.0.0.1:8000
+socket=127.0.0.1:8011
