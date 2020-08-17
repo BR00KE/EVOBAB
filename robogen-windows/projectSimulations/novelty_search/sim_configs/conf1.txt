@@ -1,7 +1,7 @@
-#flat environment - lower friction (0.6)
+#flat environment - flat ground medium friction (0.6)
 #Simulator Configuration File
 
-scenario=novelty_locomotion.js
+scenario=objective_locomotion.js
 
 #optionally specify the name of another file where obstacles are defined 
 #obstaclesConfigFile
