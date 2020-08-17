@@ -238,6 +238,8 @@ ClientBin/
 *.publishsettings
 orleans.codegen.cs
 
+
+
 # Including strong name files can present a security risk
 # (https://github.com/github/gitignore/pull/2483#issue-259490424)
 #*.snk
@@ -367,3 +369,8 @@ robogen-windows/run/results/*
 #robogen-CMAKE
 robogen/build/CMakeFiles/*
 robogen/build/CMakeCache.txt
+robogen/build/CMakeFiles/robogen-evolver.dir/CXX.includecache
+robogen/build/CMakeFiles/robogen.dir/C.includecache
+robogen/build/CMakeFiles/robogen.dir/CXX.includecache
+robogen/build/CMakeFiles/robogen.dir/evolution/engine/EvolverLog.cpp.o
+robogen/build/CMakeFiles/robogen_autogen.dir/ParseCache.txt
