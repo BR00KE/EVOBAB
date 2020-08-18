@@ -114,6 +114,23 @@ std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspring(
 	return offspring;
 }
 
+std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspringHyperNEAT(
+			boost::shared_ptr<RobotRepresentation> parent1,
+			boost::shared_ptr<RobotRepresentation> parent2) {
+
+	std::vector<boost::shared_ptr<RobotRepresentation> > offspring;
+
+	offspring.push_back(boost::shared_ptr<RobotRepresentation>(new
+			RobotRepresentation(*parent1.get())));
+
+	// Mutate
+	for(size_t i = 0; i < offspring.size(); ++i) {
+		this->mutateHyperNEAT(offspring[i]);
+	}
+
+	return offspring;
+}
+
 void Mutator::growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot) {
 
 	boost::random::uniform_int_distribution<> dist(conf_->minNumInitialParts,
@@ -198,6 +215,17 @@ bool Mutator::mutate(boost::shared_ptr<RobotRepresentation>& robot) {
 			|| conf_->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
 		mutated = (this->mutateBrain(robot) || mutated);
 	}
+
+	if (conf_->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
+		mutated = (this->mutateBody(robot) || mutated);
+	}
+
+	return mutated;
+}
+
+bool Mutator::mutateHyperNEAT(boost::shared_ptr<RobotRepresentation>& robot) {
+
+	bool mutated = false;
 
 	if (conf_->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
 		mutated = (this->mutateBody(robot) || mutated);

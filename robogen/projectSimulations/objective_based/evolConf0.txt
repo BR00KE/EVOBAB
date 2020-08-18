@@ -18,5 +18,5 @@ pSubtreeDuplicate=0.1
 pSubtreeSwap=0.1
 pNodeRemove=0.1
 pParameterModify=0.1
-evolutionaryAlgorithm=basic
+evolutionaryAlgorithm=HyperNEAT
 socket=127.0.0.1:8000

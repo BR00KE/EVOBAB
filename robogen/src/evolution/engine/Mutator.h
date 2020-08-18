@@ -65,6 +65,15 @@ public:
 			boost::shared_ptr<RobotRepresentation> parent1,
 			boost::shared_ptr<RobotRepresentation> parent2 =
 					boost::shared_ptr<RobotRepresentation>());
+	
+	/**
+	 * ADDED BY CHRISTINA - used for the specific body mutation and hyperneat
+	 */
+	std::vector<boost::shared_ptr<RobotRepresentation> > createOffspringHyperNEAT(
+			boost::shared_ptr<RobotRepresentation> parent1,
+			boost::shared_ptr<RobotRepresentation> parent2 =
+					boost::shared_ptr<RobotRepresentation>());
+
 
 	void growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot);
 	void randomizeBrain(boost::shared_ptr<RobotRepresentation>& robot);
@@ -78,6 +87,14 @@ private:
 	 * a MutableDouble class
 	 */
 	bool mutate(boost::shared_ptr<RobotRepresentation>& robot);
+
+	/**
+	 * Made by CHRISTINA - for use with HyperNEAT
+	 * @return true if robot has been modified
+	 * @todo specify bounds in the Neural Network, not here, e.g. with
+	 * a MutableDouble class
+	 */
+	bool mutateHyperNEAT(boost::shared_ptr<RobotRepresentation>& robot);
 
 	/**
 	 * Performs crossover between two robots

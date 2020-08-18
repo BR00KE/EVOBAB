@@ -600,11 +600,11 @@ bool EvolverConfiguration::init(std::string configFileName) {
 		if (vm["evolutionaryAlgorithm"].as<std::string>().compare("HyperNEAT")
 				== 0) {
 
-			if (evolutionMode == FULL_EVOLVER) {
-				std::cerr << "Currently using HyperNEAT with full evolution "
-						<< "is not supported" << std::endl;
-				return false;
-			}
+			// if (evolutionMode == FULL_EVOLVER) {
+			// 	std::cerr << "Currently using HyperNEAT with full evolution "
+			// 			<< "is not supported" << std::endl;
+			// 	return false;
+			// }
 
 			evolutionaryAlgorithm = HYPER_NEAT;
 			neatParams.PopulationSize = mu;
