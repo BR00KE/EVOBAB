@@ -144,6 +144,7 @@ void parseArgsThenInit(int argc, char* argv[]) {
 			exitRobogen(EXIT_FAILURE);
 		}
 
+		//BROOKE: add a novelty tag here to set selection method, probs the easiest way
 	}
 
 	init(seed, outputDirectory, confFileName, overwrite, saveAll);
@@ -154,7 +155,6 @@ void init(unsigned int seed, std::string outputDirectory,
 		std::string confFileName, bool overwrite, bool saveAll) {
 
 	// Seed random number generator
-
 	rng.seed(seed);
 
 	conf.reset(new EvolverConfiguration());
@@ -228,9 +228,9 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 
 	neat = (conf->evolutionaryAlgorithm == EvolverConfiguration::HYPER_NEAT);
-	population.reset(new Population());
+	population.reset(new Population()); //Population() calls IndividualContainer() which just sets evaluated sorted and evaluated both false
 	if (!population->init(referenceBot, conf->mu, mutator, growBodies,
-			(!(conf->useBrainSeed || neat)) ) ) {
+			(!(conf->useBrainSeed || neat)) ) ) { //takes ref bot as first individual in the pop and fills pop vec with RobotRepresentations
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
@@ -262,20 +262,20 @@ void init(unsigned int seed, std::string outputDirectory,
 	// ---------------------------------------
 
 	if(neat) {
-		if(!neatContainer->fillPopulationWeights(population)) {
+		if(!neatContainer->fillPopulationWeights(population)) { //query for the weights between robots cpgs
 			std::cerr << "Filling weights from NEAT failed." << std::endl;
 			exitRobogen(EXIT_FAILURE);
 		}
 	}
 
 	generation = 1;
-	population->evaluate(robotConf, sockets);
-}
+	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
+}//end of init
 
 void mainEvolutionLoop();
 
 void postEvaluateNEAT() {
-	population->sort(true);
+	population->sort(true); //after neat sorted best to worst
 	mainEvolutionLoop();
 }
 
@@ -332,7 +332,7 @@ void mainEvolutionLoop() {
 		// create children
 		if (neat) {
 			//neatPopulation->Epoch();
-			if(!neatContainer->produceNextGeneration(population)) {
+			if(!neatContainer->produceNextGeneration(population)) { //next generation of brains?
 				std::cerr << "Producing next generation from NEAT failed."
 						<< std::endl;
 				exitRobogen(EXIT_FAILURE);

@@ -125,7 +125,7 @@ bool NeatContainer::produceNextGeneration(boost::shared_ptr<Population>
 	//std::cout << "before epoch size is " << neatIdToGenomeMap_.size()
 	//		<< " " << neatIdToRobotMap_.size() << std::endl;
 	//printCurrentIds();
-	neatPopulation_->Epoch();
+	neatPopulation_->Epoch(); //Epoch performs one generation and reproduces the genomes
 	std::vector<unsigned int> currentIds;
 	std::vector<unsigned int> newIds;
 	std::cout <<  neatPopulation_->m_Species.size() << " species" << std::endl;
