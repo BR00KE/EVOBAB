@@ -51,6 +51,8 @@ public:
 
 	bool produceNextGeneration(boost::shared_ptr<Population> &population);
 
+	bool updateRobotMap(boost::shared_ptr<Population> &population);
+
 private:
 
 	bool fillBrain(NEAT::Genome *genome,

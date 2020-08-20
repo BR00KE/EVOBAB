@@ -208,6 +208,29 @@ bool NeatContainer::produceNextGeneration(boost::shared_ptr<Population>
 	return this->fillPopulationWeights(population);
 }
 
+	bool NeatContainer::updateRobotMap(boost::shared_ptr<Population> &population){
+		try {
+			int count = 0;
+			for(unsigned int i=0; i < neatPopulation_->m_Species.size(); i++) {
+				for(unsigned int j=0;
+						j < neatPopulation_->m_Species[i].m_Individuals.size();
+						j++) {
+					unsigned int id =
+							neatPopulation_->m_Species[i].m_Individuals[j].GetID();
+					// neatIdToGenomeMap_[id] =
+					// 		&neatPopulation_->m_Species[i].m_Individuals[j];
+					neatIdToRobotMap_[id] = population->at(count);
+					count++;
+				}
+			}
+			return true;
+		}
+		catch(...){
+			return false;
+		}
+	}
+
+
 bool NeatContainer::fillBrain(NEAT::Genome *genome,
 		boost::shared_ptr<RobotRepresentation> &robotRepresentation) {
 

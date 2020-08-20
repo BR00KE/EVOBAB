@@ -374,11 +374,24 @@ void mainEvolutionLoop() {
 				children.evaluate(robotConf, sockets);
 				std::cout << "Successfully mutated bodies........ " << generation << std::endl;
 				
+				// comma or plus?
+				if (conf->replacement == conf->PLUS_REPLACEMENT) {
+					children += *population.get();
+				}
+
+				// replace
+				population.reset(new Population());
+				if (!population->init(children, conf->mu)) {
+					std::cout << "Error when initializing population!" << std::endl;
+					exitRobogen(EXIT_FAILURE);
+				}
+				
 			}
 			catch (...){
 				std::cout << "Unlucky chief" << std::endl;
 			}
-		
+			std::cout << "Updating neat robot map"<< std::endl;
+			neatContainer->updateRobotMap(population);
 			// END OF ADDED BODY MUTATION
 			std::cout << "Starting HYPERNEAT BOIS" << std::endl;
 			//neatPopulation->Epoch();
