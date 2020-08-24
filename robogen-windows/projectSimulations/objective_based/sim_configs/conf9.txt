@@ -4,7 +4,7 @@
 scenario=objective_locomotion.js
 
 #optionally specify the name of another file where obstacles are defined 
-obstaclesConfigFile= obstacles1.txt
+obstaclesConfigFile= tiltedobstacles.txt
 
 #starting positions and orientations defined
 startPositionConfigFile=startposconfig.txt
