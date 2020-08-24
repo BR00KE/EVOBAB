@@ -3,9 +3,6 @@
 
 scenario=novelty_locomotion.js
 
-#optionally specify the name of another file where obstacles are defined 
-#obstaclesConfigFile
-
 #starting positions and orientations defined
 startPositionConfigFile=startposconfig.txt
 
@@ -19,7 +16,7 @@ simulationTime=10.0
 actuationFrequency=25
 terrainType=flat
 terrainLength=6
-terrainWidth=4
+terrainWidth=6
 
 terrainFriction=0.6
 

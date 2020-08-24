@@ -19,7 +19,7 @@ simulationTime=10.0
 actuationFrequency=25
 terrainType=flat
 terrainLength=6
-terrainWidth=4
+terrainWidth=6
 
 terrainFriction=0.2
 
