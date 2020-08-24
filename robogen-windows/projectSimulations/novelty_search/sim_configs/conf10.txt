@@ -1,4 +1,4 @@
-#Base environment - tilted ground, max friction
+#tilted environment, medium friction (0.6)
 #Simulator Configuration File
 
 scenario=objective_locomotion.js
@@ -21,7 +21,7 @@ terrainType=flat
 terrainLength=6
 terrainWidth=4
 
-terrainFriction=1.0
+terrainFriction=(0.6)
 
 sensorNoiseLevel=0.0
 motorNoiseLevel=0.0

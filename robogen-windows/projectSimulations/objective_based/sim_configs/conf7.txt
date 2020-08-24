@@ -20,8 +20,7 @@ actuationFrequency=25
 
 terrainType=flat
 terrainLength=6
-terrainWidth=4
-#terrainHeightField=height_field.jpg
+terrainWidth=6
 terrainHeight=0.5
 
 terrainFriction=0.6
