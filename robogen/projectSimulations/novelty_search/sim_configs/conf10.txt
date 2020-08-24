@@ -1,10 +1,10 @@
-#Base environment - tilted ground, max friction
+#Base environment - tilted ground, medium friction
 #Simulator Configuration File
 
 scenario=novelty_locomotion.js
 
 #optionally specify the name of another file where obstacles are defined 
-#obstaclesConfigFile
+obstaclesConfigFile=tiltedobstacles.txt
 
 #starting positions and orientations defined
 startPositionConfigFile=startposconfig.txt
@@ -19,14 +19,12 @@ simulationTime=10.0
 actuationFrequency=25
 terrainType=flat
 terrainLength=6
-terrainWidth=4
+terrainWidth=6
 
-terrainFriction=1.0
+terrainFriction=0.6
 
 sensorNoiseLevel=0.0
 motorNoiseLevel=0.0
 capAcceleration=false
 # uncomment the following to prevent 'jittery behaviors'
 #maxDirectionShiftsPerSecond=16
-
-

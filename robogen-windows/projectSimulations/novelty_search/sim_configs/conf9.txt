@@ -1,10 +1,10 @@
-#low friction, varied obstacles
+#full friction, tilted
 #Simulator Configuration File
 
-scenario=objective_locomotion.js
+scenario=novelty_locomotion.js
 
 #optionally specify the name of another file where obstacles are defined 
-obstaclesConfigFile= obstacles1.txt
+obstaclesConfigFile= tiltedobstacles.txt
 
 #starting positions and orientations defined
 startPositionConfigFile=startposconfig.txt
@@ -20,11 +20,10 @@ actuationFrequency=25
 
 terrainType=flat
 terrainLength=6
-terrainWidth=4
-#terrainHeightField=height_field.jpg
+terrainWidth=6
 terrainHeight=0.5
 
-terrainFriction=0.2
+terrainFriction=1.0
 
 sensorNoiseLevel=0.0
 motorNoiseLevel=0.0
