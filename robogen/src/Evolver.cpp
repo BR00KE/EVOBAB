@@ -243,7 +243,7 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 	//make sure brains of pop are 'filled' using the CPPNs 
 	for(int i=0; i<population->size();i++){
-		neatContainer.fillBrain(& population->at(i)->neatGenome, population->at(i));
+		neatContainer->fillBrain(& population->at(i)->neatGenome, population->at(i));
 		//neatContainer->NeatContainer::fillBrain(& population->at(i)->neatGenome, population->at(i));
 	}
 
