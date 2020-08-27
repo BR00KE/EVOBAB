@@ -46,6 +46,8 @@
 #include "utils/network/TcpSocket.h"
 #include "robogen.pb.h"
 
+#include "evolution/neat/Genome.h"//BK added
+
 namespace robogen {
 
 /**
@@ -279,6 +281,10 @@ private:
 	 */
 	bool evaluated_;
 
+	/*
+	* BK: Genome for HyperNEAT-light attempt
+	*/
+	NEAT::Genome neatGenome;
 };
 
 /**
