@@ -242,10 +242,8 @@ void init(unsigned int seed, std::string outputDirectory,
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
 	}
 	//make sure brains of pop are 'filled' using the CPPNs 
-	for(int i=0; i<population->size();i++){
-		neatContainer->fillBrain(& population->at(i)->neatGenome, population->at(i));
-		//neatContainer->NeatContainer::fillBrain(& population->at(i)->neatGenome, population->at(i));
-	}
+	
+	
 
 
 	// ---------------------------------------
@@ -270,11 +268,14 @@ void init(unsigned int seed, std::string outputDirectory,
 	// run evolution TODO stopping criterion
 	// ---------------------------------------
 
+
 	if(neat) {
+		
 		if(!neatContainer->fillPopulationWeights(population)) { //query for the weights between robots cpgs
 			std::cerr << "Filling weights from NEAT failed." << std::endl;
 			exitRobogen(EXIT_FAILURE);
 		}
+		
 	}
 
 	generation = 1;

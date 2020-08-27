@@ -66,7 +66,7 @@ NeatContainer::~NeatContainer() {
 
 bool NeatContainer::fillPopulationWeights(
 		boost::shared_ptr<Population> &population) {
-
+	/*
 	for(NeatIdToGenomeMap::iterator i = neatIdToGenomeMap_.begin();
 			i != neatIdToGenomeMap_.end(); i++) {
 		unsigned int id = i->first;
@@ -82,6 +82,14 @@ bool NeatContainer::fillPopulationWeights(
 
 	}
 	return true;
+	*/
+	
+	for(auto i : *population){
+		try{fillBrain(i->getNeatGenomePointer(),i);}
+		catch(std::exception &e){std::cout<<e.what()<<std::endl;}
+	}
+	
+	//fillBrain(population->at(1)->getNeatGenomePointer(),population->at(1));
 }
 
 void NeatContainer::printCurrentIds() {
@@ -211,6 +219,7 @@ bool NeatContainer::produceNextGeneration(boost::shared_ptr<Population>
 bool NeatContainer::fillBrain(NEAT::Genome *genome,
 		boost::shared_ptr<RobotRepresentation> &robotRepresentation) {
 
+	
 	// Initialize ODE
 	dInitODE();
 	dWorldID odeWorld = dWorldCreate();

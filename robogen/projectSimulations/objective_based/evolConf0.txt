@@ -1,6 +1,6 @@
 simulatorConfFile=sim_configs/conf0.txt
-mu=20
-lambda=20
+mu=5
+lambda=5
 selection=deterministic-tournament
 replacement=plus
 tournamentSize=2
@@ -18,5 +18,5 @@ pSubtreeDuplicate=0.1
 pSubtreeSwap=0.1
 pNodeRemove=0.1
 pParameterModify=0.1
-evolutionaryAlgorithm=basic
+evolutionaryAlgorithm=HyperNEAT
 socket=127.0.0.1:8000

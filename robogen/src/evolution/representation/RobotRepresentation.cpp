@@ -55,6 +55,10 @@
 
 namespace robogen {
 
+NEAT::Genome * RobotRepresentation::getNeatGenomePointer(){
+		return & neatGenome;
+	}
+
 RobotRepresentation::RobotRepresentation() :
 		maxid_(1000), evaluated_(false) {
 
@@ -1147,7 +1151,7 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 
 //BK added for HyperNEAT-light attempt
 void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
-	neatGenome = neatgenome;
+	this->neatGenome = neatgenome;
 }
 
 }
