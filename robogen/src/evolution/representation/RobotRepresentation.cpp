@@ -1142,6 +1142,44 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 
 }
 
+float RobotRepresentation::calculateBodyComplexity(){
+	if(bodyTree_==NULL){ return 0;}
+	float complexity = 0.0f;
+	std::queue<boost::shared_ptr<PartRepresentation> > queue;
+	queue.push(bodyTree_);
+	while(!queue.empty()){
+		int size = queue.size();
+		while(size>0){
+			boost::shared_ptr<PartRepresentation> part = queue.front();
+			complexity+= getPartComplexity(part);
+			queue.pop();
+			for (unsigned int i = 0; i<part->getArity();i++){
+				boost::shared_ptr<PartRepresentation> tempPart = part->getChild(i);
+				if (part->getChild(i)!=NULL)
+				{
+					queue.push(part->getChild(i));
+				}
+			}
+			size--;
+		}
+	}
+	this->complexity_ = complexity;
+	return complexity;
+}
+
+float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentation> part){
+	std::stringstream str;
+	str << part->getType();
+	if(str.str()==PART_TYPE_PASSIVE_HINGE){return part->passiveHingeComplexity;}
+	else if(str.str()==PART_TYPE_ACTIVE_HINGE){return part->activeHingeComplexity;}
+	else if(str.str()==PART_TYPE_FIXED_BRICK){ return part->fixedBrickComplexity;}
+	else { return 0.0f;}
+}
+
+float RobotRepresentation::getComplexity(){
+	return complexity_;
+}
+
 }
 
 #endif /* usage of fake robot representation */

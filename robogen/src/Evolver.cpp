@@ -234,6 +234,7 @@ void init(unsigned int seed, std::string outputDirectory,
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
+	population->evaluateComplexity();
 
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
@@ -379,6 +380,7 @@ void mainEvolutionLoop() {
 				}
 			}
 			children.evaluate(robotConf, sockets);
+			children.evaluateComplexity();
 		}
 #ifndef EMSCRIPTEN
 		triggerPostEvaluate();

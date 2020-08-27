@@ -182,6 +182,9 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 			//ss << logPath_ + "/Generation-" << generation << "-Guy-" << (i+1) << ".json";
 			ss << logPath_+"/Generation-"+ std::to_string(generation) + "/Individual-" << (i+1) << ".json";
 			saveRobotJson(population[i], ss.str());
+			ss.str(std::string());
+			ss << logPath_+"/Generation-"+ std::to_string(generation) + "/Individual-" << (i+1) << "-Complexity.txt";
+			saveRobotComplexity(population[i], ss.str());
 		}
 	}
 
@@ -202,5 +205,11 @@ void EvolverLog::copyConfFile(std::string fileName) {
 	boost::filesystem::copy_file(confFrom, confTo);
 
 }
+void EvolverLog::saveRobotComplexity(boost::shared_ptr<RobotRepresentation> robot, std::string fileName){
+	std::ofstream complexityFile(fileName.c_str(),std::ios::out|std::ios::trunc);
+	complexityFile << robot->getComplexity();
+	complexityFile.close();
+}
+
 
 } /* namespace robogen */
