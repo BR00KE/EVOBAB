@@ -196,7 +196,8 @@ bool Mutator::mutate(boost::shared_ptr<RobotRepresentation>& robot) {
 	// mutate brain TODO conf bits?
 	if (conf_->evolutionMode == EvolverConfiguration::BRAIN_EVOLVER
 			|| conf_->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
-		mutated = (this->mutateBrain(robot) || mutated);
+		mutated = (this->mutateBrain(robot) || mutated);//BK change this to mutate CPPN
+		//BK add mutateBody here
 	}
 
 	if (conf_->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {

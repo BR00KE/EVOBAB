@@ -57,11 +57,45 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 		if (i == 0 || randomizeBrains) {
 			this->push_back(
 				boost::shared_ptr<RobotRepresentation>(
-						new RobotRepresentation(*robot.get())));
-
+						new RobotRepresentation(*robot.get()))); //BK change the RobotRepresentation Constructor to make a CPPN
+			
 			if (randomizeBrains) {
 				mutator->randomizeBrain(this->back());
 			}
+			
+		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
+			this->push_back( mutator->createOffspring(robot)[0] );
+		}
+
+		if (growBodies) {
+			mutator->growBodyRandomly(this->back());
+		}
+		//BodyVerifier::fixRobotBody(this->back());
+	}
+	return true;
+}
+//BK - the one used for HyperNEAT
+bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
+		boost::shared_ptr<Mutator> mutator, bool growBodies,
+		bool randomizeBrains, EvolverConfiguration & evolConf) {
+
+	// fill population vector
+	for (int i = 0; i < popSize; i++) {
+
+		if (i == 0 || randomizeBrains) {
+			this->push_back(
+				boost::shared_ptr<RobotRepresentation>(
+						new RobotRepresentation(*robot.get()))); //BK change the RobotRepresentation Constructor to make a CPPN
+			
+			if (randomizeBrains) {
+				//BK - This changed to randomly initialise neatGenome and then fill the brain
+				NEAT::Genome cppn = NEAT::Genome(0, 7, 0, 5, false,
+							NEAT::UNSIGNED_SIGMOID,NEAT::UNSIGNED_SIGMOID, 0,
+							evolConf.neatParams);
+				robot.get()->setNeatGenome(cppn);
+				
+			}
+			
 		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
 			this->push_back( mutator->createOffspring(robot)[0] );
 		}

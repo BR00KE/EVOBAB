@@ -91,6 +91,9 @@ RobotRepresentation::RobotRepresentation(const RobotRepresentation &r) {
 	fitness_ = r.fitness_;
 	evaluated_ = r.evaluated_;
 	maxid_ = r.maxid_;
+	
+	neatGenome = r.neatGenome;//BK added
+	
 }
 
 /**
@@ -1140,6 +1143,11 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 	}
 	return true;
 
+}
+
+//BK added for HyperNEAT-light attempt
+void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
+	neatGenome = neatgenome;
 }
 
 }

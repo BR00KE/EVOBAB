@@ -65,6 +65,15 @@ public:
 			bool randomizeBrains);
 
 	/**
+	 * BK - For HyperNEAT light
+	 * Aim to initialise population with random bodies and random CPPNs
+	 * Then use CPPNs to fill brain?
+	 */
+	bool init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
+			boost::shared_ptr<Mutator> mutator, bool growBodies,
+			bool randomizeBrains, EvolverConfiguration & evolConf);
+
+	/**
 	 * Creates a population from the popSize best individuals of origin.
 	 */
 	bool init(const IndividualContainer &origin, unsigned int popSize);

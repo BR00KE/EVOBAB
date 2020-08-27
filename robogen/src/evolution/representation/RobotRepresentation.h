@@ -235,6 +235,9 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
+	//BK added for HyperNEAT-light attempt
+	void setNeatGenome(NEAT::Genome & neatGenome);
+
 private:
 	/**
 	 *
