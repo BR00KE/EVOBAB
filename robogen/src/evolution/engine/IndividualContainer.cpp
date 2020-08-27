@@ -178,4 +178,16 @@ bool IndividualContainer::areEvaluated() const {
 	return evaluated_;
 }
 
+void IndividualContainer::evaluateComplexity() {
+	float complexity = 0.0f;
+	for (int i = 0; i<this->size();i++){
+		complexity += this->at(i)->calculateBodyComplexity();
+	}
+	complexity_ = complexity;
+}
+
+float IndividualContainer::getComplexity(){
+	return complexity_;
+}
+
 } /* namespace robogen */

@@ -233,6 +233,12 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
+	float calculateBodyComplexity();
+
+	float getPartComplexity(boost::shared_ptr<PartRepresentation> part);
+
+	float getComplexity();
+
 private:
 	/**
 	 *
@@ -278,6 +284,8 @@ private:
 	 * Indicates whether robot evaluated
 	 */
 	bool evaluated_;
+
+	float complexity_;
 
 };
 

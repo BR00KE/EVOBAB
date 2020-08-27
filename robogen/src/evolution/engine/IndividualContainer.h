@@ -69,6 +69,10 @@ public:
 	 */
 	bool areEvaluated() const;
 
+	void evaluateComplexity();
+
+	float getComplexity();
+
 
 protected:
 
@@ -77,6 +81,7 @@ protected:
 private:
 
 	bool sorted_;
+	float complexity_;
 
 };
 
