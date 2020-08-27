@@ -238,6 +238,11 @@ public:
 	//BK added for HyperNEAT-light attempt
 	void setNeatGenome(NEAT::Genome & neatGenome);
 
+	/*
+	* BK: Genome for HyperNEAT-light attempt
+	*/
+	NEAT::Genome neatGenome;
+
 private:
 	/**
 	 *
@@ -284,10 +289,7 @@ private:
 	 */
 	bool evaluated_;
 
-	/*
-	* BK: Genome for HyperNEAT-light attempt
-	*/
-	NEAT::Genome neatGenome;
+	
 };
 
 /**

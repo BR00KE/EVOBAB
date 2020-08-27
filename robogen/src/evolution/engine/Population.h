@@ -71,7 +71,7 @@ public:
 	 */
 	bool init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 			boost::shared_ptr<Mutator> mutator, bool growBodies,
-			bool randomizeBrains, EvolverConfiguration & evolConf);
+			bool randomizeBrains,  boost::shared_ptr<EvolverConfiguration> evolConf);
 
 	/**
 	 * Creates a population from the popSize best individuals of origin.

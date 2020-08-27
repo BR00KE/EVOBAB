@@ -229,15 +229,24 @@ void init(unsigned int seed, std::string outputDirectory,
 
 	neat = (conf->evolutionaryAlgorithm == EvolverConfiguration::HYPER_NEAT);
 	population.reset(new Population()); //Population() calls IndividualContainer() which just sets evaluated sorted and evaluated both false
+	//BK changed this to use the init method sig i made for hyperneat light implementation 
 	if (!population->init(referenceBot, conf->mu, mutator, growBodies,
-			(!(conf->useBrainSeed || neat)) ) ) { //takes ref bot as first individual in the pop and fills pop vec with RobotRepresentations
+			(!(conf->useBrainSeed || neat)), conf )) { //takes ref bot as first individual in the pop and fills pop vec with RobotRepresentations
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
 
+	// BK - maybe take this out, not really sure we need a neatContainer?
+	
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
 	}
+	//make sure brains of pop are 'filled' using the CPPNs 
+	for(int i=0; i<population->size();i++){
+		neatContainer.fillBrain(& population->at(i)->neatGenome, population->at(i));
+		//neatContainer->NeatContainer::fillBrain(& population->at(i)->neatGenome, population->at(i));
+	}
+
 
 	// ---------------------------------------
 	// open sockets for communication with simulator processes
