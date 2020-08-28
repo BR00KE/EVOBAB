@@ -228,10 +228,11 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 
 	neat = (conf->evolutionaryAlgorithm == EvolverConfiguration::HYPER_NEAT);
+	//bool var = conf->useBrainSeed || neat;
 	population.reset(new Population()); //Population() calls IndividualContainer() which just sets evaluated sorted and evaluated both false
 	//BK changed this to use the init method sig i made for hyperneat light implementation 
 	if (!population->init(referenceBot, conf->mu, mutator, growBodies,
-			(!(conf->useBrainSeed || neat)), conf )) { //takes ref bot as first individual in the pop and fills pop vec with RobotRepresentations
+			((conf->useBrainSeed || neat)), conf )) { //takes ref bot as first individual in the pop and fills pop vec with RobotRepresentations
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
@@ -271,10 +272,10 @@ void init(unsigned int seed, std::string outputDirectory,
 	// ---------------------------------------
 
 	if(neat) {
-		if(!neatContainer->fillPopulationWeights(population)) { //query for the weights between robots cpgs
-			std::cerr << "Filling weights from NEAT failed." << std::endl;
-			exitRobogen(EXIT_FAILURE);
-		}
+		// if(!neatContainer->fillPopulationWeights(population)) { //query for the weights between robots cpgs
+		// 	std::cerr << "Filling weights from NEAT failed." << std::endl;
+		// 	exitRobogen(EXIT_FAILURE);
+		// }
 	}
 
 	generation = 1;
@@ -308,7 +309,10 @@ void triggerPostEvaluate() {
 	if (generation == 1) {
 		mainEvolutionLoop();
 	} else {
-		if (neat) {
+		if (neat && conf->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
+			postEvaluateStd();
+		}
+		else if(neat){
 			postEvaluateNEAT();
 		} else {
 			postEvaluateStd();
@@ -340,13 +344,53 @@ void mainEvolutionLoop() {
 
 		// create children
 		if (neat) {
-			//neatPopulation->Epoch();
-			if(!neatContainer->produceNextGeneration(population)) { //next generation of brains?
-				std::cerr << "Producing next generation from NEAT failed."
-						<< std::endl;
-				exitRobogen(EXIT_FAILURE);
+			// //neatPopulation->Epoch();
+			// if(!neatContainer->produceNextGeneration(population)) { //next generation of brains?
+			// 	std::cerr << "Producing next generation from NEAT failed."
+			// 			<< std::endl;
+			// 	exitRobogen(EXIT_FAILURE);
+			// }
+			// population->evaluate(robotConf, sockets);
+
+			selector->initPopulation(population);
+			unsigned int numOffspring = 0;
+			while (numOffspring < conf->lambda) {
+
+				std::pair<boost::shared_ptr<RobotRepresentation>,
+						boost::shared_ptr<RobotRepresentation> > selection;
+				if (!selector->select(selection.first)) {
+					std::cerr << "Selector::select() failed." << std::endl;
+					exitRobogen(EXIT_FAILURE);
+				}
+				unsigned int tries = 0;
+				do {
+					if (tries > 10000) {
+						std::cerr << "Selecting second parent failed after "
+								"10000 tries, giving up.";
+						exitRobogen(EXIT_FAILURE);
+					}
+					if (!selector->select(selection.second)) {
+						std::cerr << "Selector::select() failed." << std::endl;
+						exitRobogen(EXIT_FAILURE);
+					}
+					tries++;
+				} while (selection.first == selection.second);
+
+				std::vector<boost::shared_ptr<RobotRepresentation> > offspring
+					= mutator->createOffspringHyperNEAT(selection.first,
+											   selection.second);
+
+				// no crossover, or can fit both new individuals
+				if ( (numOffspring + offspring.size()) <= conf->lambda ) {
+					children.insert(children.end(), offspring.begin(),
+													offspring.end() );
+					numOffspring += offspring.size();
+				} else { // crossover, but can only fit one
+					children.push_back(offspring[0]);
+					numOffspring++;
+				}
 			}
-			population->evaluate(robotConf, sockets);
+			children.evaluate(robotConf, sockets);
 
 		} else {
 			selector->initPopulation(population);

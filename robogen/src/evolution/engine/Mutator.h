@@ -66,6 +66,13 @@ public:
 			boost::shared_ptr<RobotRepresentation> parent2 =
 					boost::shared_ptr<RobotRepresentation>());
 
+	// CH - added this for our hyperneat offspring production
+	std::vector<boost::shared_ptr<RobotRepresentation> > createOffspringHyperNEAT(
+		boost::shared_ptr<RobotRepresentation> parent1,
+		boost::shared_ptr<RobotRepresentation> parent2 =
+				boost::shared_ptr<RobotRepresentation>());
+	
+
 	void growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot);
 	void randomizeBrain(boost::shared_ptr<RobotRepresentation>& robot);
 
@@ -79,6 +86,11 @@ private:
 	 */
 	bool mutate(boost::shared_ptr<RobotRepresentation>& robot);
 
+	// CH - Added for body/brain mutation with hyperneat
+	bool mutateBrainBody(boost::shared_ptr<RobotRepresentation>& robot, 
+			boost::shared_ptr<RobotRepresentation> &parent1, 
+			boost::shared_ptr<RobotRepresentation> &parent2);
+
 	/**
 	 * Performs crossover between two robots
 	 * @return true if some crossover has been performed
@@ -91,6 +103,8 @@ private:
 	 * Mutation operators
 	 */
 	bool mutateBrain(boost::shared_ptr<RobotRepresentation>& robot);
+	// CH - added this for hyperneat brain crossover
+	bool mutateBrainHyperNEAT(boost::shared_ptr<RobotRepresentation> & robot, boost::shared_ptr<RobotRepresentation> &parent1, boost::shared_ptr<RobotRepresentation> &parent2);
 	bool mutateBody(boost::shared_ptr<RobotRepresentation>& robot);
 	bool removeSubtree(boost::shared_ptr<RobotRepresentation>& robot);
 	bool duplicateSubtree(boost::shared_ptr<RobotRepresentation>& robot);
