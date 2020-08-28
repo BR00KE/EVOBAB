@@ -55,9 +55,9 @@ public:
 	//BK made this method public 
 	bool fillBrain(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
-
+			
 private:
-
+	
 	
 	typedef std::map<unsigned int, NEAT::Genome*> NeatIdToGenomeMap;
 	typedef std::map<unsigned int, boost::shared_ptr<RobotRepresentation> >

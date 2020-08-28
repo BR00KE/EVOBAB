@@ -1,6 +1,6 @@
 simulatorConfFile=sim_configs/conf0.txt
-mu=20
-lambda=20
+mu=5
+lambda=5
 selection=deterministic-tournament
 replacement=plus
 tournamentSize=2

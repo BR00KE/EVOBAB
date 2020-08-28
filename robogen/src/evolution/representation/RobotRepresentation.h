@@ -238,6 +238,7 @@ public:
 	//BK added for HyperNEAT-light attempt
 	void setNeatGenome(NEAT::Genome & neatGenome);
 
+	NEAT::Genome * getNeatGenomePointer();
 	/*
 	* BK: Genome for HyperNEAT-light attempt
 	*/

@@ -91,11 +91,11 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 			
 			if (randomizeBrains) {
 				//BK - This changed to randomly initialise neatGenome and then fill the brain
-				NEAT::Genome cppn = NEAT::Genome(0, 7, 0, 5, false,
+				NEAT::Genome * cppn = new NEAT::Genome(0, 7, 0, 5, false,
 							NEAT::UNSIGNED_SIGMOID,NEAT::UNSIGNED_SIGMOID, 0,
 							evolConf->neatParams);
 				//robot.get()->setNeatGenome(cppn);
-				this->back()->setNeatGenome(cppn);
+				this->back()->setNeatGenome(*cppn);
 			}
 			
 		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
