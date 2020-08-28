@@ -271,10 +271,10 @@ void init(unsigned int seed, std::string outputDirectory,
 
 
 	if(neat) {
-		// if(!neatContainer->fillPopulationWeights(population)) { //query for the weights between robots cpgs
-		// 	std::cerr << "Filling weights from NEAT failed." << std::endl;
-		// 	exitRobogen(EXIT_FAILURE);
-		// }
+		if(!neatContainer->fillPopulationWeights(population)) { //query for the weights between robots cpgs
+			std::cerr << "Filling weights from NEAT failed." << std::endl;
+		 	exitRobogen(EXIT_FAILURE);
+		}
 	}
 
 	generation = 1;
