@@ -378,7 +378,14 @@ void mainEvolutionLoop() {
 				std::vector<boost::shared_ptr<RobotRepresentation> > offspring
 					= mutator->createOffspringHyperNEAT(selection.first,
 											   selection.second);
-
+				//BK fill brain for offspring
+				for(boost::shared_ptr<RobotRepresentation> rep:offspring){
+					if(!neatContainer->fillBrain(rep->getNeatGenomePointer(),rep)) { //query for the weights between robots cpgs
+						std::cerr << "Filling offspring weights from NEAT failed." << std::endl;
+						exitRobogen(EXIT_FAILURE);
+					}
+				}
+				
 				// no crossover, or can fit both new individuals
 				if ( (numOffspring + offspring.size()) <= conf->lambda ) {
 					children.insert(children.end(), offspring.begin(),

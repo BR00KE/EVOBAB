@@ -84,12 +84,17 @@ bool NeatContainer::fillPopulationWeights(
 	return true;
 	*/
 	
-	for(auto i : *population){
-		//try{fillBrain(i->getNeatGenomePointer(),i);}
-		//catch(std::exception &e){std::cout<<e.what()<<std::endl;}
-		if(!this->fillBrain(i->getNeatGenomePointer(),i)){
-			return false;
-		}
+	// for(auto i : *population){
+	// 	if(!this->fillBrain(i->getNeatGenomePointer(),i)){
+	// 		return false;
+	// 	}
+	// }
+	for(Population::iterator i = population->begin(); i!=population->end(); i++){
+		//std::cout<<typeid(i).name()<<std::endl;
+		boost::shared_ptr<RobotRepresentation> rep = *i;
+		if(!this->fillBrain(rep->getNeatGenomePointer(),rep)){
+	 		return false;
+	 	}
 	}
 	return true;
 	//fillBrain(population->at(1)->getNeatGenomePointer(),population->at(1));
