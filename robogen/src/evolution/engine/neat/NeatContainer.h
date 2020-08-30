@@ -57,7 +57,7 @@ public:
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
 
 	//BK get the initial pop of genomes
-	std::vector<NEAT::Genome> * getInitialGenomePop();
+	std::vector<NEAT::Genome> getInitialGenomePop();
 	
 private:
 	
