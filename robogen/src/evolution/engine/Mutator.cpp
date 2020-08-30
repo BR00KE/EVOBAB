@@ -116,8 +116,9 @@ std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspring(
 
 // CH - added this boi
 std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspringHyperNEAT(
-	boost::shared_ptr<RobotRepresentation> parent1,
-	boost::shared_ptr<RobotRepresentation> parent2){
+		boost::shared_ptr<RobotRepresentation> parent1,
+		NEAT::Population & a_Pop,
+		boost::shared_ptr<RobotRepresentation> parent2){
 
 	std::vector<boost::shared_ptr<RobotRepresentation> > offspring;
 
@@ -129,7 +130,7 @@ std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspringHyp
 	
 	// Mutate
 	for(size_t i = 0; i < offspring.size(); ++i) {
-		this->mutateBrainBody(offspring[i], parent1, parent2);
+		this->mutateBrainBody(offspring[i], a_Pop);
 	}
 
 	return offspring;
@@ -229,9 +230,9 @@ bool Mutator::mutate(boost::shared_ptr<RobotRepresentation>& robot) {
 }
 
 // CH - added this boi
-bool Mutator::mutateBrainBody(boost::shared_ptr<RobotRepresentation>& robot, boost::shared_ptr<RobotRepresentation> & parent1, boost::shared_ptr<RobotRepresentation> & parent2){
+bool Mutator::mutateBrainBody(boost::shared_ptr<RobotRepresentation>& robot, NEAT::Population & a_Pop){
 	bool mutated = false;
-	mutated = (this->mutateBrainHyperNEAT(robot, parent1, parent2) || mutated);
+	mutated = (this->mutateBrainHyperNEAT(robot, a_Pop) || mutated);
 	mutated = (this->mutateBody(robot) || mutated);
 	return mutated;
 }
@@ -248,14 +249,12 @@ double clip(double value, double min, double max) {
 }
 
 // CH - hyperneat brain crossover
-bool Mutator::mutateBrainHyperNEAT(boost::shared_ptr<RobotRepresentation>& robot,boost::shared_ptr<RobotRepresentation> &parent1, boost::shared_ptr<RobotRepresentation> &parent2){
+bool Mutator::mutateBrainHyperNEAT(boost::shared_ptr<RobotRepresentation>& robot, NEAT::Population & a_Pop){
 	bool mutated = false;
 	NEAT::RNG rng;
 	rng.TimeSeed();
 	try{
-		NEAT::Genome genome = parent1->neatGenome.Mate(parent2->neatGenome,true,true, rng);
-		robot->setNeatGenome(genome);
-		mutated = true;
+		mutated = a_Pop.MutateGenome(true, a_Pop, robot->neatGenome, a_Pop.m_Parameters, a_Pop.m_RNG);
 	} catch(...){std::cerr << "Problem mutating CPPNs." << std::endl;}
 	return mutated;
 }	

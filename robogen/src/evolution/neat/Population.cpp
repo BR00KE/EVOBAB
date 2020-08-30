@@ -45,6 +45,15 @@
 namespace NEAT
 {
 
+// CH - added this
+bool Population::MutateGenome( bool t_baby_is_clone, Population &a_Pop, Genome &t_baby, Parameters& a_Parameters, RNG& a_RNG){
+    try{
+        m_Species[0].MutateGenome(t_baby_is_clone, a_Pop, t_baby, a_Parameters, a_RNG);
+        return true;
+    } catch(...){ return false;}
+}
+
+
 // The constructor
 Population::Population(const Genome& a_Seed, const Parameters& a_Parameters,
 		               bool a_RandomizeWeights, double a_RandomizationRange, int a_RNG_seed)

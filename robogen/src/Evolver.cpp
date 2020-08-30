@@ -376,7 +376,7 @@ void mainEvolutionLoop() {
 				} while (selection.first == selection.second);
 
 				std::vector<boost::shared_ptr<RobotRepresentation> > offspring
-					= mutator->createOffspringHyperNEAT(selection.first,
+					= mutator->createOffspringHyperNEAT(selection.first,  *neatContainer->getPopulation(),
 											   selection.second);
 				//BK fill brain for offspring
 				for(boost::shared_ptr<RobotRepresentation> rep:offspring){

@@ -39,6 +39,9 @@
 #include "config/EvolverConfiguration.h"
 #include "evolution/representation/RobotRepresentation.h"
 #include "evolution/engine/BodyVerifier.h"
+#include "evolution/neat/Population.h"
+#include "evolution/neat/Parameters.h"
+#include "evolution/neat/Random.h"
 
 #define MAX_MUTATION_ATTEMPTS 100 //TODO move this somewhere else
 namespace robogen {
@@ -69,8 +72,9 @@ public:
 	// CH - added this for our hyperneat offspring production
 	std::vector<boost::shared_ptr<RobotRepresentation> > createOffspringHyperNEAT(
 		boost::shared_ptr<RobotRepresentation> parent1,
-		boost::shared_ptr<RobotRepresentation> parent2 =
-				boost::shared_ptr<RobotRepresentation>());
+		NEAT::Population & a_Pop,
+		boost::shared_ptr<RobotRepresentation> parent2 = 
+			boost::shared_ptr<RobotRepresentation>());
 	
 
 	void growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot);
@@ -88,8 +92,7 @@ private:
 
 	// CH - Added for body/brain mutation with hyperneat
 	bool mutateBrainBody(boost::shared_ptr<RobotRepresentation>& robot, 
-			boost::shared_ptr<RobotRepresentation> &parent1, 
-			boost::shared_ptr<RobotRepresentation> &parent2);
+		NEAT::Population & a_Pop);
 
 	/**
 	 * Performs crossover between two robots
@@ -104,7 +107,7 @@ private:
 	 */
 	bool mutateBrain(boost::shared_ptr<RobotRepresentation>& robot);
 	// CH - added this for hyperneat brain crossover
-	bool mutateBrainHyperNEAT(boost::shared_ptr<RobotRepresentation> & robot, boost::shared_ptr<RobotRepresentation> &parent1, boost::shared_ptr<RobotRepresentation> &parent2);
+	bool mutateBrainHyperNEAT(boost::shared_ptr<RobotRepresentation> & robot, NEAT::Population & a_Pop);
 	bool mutateBody(boost::shared_ptr<RobotRepresentation>& robot);
 	bool removeSubtree(boost::shared_ptr<RobotRepresentation>& robot);
 	bool duplicateSubtree(boost::shared_ptr<RobotRepresentation>& robot);

@@ -55,6 +55,8 @@ public:
 	//BK made this method public 
 	bool fillBrain(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
+	// CH - added this
+	boost::shared_ptr<NEAT::Population> getPopulation();
 			
 private:
 	

@@ -10,7 +10,7 @@
 
 
 
-Hip1 0 Oscillator 0.8 -0.8 1
+Hip1 0 Sigmoid 10
 Hip2 0 Oscillator 0.8 -0.95 1
-Knee1 0 Oscillator 0.8 0.2 1
+Knee1 0 Sigmoid 10
 Knee2 0 Oscillator 0.8 -1.0 1

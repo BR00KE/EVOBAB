@@ -35,6 +35,12 @@
 
 namespace robogen {
 
+// CH - added this
+boost::shared_ptr<NEAT::Population> NeatContainer::getPopulation(){
+	return neatPopulation_;
+}
+
+
 NeatContainer::NeatContainer(boost::shared_ptr<EvolverConfiguration> &evoConf,
 		boost::shared_ptr<Population> &population, unsigned int seed,
 		boost::random::mt19937 &rng) :

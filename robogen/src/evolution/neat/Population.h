@@ -127,6 +127,8 @@ private:
     std::vector<Genome> m_Genomes;
 
 public:
+    // CH - added this
+    bool MutateGenome( bool t_baby_is_clone, Population &a_Pop, Genome &t_baby, Parameters& a_Parameters, RNG& a_RNG);
 
     // Random number generator
     RNG m_RNG;
