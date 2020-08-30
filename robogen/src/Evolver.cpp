@@ -238,7 +238,6 @@ void init(unsigned int seed, std::string outputDirectory,
 		exitRobogen(EXIT_FAILURE);
 	}
 
-	// BK - maybe take this out, not really sure we need a neatContainer?
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
 		//make a neat population and then pass it to init to assign genomes from this pop to bodies
@@ -252,11 +251,6 @@ void init(unsigned int seed, std::string outputDirectory,
 		}
 	}
 	
-	//make sure brains of pop are 'filled' using the CPPNs 
-	neatContainer->fillPopulationWeights(population);
-	
-
-
 	// ---------------------------------------
 	// open sockets for communication with simulator processes
 	// ---------------------------------------
