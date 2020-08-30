@@ -64,10 +64,15 @@ NeatContainer::NeatContainer(boost::shared_ptr<EvolverConfiguration> &evoConf,
 			count++;
 		}
 	}
-
+	
 }
 
 NeatContainer::~NeatContainer() {
+}
+
+//BK added: to get vector of initialized genome population
+std::vector<NEAT::Genome> NeatContainer::getInitialGenomePop(){
+	return neatPopulation_->m_Genomes;
 }
 
 bool NeatContainer::fillPopulationWeights(

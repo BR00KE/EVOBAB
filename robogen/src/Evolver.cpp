@@ -144,7 +144,7 @@ void parseArgsThenInit(int argc, char* argv[]) {
 			exitRobogen(EXIT_FAILURE);
 		}
 
-		//BROOKE: add a novelty tag here to set selection method, probs the easiest way
+		//BK: add a novelty tag here to set selection method, probs the easiest way
 	}
 
 	init(seed, outputDirectory, confFileName, overwrite, saveAll);
@@ -230,6 +230,7 @@ void init(unsigned int seed, std::string outputDirectory,
 	neat = (conf->evolutionaryAlgorithm == EvolverConfiguration::HYPER_NEAT);
 	//bool var = conf->useBrainSeed || neat;
 	population.reset(new Population()); //Population() calls IndividualContainer() which just sets evaluated sorted and evaluated both false
+
 	//BK changed this to use the init method sig i made for hyperneat light implementation 
 	if (!population->init(referenceBot, conf->mu, mutator, growBodies,
 			((conf->useBrainSeed || neat)), conf )) { //takes ref bot as first individual in the pop and fills pop vec with RobotRepresentations
@@ -237,16 +238,19 @@ void init(unsigned int seed, std::string outputDirectory,
 		exitRobogen(EXIT_FAILURE);
 	}
 
-	// BK - maybe take this out, not really sure we need a neatContainer?
-	
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
+		//make a neat population and then pass it to init to assign genomes from this pop to bodies
+		std::vector<NEAT::Genome> initialNEATPop = neatContainer->getInitialGenomePop();
+		int c=0;
+		for(Population::iterator i = population->begin(); i!=population->end(); i++){
+			//std::cout<<typeid(i).name()<<std::endl;
+			boost::shared_ptr<RobotRepresentation> rep = *i;
+			rep->neatGenome = initialNEATPop[c];
+			c++;
+		}
 	}
-	//make sure brains of pop are 'filled' using the CPPNs 
 	
-	
-
-
 	// ---------------------------------------
 	// open sockets for communication with simulator processes
 	// ---------------------------------------

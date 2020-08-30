@@ -55,9 +55,16 @@ public:
 	//BK made this method public 
 	bool fillBrain(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
+<<<<<<< HEAD
 	// CH - added this
 	boost::shared_ptr<NEAT::Population> getPopulation();
 			
+=======
+
+	//BK get the initial pop of genomes
+	std::vector<NEAT::Genome> getInitialGenomePop();
+	
+>>>>>>> f8e418f96aafe4c6b33f0093028329c8890ed8e4
 private:
 	
 	
