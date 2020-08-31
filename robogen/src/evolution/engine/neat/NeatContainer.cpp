@@ -58,15 +58,20 @@ NeatContainer::NeatContainer(boost::shared_ptr<EvolverConfiguration> &evoConf,
 			count++;
 		}
 	}
-
+	
 }
 
 NeatContainer::~NeatContainer() {
 }
 
+//BK added: to get vector of initialized genome population
+std::vector<NEAT::Genome> NeatContainer::getInitialGenomePop(){
+	return neatPopulation_->m_Genomes;
+}
+
 bool NeatContainer::fillPopulationWeights(
 		boost::shared_ptr<Population> &population) {
-
+	/*
 	for(NeatIdToGenomeMap::iterator i = neatIdToGenomeMap_.begin();
 			i != neatIdToGenomeMap_.end(); i++) {
 		unsigned int id = i->first;
@@ -82,6 +87,22 @@ bool NeatContainer::fillPopulationWeights(
 
 	}
 	return true;
+	*/
+	
+	// for(auto i : *population){
+	// 	if(!this->fillBrain(i->getNeatGenomePointer(),i)){
+	// 		return false;
+	// 	}
+	// }
+	for(Population::iterator i = population->begin(); i!=population->end(); i++){
+		//std::cout<<typeid(i).name()<<std::endl;
+		boost::shared_ptr<RobotRepresentation> rep = *i;
+		if(!this->fillBrain(rep->getNeatGenomePointer(),rep)){
+	 		return false;
+	 	}
+	}
+	return true;
+	//fillBrain(population->at(1)->getNeatGenomePointer(),population->at(1));
 }
 
 void NeatContainer::printCurrentIds() {
@@ -125,7 +146,7 @@ bool NeatContainer::produceNextGeneration(boost::shared_ptr<Population>
 	//std::cout << "before epoch size is " << neatIdToGenomeMap_.size()
 	//		<< " " << neatIdToRobotMap_.size() << std::endl;
 	//printCurrentIds();
-	neatPopulation_->Epoch();
+	neatPopulation_->Epoch(); //Epoch performs one generation and reproduces the genomes
 	std::vector<unsigned int> currentIds;
 	std::vector<unsigned int> newIds;
 	std::cout <<  neatPopulation_->m_Species.size() << " species" << std::endl;
@@ -211,6 +232,7 @@ bool NeatContainer::produceNextGeneration(boost::shared_ptr<Population>
 bool NeatContainer::fillBrain(NEAT::Genome *genome,
 		boost::shared_ptr<RobotRepresentation> &robotRepresentation) {
 
+	
 	// Initialize ODE
 	dInitODE();
 	dWorldID odeWorld = dWorldCreate();

@@ -55,6 +55,10 @@
 
 namespace robogen {
 
+NEAT::Genome * RobotRepresentation::getNeatGenomePointer(){
+		return & neatGenome;
+	}
+
 RobotRepresentation::RobotRepresentation() :
 		maxid_(1000), evaluated_(false) {
 
@@ -91,6 +95,9 @@ RobotRepresentation::RobotRepresentation(const RobotRepresentation &r) {
 	fitness_ = r.fitness_;
 	evaluated_ = r.evaluated_;
 	maxid_ = r.maxid_;
+	
+	neatGenome = r.neatGenome;//BK added
+	
 }
 
 /**
@@ -1178,6 +1185,10 @@ float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentatio
 
 float RobotRepresentation::getComplexity(){
 	return complexity_;
+}
+//BK added for HyperNEAT-light attempt
+void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
+	this->neatGenome = neatgenome;
 }
 
 }

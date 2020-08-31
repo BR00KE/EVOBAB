@@ -114,6 +114,27 @@ std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspring(
 	return offspring;
 }
 
+// CH - added this boi
+std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspringHyperNEAT(
+	boost::shared_ptr<RobotRepresentation> parent1,
+	boost::shared_ptr<RobotRepresentation> parent2){
+
+	std::vector<boost::shared_ptr<RobotRepresentation> > offspring;
+
+	offspring.push_back(boost::shared_ptr<RobotRepresentation>(new
+			RobotRepresentation(*parent1.get())));
+	// offspring.push_back(boost::shared_ptr<RobotRepresentation>(new
+	// 		RobotRepresentation(*parent2.get())));
+	// this->crossover(offspring[0], offspring[1]);
+	
+	// Mutate
+	for(size_t i = 0; i < offspring.size(); ++i) {
+		this->mutateBrainBody(offspring[i], parent1, parent2);
+	}
+
+	return offspring;
+}
+
 void Mutator::growBodyRandomly(boost::shared_ptr<RobotRepresentation>& robot) {
 
 	boost::random::uniform_int_distribution<> dist(conf_->minNumInitialParts,
@@ -196,7 +217,8 @@ bool Mutator::mutate(boost::shared_ptr<RobotRepresentation>& robot) {
 	// mutate brain TODO conf bits?
 	if (conf_->evolutionMode == EvolverConfiguration::BRAIN_EVOLVER
 			|| conf_->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
-		mutated = (this->mutateBrain(robot) || mutated);
+		mutated = (this->mutateBrain(robot) || mutated);//BK change this to mutate CPPN
+		//BK add mutateBody here
 	}
 
 	if (conf_->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
@@ -205,6 +227,15 @@ bool Mutator::mutate(boost::shared_ptr<RobotRepresentation>& robot) {
 
 	return mutated;
 }
+
+// CH - added this boi
+bool Mutator::mutateBrainBody(boost::shared_ptr<RobotRepresentation>& robot, boost::shared_ptr<RobotRepresentation> & parent1, boost::shared_ptr<RobotRepresentation> & parent2){
+	bool mutated = false;
+	mutated = (this->mutateBrainHyperNEAT(robot, parent1, parent2) || mutated);
+	mutated = (this->mutateBody(robot) || mutated);
+	return mutated;
+}
+
 
 //helper function for mutations
 
@@ -215,6 +246,20 @@ double clip(double value, double min, double max) {
 		return max;
 	return value;
 }
+
+// CH - hyperneat brain crossover
+bool Mutator::mutateBrainHyperNEAT(boost::shared_ptr<RobotRepresentation>& robot,boost::shared_ptr<RobotRepresentation> &parent1, boost::shared_ptr<RobotRepresentation> &parent2){
+	bool mutated = false;
+	NEAT::RNG rng;
+	rng.TimeSeed();
+	try{
+		NEAT::Genome genome = parent1->neatGenome.Mate(parent2->neatGenome,true,true, rng);
+		robot->setNeatGenome(genome);
+		mutated = true;
+	} catch(...){std::cerr << "Problem mutating CPPNs." << std::endl;}
+	return mutated;
+}	
+
 
 bool Mutator::mutateBrain(boost::shared_ptr<RobotRepresentation>& robot) {
 	bool mutated = false;

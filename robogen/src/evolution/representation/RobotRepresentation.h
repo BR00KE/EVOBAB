@@ -46,6 +46,8 @@
 #include "utils/network/TcpSocket.h"
 #include "robogen.pb.h"
 
+#include "evolution/neat/Genome.h"//BK added
+
 namespace robogen {
 
 /**
@@ -238,6 +240,15 @@ public:
 	float getPartComplexity(boost::shared_ptr<PartRepresentation> part);
 
 	float getComplexity();
+	
+	//BK added for HyperNEAT-light attempt
+	void setNeatGenome(NEAT::Genome & neatGenome);
+
+	NEAT::Genome * getNeatGenomePointer();
+	/*
+	* BK: Genome for HyperNEAT-light attempt
+	*/
+	NEAT::Genome neatGenome;
 
 private:
 	/**
@@ -285,6 +296,7 @@ private:
 	 */
 	bool evaluated_;
 
+	//for complexity metric
 	float complexity_;
 
 };

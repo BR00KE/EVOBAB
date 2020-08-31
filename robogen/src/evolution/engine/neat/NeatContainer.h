@@ -34,6 +34,7 @@
 #include "evolution/neat/Population.h"
 #include "evolution/neat/Genome.h"
 
+
 namespace robogen {
 
 // TODO transform to shared pointer?
@@ -51,11 +52,16 @@ public:
 
 	bool produceNextGeneration(boost::shared_ptr<Population> &population);
 
-private:
-
+	//BK made this method public 
 	bool fillBrain(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
 
+	//BK get the initial pop of genomes
+	std::vector<NEAT::Genome> getInitialGenomePop();
+	
+private:
+	
+	
 	typedef std::map<unsigned int, NEAT::Genome*> NeatIdToGenomeMap;
 	typedef std::map<unsigned int, boost::shared_ptr<RobotRepresentation> >
 		NeatIdToRobotMap;
