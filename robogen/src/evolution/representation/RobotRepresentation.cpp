@@ -1148,7 +1148,7 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 	return true;
 
 }
-
+// CH - for complexity metric
 float RobotRepresentation::calculateBodyComplexity(){
 	if(bodyTree_==NULL){ return 0;}
 	float complexity = 0.0f;
@@ -1174,6 +1174,7 @@ float RobotRepresentation::calculateBodyComplexity(){
 	return complexity;
 }
 
+// CH - for complexity metric
 float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentation> part){
 	std::stringstream str;
 	str << part->getType();
@@ -1183,6 +1184,7 @@ float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentatio
 	else { return 0.0f;}
 }
 
+// CH - for complexity metric
 float RobotRepresentation::getComplexity(){
 	return complexity_;
 }

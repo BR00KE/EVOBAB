@@ -391,7 +391,6 @@ void mainEvolutionLoop() {
 						std::cerr << "Filling offspring weights from NEAT failed." << std::endl;
 						exitRobogen(EXIT_FAILURE);
 					}
-					boost::shared_ptr<NeuralNetworkRepresentation> tempBrain = neatContainer->queryCppn(rep->getNeatGenomePointer(), rep);
 				}
 				
 				// no crossover, or can fit both new individuals

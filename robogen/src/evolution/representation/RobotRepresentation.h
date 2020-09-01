@@ -235,10 +235,13 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
+	// CH - calculates the body complexity value of a robot
 	float calculateBodyComplexity();
 
+	// CH - gets the complexity of a single body part
 	float getPartComplexity(boost::shared_ptr<PartRepresentation> part);
 
+	// CH - get the complexity of a robot
 	float getComplexity();
 	
 	//BK added for HyperNEAT-light attempt
@@ -296,7 +299,7 @@ private:
 	 */
 	bool evaluated_;
 
-	//for complexity metric
+	// CH - for complexity metric
 	float complexity_;
 
 };
