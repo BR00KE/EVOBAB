@@ -313,6 +313,7 @@ void triggerPostEvaluate() {
 	if (generation == 1) {
 		mainEvolutionLoop();
 	} else {
+		// CH - added this for our specfic evolution
 		if (neat && conf->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
 			postEvaluateStd();
 		}
@@ -384,11 +385,13 @@ void mainEvolutionLoop() {
 					= mutator->createOffspringHyperNEAT(selection.first,
 											   selection.second);
 				//BK fill brain for offspring
+				
 				for(boost::shared_ptr<RobotRepresentation> rep:offspring){
 					if(!neatContainer->fillBrain(rep->getNeatGenomePointer(),rep)) { //query for the weights between robots cpgs
 						std::cerr << "Filling offspring weights from NEAT failed." << std::endl;
 						exitRobogen(EXIT_FAILURE);
 					}
+					boost::shared_ptr<NeuralNetworkRepresentation> tempBrain = neatContainer->queryCppn(rep->getNeatGenomePointer(), rep);
 				}
 				
 				// no crossover, or can fit both new individuals

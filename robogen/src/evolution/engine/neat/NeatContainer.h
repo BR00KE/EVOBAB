@@ -33,6 +33,7 @@
 #include "evolution/engine/Population.h"
 #include "evolution/neat/Population.h"
 #include "evolution/neat/Genome.h"
+#include "evolution/representation/NeuralNetworkRepresentation.h"
 
 
 namespace robogen {
@@ -54,6 +55,10 @@ public:
 
 	//BK made this method public 
 	bool fillBrain(NEAT::Genome *genome,
+			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
+
+	//CH added this for the neural part of the complexity metric
+	boost::shared_ptr<NeuralNetworkRepresentation> queryCppn(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
 
 	//BK get the initial pop of genomes
