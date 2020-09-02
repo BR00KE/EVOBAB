@@ -1149,32 +1149,25 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 
 }
 
-float RobotRepresentation::calculateBodyComplexity(){
-	if(bodyTree_==NULL){ return 0;}
+// CH - complexity calculation
+float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root){
 	float complexity = 0.0f;
-	std::queue<boost::shared_ptr<PartRepresentation> > queue;
-	queue.push(bodyTree_);
-	while(!queue.empty()){
-		int size = queue.size();
-		while(size>0){
-			boost::shared_ptr<PartRepresentation> part = queue.front();
-			complexity+= getPartComplexity(part);
-			queue.pop();
-			for (unsigned int i = 0; i<part->getArity();i++){
-				boost::shared_ptr<PartRepresentation> tempPart = part->getChild(i);
-				if (part->getChild(i)!=NULL)
-				{
-					queue.push(part->getChild(i));
-				}
-			}
-			size--;
+	int count =0;
+	for (unsigned int i = 0; i < root->getChildren().size(); ++i) {
+		if (root->getChildren()[i].get()) {
+			complexity += getPartComplexity(root->getChildren()[i]);
+			std::vector<boost::shared_ptr<PartRepresentation > > descendants = root->getChildren()[i]->getDescendants();
+			std::vector<boost::weak_ptr<NeuronRepresentation> > descendantNeurons = getDescendantNeurons(descendants);
+			int count1 = 0;
+			complexity += calculateBodyComplexity(root->getChildren()[i]);
 		}
 	}
 	this->complexity_ = complexity;
 	return complexity;
 }
 
-float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentation> part){
+// CH - returns the complexity of a part
+float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
 	std::stringstream str;
 	str << part->getType();
 	if(str.str()==PART_TYPE_PASSIVE_HINGE){return part->passiveHingeComplexity;}
@@ -1183,6 +1176,7 @@ float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentatio
 	else { return 0.0f;}
 }
 
+// CH - returns complexity of robot
 float RobotRepresentation::getComplexity(){
 	return complexity_;
 }
@@ -1190,6 +1184,28 @@ float RobotRepresentation::getComplexity(){
 void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
 	this->neatGenome = neatgenome;
 }
+
+// CH - added this to get root
+boost::shared_ptr<PartRepresentation> RobotRepresentation::getBodyRoot(){
+	return bodyTree_;
+}
+// CH - fetch descendant neurons of a part
+std::vector<boost::weak_ptr<NeuronRepresentation> > RobotRepresentation::getDescendantNeurons(const std::vector<boost::shared_ptr<PartRepresentation > > parts){
+	std::vector<boost::weak_ptr<NeuronRepresentation> > neurons;
+	for (boost::shared_ptr<PartRepresentation> part : parts){
+		std::vector<boost::weak_ptr<NeuronRepresentation> > temp = neuralNetwork_->getBodyPartNeurons(part->getId());
+		neurons.insert(neurons.end(), temp.begin(), temp.end());
+	}
+	return neurons;
+}
+
+// CH - idk
+
+void RobotRepresentation::setWeightMap(WeightMap weightMap){
+	neuralNetwork_->setWeightMap(weightMap);
+}
+
+
 
 }
 

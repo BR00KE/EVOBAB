@@ -37,6 +37,7 @@
 #include <boost/weak_ptr.hpp>
 #include "robogen.pb.h"
 
+
 namespace robogen {
 
 /**
@@ -206,6 +207,13 @@ public:
 	 * Print recursively the body tree representation
 	 */
 	void toString(std::stringstream& str, unsigned int depth);
+
+	// CH -added this to return all descendants for a part
+	std::vector<boost::shared_ptr<PartRepresentation> > getDescendants() const;
+
+	// CH - return children
+	std::vector<boost::shared_ptr<PartRepresentation> > getChildren() const;
+
 
 private:
 

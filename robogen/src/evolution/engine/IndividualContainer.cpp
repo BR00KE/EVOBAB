@@ -181,7 +181,7 @@ bool IndividualContainer::areEvaluated() const {
 void IndividualContainer::evaluateComplexity() {
 	float complexity = 0.0f;
 	for (int i = 0; i<this->size();i++){
-		complexity += this->at(i)->calculateBodyComplexity();
+		complexity += this->at(i)->calculateBodyComplexity(this->at(i)->getBodyRoot());
 	}
 	complexity_ = complexity;
 }

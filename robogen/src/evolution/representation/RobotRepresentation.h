@@ -63,6 +63,8 @@ public:
 	 * Map from an id string to a weak pointer of a part representation
 	 */
 	typedef std::map<std::string, boost::weak_ptr<PartRepresentation> > IdPartMap;
+	typedef std::pair<std::string,std::string> StringPair;
+	typedef std::map<StringPair, double> WeightMap;
 
 	/**
 	 * Copy constructor: Deep copy body parts and Neural network
@@ -235,10 +237,11 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
-	float calculateBodyComplexity();
-
-	float getPartComplexity(boost::shared_ptr<PartRepresentation> part);
-
+	// CH - W T F 
+	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
+	// CH - W T F 
+	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
+	// CH - W T F 
 	float getComplexity();
 	
 	//BK added for HyperNEAT-light attempt
@@ -249,6 +252,16 @@ public:
 	* BK: Genome for HyperNEAT-light attempt
 	*/
 	NEAT::Genome neatGenome;
+
+	// CH - I NEED THIS OK
+	boost::shared_ptr<PartRepresentation> getBodyRoot();
+
+	// CH - get all descendant neurons of a part
+	std::vector<boost::weak_ptr<NeuronRepresentation> > getDescendantNeurons(const std::vector<boost::shared_ptr<PartRepresentation > > parts);
+
+	// CH - set weight map
+	void setWeightMap(WeightMap weightMap);
+
 
 private:
 	/**

@@ -510,4 +510,9 @@ int NeuralNetworkRepresentation::getNumOutputs() {
 	return numOutputs;
 }
 
+// CH - set weight map for CM
+void NeuralNetworkRepresentation::setWeightMap(WeightMap weightMap){
+	weights_ = weightMap;
+}
+
 } /* namespace robogen */
