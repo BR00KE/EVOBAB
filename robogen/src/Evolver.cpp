@@ -404,6 +404,8 @@ void mainEvolutionLoop() {
 				}
 			}
 			children.evaluate(robotConf, sockets);
+			children.evaluateComplexity();
+
 
 		} else {
 			selector->initPopulation(population);
@@ -445,7 +447,6 @@ void mainEvolutionLoop() {
 				}
 			}
 			children.evaluate(robotConf, sockets);
-			children.evaluateComplexity();
 		}
 #ifndef EMSCRIPTEN
 		triggerPostEvaluate();
