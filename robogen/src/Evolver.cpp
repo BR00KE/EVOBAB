@@ -248,6 +248,8 @@ void init(unsigned int seed, std::string outputDirectory,
 			//std::cout<<typeid(i).name()<<std::endl;
 			boost::shared_ptr<RobotRepresentation> rep = *i;
 			rep->neatGenome = initialNEATPop[c];
+			rep->setWeightMap(neatContainer->queryCppn(rep->getNeatGenomePointer(),rep)->getWeightMap());
+
 			c++;
 		}
 	}
@@ -391,6 +393,7 @@ void mainEvolutionLoop() {
 						std::cerr << "Filling offspring weights from NEAT failed." << std::endl;
 						exitRobogen(EXIT_FAILURE);
 					}
+					rep->setWeightMap(neatContainer->queryCppn(rep->getNeatGenomePointer(),rep)->getWeightMap());
 				}
 				
 				// no crossover, or can fit both new individuals

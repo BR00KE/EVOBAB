@@ -189,6 +189,7 @@ public:
 
 	// CH - added this for the weight map CM
 	void setWeightMap(WeightMap weightMap);
+	WeightMap getWeightMap() const;
 
 
 private:

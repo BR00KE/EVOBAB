@@ -237,21 +237,11 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
-<<<<<<< HEAD
-	// CH - calculates the body complexity value of a robot
-	float calculateBodyComplexity();
-
-	// CH - gets the complexity of a single body part
-	float getPartComplexity(boost::shared_ptr<PartRepresentation> part);
-
-	// CH - get the complexity of a robot
-=======
 	// CH - W T F 
 	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
 	// CH - W T F 
 	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
 	// CH - W T F 
->>>>>>> master
 	float getComplexity();
 	
 	//BK added for HyperNEAT-light attempt

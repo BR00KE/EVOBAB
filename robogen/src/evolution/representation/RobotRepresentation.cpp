@@ -1148,15 +1148,9 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 	return true;
 
 }
-<<<<<<< HEAD
-// CH - for complexity metric
-float RobotRepresentation::calculateBodyComplexity(){
-	if(bodyTree_==NULL){ return 0;}
-=======
 
 // CH - complexity calculation
 float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root){
->>>>>>> master
 	float complexity = 0.0f;
 	int count =0;
 	for (unsigned int i = 0; i < root->getChildren().size(); ++i) {
@@ -1172,13 +1166,8 @@ float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartReprese
 	return complexity;
 }
 
-<<<<<<< HEAD
-// CH - for complexity metric
-float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentation> part){
-=======
 // CH - returns the complexity of a part
 float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
->>>>>>> master
 	std::stringstream str;
 	str << part->getType();
 	if(str.str()==PART_TYPE_PASSIVE_HINGE){return part->passiveHingeComplexity;}
@@ -1187,11 +1176,7 @@ float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartReprese
 	else { return 0.0f;}
 }
 
-<<<<<<< HEAD
-// CH - for complexity metric
-=======
 // CH - returns complexity of robot
->>>>>>> master
 float RobotRepresentation::getComplexity(){
 	return complexity_;
 }
