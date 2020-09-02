@@ -252,6 +252,9 @@ public:
 	* BK: Genome for HyperNEAT-light attempt
 	*/
 	NEAT::Genome neatGenome;
+	
+	//BK culmulativeWeightMap for neural complexity 
+	 std::map<std::pair<std::string,std::string>, double> culmulativeWeightMap;
 
 private:
 	/**
