@@ -252,6 +252,9 @@ public:
 	* BK: Genome for HyperNEAT-light attempt
 	*/
 	NEAT::Genome neatGenome;
+	
+	//BK culmulativeWeightMap for neural complexity 
+	 std::map<std::pair<std::string,std::string>, double> culmulativeWeightMap;
 
 	// CH - I NEED THIS OK
 	boost::shared_ptr<PartRepresentation> getBodyRoot();
@@ -309,7 +312,7 @@ private:
 	 */
 	bool evaluated_;
 
-	//for complexity metric
+	// CH - for complexity metric
 	float complexity_;
 
 };

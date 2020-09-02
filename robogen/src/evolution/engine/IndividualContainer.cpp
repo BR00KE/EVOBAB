@@ -178,6 +178,7 @@ bool IndividualContainer::areEvaluated() const {
 	return evaluated_;
 }
 
+//BK - i don't really get this method?
 void IndividualContainer::evaluateComplexity() {
 	float complexity = 0.0f;
 	for (int i = 0; i<this->size();i++){
