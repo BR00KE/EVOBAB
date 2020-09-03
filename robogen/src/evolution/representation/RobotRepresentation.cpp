@@ -1250,6 +1250,9 @@ void RobotRepresentation::calculateCumulativeWeights(){
 			}
 		}
 	}
+	//while i recognise that this is inefficient i havnae another idea of how to do it
+	//also if body parts are limited to 50 we can reasonably expect the upper bound on iterations to be reasonable
+	//want weighted influence of node on all others
 }
 
 }
