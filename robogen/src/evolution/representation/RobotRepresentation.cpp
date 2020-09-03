@@ -1218,21 +1218,39 @@ NeuralNetworkRepresentation::WeightMap RobotRepresentation::getWeightMap(){
 void RobotRepresentation::calculateCumulativeWeights(){
 	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
 	//create a unordered set of neuronIDs
-	std::unordered_set<std::string> neuronIDs;
+	std::set<std::string> neurons;
 	std::map<StringPair,double>::iterator it = weightMap.begin();
 	while(it!=weightMap.end()){
-		if(neuronIDs.find(it->first.first)==neuronIDs.end()){ //element not already present
-			neuronIDs.insert(it->first.first);
-		}
-		if(neuronIDs.find(it->first.second)==neuronIDs.end()){ //element not already present
-			neuronIDs.insert(it->first.second);
-		}
+		//set insert will only insert an element not already present
+		neurons.insert(it->first.first);
+		neurons.insert(it->first.second);
+		
 		it++;
 	}
-
+	std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
 	//now perform adapted dijkstra to find shortest path big yikes
 	//think I am gonna make a 2D vector/table where the index will indicate the neuron at that position in the neuronIDs set
+	double connectionTable[neuronIDs.size()][neuronIDs.size()];
 
+	std::map<StringPair,double>::iterator it;
+	//initialise table
+	for(int fromNeuron=0;fromNeuron<neuronIDs.size();fromNeuron++){
+		for(int toNeuron=0;toNeuron<neuronIDs.size();toNeuron++){
+			StringPair idpair(neuronIDs[fromNeuron],neuronIDs[toNeuron]);
+			it = weightMap.find(idpair);
+			if(it!=weightMap.end()){//connection present in the map already?
+				connectionTable[fromNeuron][toNeuron]=it->second;
+			}
+			//from something to itself has max influence i.e. a value of 1?
+			else if(fromNeuron==toNeuron){
+				connectionTable[fromNeuron][toNeuron]=1;
+			}
+			else { 
+				connectionTable[fromNeuron][toNeuron]= 0;//no connection weight yet
+
+			}
+		}
+	}
 }
 
 }
