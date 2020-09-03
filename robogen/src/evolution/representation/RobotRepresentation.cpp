@@ -1163,6 +1163,11 @@ float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartReprese
 		}
 	}
 	this->complexity_ = complexity;
+
+	//BK for testing
+	this->calculateCumulativeWeights();
+	//RobotRepresentation::calculateCumulativeWeights();
+
 	return complexity;
 }
 
@@ -1205,7 +1210,30 @@ void RobotRepresentation::setWeightMap(WeightMap weightMap){
 	neuralNetwork_->setWeightMap(weightMap);
 }
 
+//BK
+NeuralNetworkRepresentation::WeightMap RobotRepresentation::getWeightMap(){
+	return neuralNetwork_->getWeightMap();
+}
 
+void RobotRepresentation::calculateCumulativeWeights(){
+	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
+	//create a unordered set of neuronIDs
+	std::unordered_set<std::string> neuronIDs;
+	std::map<StringPair,double>::iterator it = weightMap.begin();
+	while(it!=weightMap.end()){
+		if(neuronIDs.find(it->first.first)==neuronIDs.end()){ //element not already present
+			neuronIDs.insert(it->first.first);
+		}
+		if(neuronIDs.find(it->first.second)==neuronIDs.end()){ //element not already present
+			neuronIDs.insert(it->first.second);
+		}
+		it++;
+	}
+
+	//now perform adapted dijkstra to find shortest path big yikes
+	//think I am gonna make a 2D vector/table where the index will indicate the neuron at that position in the neuronIDs set
+
+}
 
 }
 

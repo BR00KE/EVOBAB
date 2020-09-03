@@ -312,6 +312,13 @@ private:
 	// CH - for complexity metric
 	float complexity_;
 
+	//added by BK for EI calc 
+	WeightMap culmulativeWeightMap;
+	
+	//BK get weight map
+	NeuralNetworkRepresentation::WeightMap getWeightMap();
+
+	void calculateCumulativeWeights();
 };
 
 /**

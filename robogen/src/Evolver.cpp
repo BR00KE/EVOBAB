@@ -237,7 +237,7 @@ void init(unsigned int seed, std::string outputDirectory,
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
-	population->evaluateComplexity();
+	//population->evaluateComplexity(); //This shouldn't be called before fillBrains
 
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
@@ -286,12 +286,17 @@ void init(unsigned int seed, std::string outputDirectory,
 
 	generation = 1;
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
+	//BK added - evaluate population complexity for gen 0
+	population->evaluateComplexity();
 }//end of init
 
 void mainEvolutionLoop();
 
 void postEvaluateNEAT() {
 	population->sort(true); //after neat sorted best to worst
+	//We should add the complexity calculation here to happen at the end of each generation
+
+
 	mainEvolutionLoop();
 }
 
