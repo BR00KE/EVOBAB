@@ -1232,7 +1232,6 @@ void RobotRepresentation::calculateCumulativeWeights(){
 	//think I am gonna make a 2D vector/table where the index will indicate the neuron at that position in the neuronIDs set
 	double connectionTable[neuronIDs.size()][neuronIDs.size()];
 
-	std::map<StringPair,double>::iterator it;
 	//initialise table
 	for(int fromNeuron=0;fromNeuron<neuronIDs.size();fromNeuron++){
 		for(int toNeuron=0;toNeuron<neuronIDs.size();toNeuron++){
