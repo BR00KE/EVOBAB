@@ -1242,10 +1242,12 @@ void RobotRepresentation::calculateCumulativeWeights(){
 			if(it!=weightMap.end()){//connection present in the map already?
 				connectionTable[fromNeuron][toNeuron]=it->second;
 			}
-			//from something to itself has max influence i.e. a value of 1?
+			//from something to itself has max influence i.e. a value of 1? Not a recurrent connection though 
+			/*
 			else if(fromNeuron==toNeuron){
 				connectionTable[fromNeuron][toNeuron]= (double)1;
 			}
+			*/
 			else { 
 				connectionTable[fromNeuron][toNeuron]= (double) 0.0;//no connection weight / influence yet
 			}
@@ -1280,6 +1282,8 @@ void RobotRepresentation::AdaptedDijkstra(std::vector< std::vector<double> > con
 			}
 		}
 	}
+	std::vector<double> inflRow(weightedInfluence +0,weightedInfluence+numNeurons);
+	connectionTable[fromNeuron]=inflRow;
 }
 //another helper method
 int RobotRepresentation::maxInfl(double weightedInfluence[], bool wptSet[], int fromNeuron, int numNeurons){
