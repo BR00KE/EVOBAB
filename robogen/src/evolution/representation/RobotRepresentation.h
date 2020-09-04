@@ -311,18 +311,11 @@ private:
 
 	// CH - for complexity metric
 	float complexity_;
-
-	//added by BK for EI calc 
-	WeightMap culmulativeWeightMap;
 	
-	//helper method for calculating culmulative Weight table
-	void AdaptedDijkstra(std::vector< std::vector<double> > connectionTable, int fromNeuron, int numNeurons);
-	//helper method to find max weighted infl so far
-	int maxInfl(double weightedInfluence[], bool wptSet[], int fromNeuron, int numNeurons);
 	//BK get weight map
 	NeuralNetworkRepresentation::WeightMap getWeightMap();
 
-	void calculateCumulativeWeights();
+	void createConnectionTable();
 };
 
 /**

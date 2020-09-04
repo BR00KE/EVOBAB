@@ -1165,8 +1165,7 @@ float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartReprese
 	this->complexity_ = complexity;
 
 	//BK for testing
-	this->calculateCumulativeWeights();
-	//RobotRepresentation::calculateCumulativeWeights();
+	this->createConnectionTable();
 
 	return complexity;
 }
@@ -1215,7 +1214,7 @@ NeuralNetworkRepresentation::WeightMap RobotRepresentation::getWeightMap(){
 	return neuralNetwork_->getWeightMap();
 }
 
-void RobotRepresentation::calculateCumulativeWeights(){
+void RobotRepresentation::createConnectionTable(){
 	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
 	//create a unordered set of neuronIDs
 	std::set<std::string> neurons;
@@ -1228,11 +1227,8 @@ void RobotRepresentation::calculateCumulativeWeights(){
 		it++;
 	}
 	std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
-	//now perform adapted dijkstra to find shortest path big yikes
-	//think I am gonna make a 2D vector/table where the index will indicate the neuron at that position in the neuronIDs set
-	
-	std::vector< std::vector<double> > connectionTable;
 
+	std::vector< std::vector<double> > connectionTable;
 	//initialise table
 	for(int fromNeuron=0;fromNeuron<neuronIDs.size();fromNeuron++){
 		connectionTable.push_back( std::vector<double>(neuronIDs.size()));
@@ -1253,50 +1249,9 @@ void RobotRepresentation::calculateCumulativeWeights(){
 			}
 		}
 	}
-	//while i recognise that this is inefficient i havnae another idea of how to do it
-	//also if body parts are limited to 50 we can reasonably expect the upper bound on iterations to be reasonable
-	//want weighted influence of node on all others
-	for(int fromNeuron=0;fromNeuron<neuronIDs.size();fromNeuron++){
-		this->AdaptedDijkstra(connectionTable,fromNeuron,neuronIDs.size());
-	}
+	
 }
-//helper method
-void RobotRepresentation::AdaptedDijkstra(std::vector< std::vector<double> > connectionTable, int fromNeuron, int numNeurons){
-	double weightedInfluence[numNeurons];
-	bool wgtSet[numNeurons]; //entry will be true if weighted influence of fromNeuron on this neuron has been determined
-	//initialise
-	for(int i=0; i<numNeurons; i++){
-		weightedInfluence[i]=connectionTable[fromNeuron][i];
-		wgtSet[i]=false;
-	}
-	//find max weighted influence for all vertices
-	for(int c=0; c<numNeurons; c++){
-		int u = maxInfl(weightedInfluence,wgtSet,fromNeuron,numNeurons);
-		//mark picked vertex as processed
-		wgtSet[u]=true;
-		//update weighted infl values of adjacent vertices of the picked vertex
-		for(int n=0; n<numNeurons; n++){
-			//update wgt[n] only if it not in wgtset
-			if(!wgtSet[n]&&connectionTable[u][n]&&weightedInfluence[u]!=0&&weightedInfluence[u]*connectionTable[u][n]>weightedInfluence[u]){
-				weightedInfluence[n]=weightedInfluence[n]*connectionTable[u][n];
-			}
-		}
-	}
-	std::vector<double> inflRow(weightedInfluence +0,weightedInfluence+numNeurons);
-	connectionTable[fromNeuron]=inflRow;
-}
-//another helper method
-int RobotRepresentation::maxInfl(double weightedInfluence[], bool wptSet[], int fromNeuron, int numNeurons){
-	double maxInfl = 0; 
-	int maxInd;
-	for(int n=0; n<numNeurons; n++){
-		if(wptSet[n]==false && weightedInfluence[n]>=maxInfl){
-			maxInfl=weightedInfluence[n];
-			maxInd=n;
-		}
-	}
-	return maxInd;
-}
+
 
 }
 
