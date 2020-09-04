@@ -1245,14 +1245,34 @@ void RobotRepresentation::calculateCumulativeWeights(){
 				connectionTable[fromNeuron][toNeuron]=1;
 			}
 			else { 
-				connectionTable[fromNeuron][toNeuron]= 0;//no connection weight yet
-
+				connectionTable[fromNeuron][toNeuron]= 0;//no connection weight / influence yet
 			}
 		}
 	}
 	//while i recognise that this is inefficient i havnae another idea of how to do it
 	//also if body parts are limited to 50 we can reasonably expect the upper bound on iterations to be reasonable
 	//want weighted influence of node on all others
+	for(int fromNeuron=0;fromNeuron<neuronIDs.size();fromNeuron++){
+		std::vector<double> weightSet(neuronIDs.size());
+		for(int toNeuron=0; toNeuron<neuronIDs.size();toNeuron++){
+			
+		}
+	}
+}
+//helper method
+void RobotRepresentation::AdaptedDijkstra(double** culmulativeWeights, int fromNeuron, int numNeurons){
+	double weightedInfluence[numNeurons];
+	bool wgtSet[numNeurons]; //entry will be true if weighted influence of fromNeuron on this neuron has been determined
+	//initialise
+	for(int i=0; i<numNeurons; i++){
+		weightedInfluence[i]=INT_MIN;
+		wgtSet[i]=false;
+	}
+	weightedInfluence[fromNeuron]=1; //neuron always has max influence on itself
+	//find max weighted influence for all vertices
+	for(int c=0; c<numNeurons; c++){
+		
+	}
 }
 
 }

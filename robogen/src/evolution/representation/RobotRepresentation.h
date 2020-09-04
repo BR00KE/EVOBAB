@@ -315,6 +315,9 @@ private:
 	//added by BK for EI calc 
 	WeightMap culmulativeWeightMap;
 	
+	//helper method for calculating culmulative Weight table
+	void AdaptedDijkstra(double** culmulativeWeights, int fromNeuron, int numNeurons);
+
 	//BK get weight map
 	NeuralNetworkRepresentation::WeightMap getWeightMap();
 
