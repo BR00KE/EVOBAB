@@ -1260,19 +1260,30 @@ void RobotRepresentation::calculateCumulativeWeights(){
 	}
 }
 //helper method
-void RobotRepresentation::AdaptedDijkstra(double** culmulativeWeights, int fromNeuron, int numNeurons){
+void RobotRepresentation::AdaptedDijkstra(double** connectionTable, int fromNeuron, int numNeurons){
 	double weightedInfluence[numNeurons];
 	bool wgtSet[numNeurons]; //entry will be true if weighted influence of fromNeuron on this neuron has been determined
 	//initialise
 	for(int i=0; i<numNeurons; i++){
-		weightedInfluence[i]=INT_MIN;
+		weightedInfluence[i]=connectionTable[fromNeuron][i];
 		wgtSet[i]=false;
 	}
-	weightedInfluence[fromNeuron]=1; //neuron always has max influence on itself
 	//find max weighted influence for all vertices
 	for(int c=0; c<numNeurons; c++){
 		
 	}
+}
+//another helper method
+int RobotRepresentation::maxInfl(double * weightedInfluence, bool * wptSet, int fromNeuron, int numNeurons){
+	double maxInfl = 0; 
+	int maxInd;
+	for(int n=0; n<numNeurons; n++){
+		if(wptSet[n]==false && weightedInfluence[n]>=maxInfl){
+			maxInfl=weightedInfluence[n];
+			maxInd=n;
+		}
+	}
+	return maxInd;
 }
 
 }
