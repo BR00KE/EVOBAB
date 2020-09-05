@@ -228,6 +228,8 @@ unsigned int runSimulations(boost::shared_ptr<Scenario> scenario,
 				new CollisionData(scenario) );
 
 		double step = configuration->getTimeStepLength();
+
+		// this is where we will penalise simulation ticks by setting t = whatever you FEEL MEEEEEEEEEEEEE
 		while ((t < configuration->getSimulationTime())
 			   && (!(visualize && viewer->done()))) {
 
@@ -415,7 +417,6 @@ unsigned int runSimulations(boost::shared_ptr<Scenario> scenario,
 			if(webGLlogger) {
 				webGLlogger->log(t);
 			}
-
 			t += step;
 
 		}

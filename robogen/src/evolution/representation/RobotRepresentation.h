@@ -319,6 +319,9 @@ private:
 	void createConnectionTable();
 
 	float getBrainComplexity();
+	
+	static const int MIN_BODY_COMPLEXITY = 2;
+	static const int MAX_BODY_COMPLEXITY = 120;
 
 };
 

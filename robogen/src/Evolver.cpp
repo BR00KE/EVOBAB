@@ -285,9 +285,9 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 
 	generation = 1;
+	population->evaluateComplexity();
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
 	//BK added - evaluate population complexity for gen 0
-	population->evaluateComplexity();
 }//end of init
 
 void mainEvolutionLoop();
@@ -411,9 +411,8 @@ void mainEvolutionLoop() {
 					numOffspring++;
 				}
 			}
-			children.evaluate(robotConf, sockets);
 			children.evaluateComplexity();
-
+			children.evaluate(robotConf, sockets);
 
 		} else {
 			selector->initPopulation(population);

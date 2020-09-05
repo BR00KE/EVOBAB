@@ -1170,6 +1170,7 @@ float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartReprese
 			complexity += calculateBodyComplexity(root->getChildren()[i]);
 		}
 	}
+	complexity = (complexity - MIN_BODY_COMPLEXITY)/(MAX_BODY_COMPLEXITY - MIN_BODY_COMPLEXITY);
 	this->complexity_ = complexity;
 
 	//BK for testing
