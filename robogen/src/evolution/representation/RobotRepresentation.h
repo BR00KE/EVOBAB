@@ -239,11 +239,11 @@ public:
 											std::string robotFileString);
 
 	// CH - W T F 
-	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
+	double calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
 	// CH - W T F 
-	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
+	double getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
 	// CH - W T F 
-	float getComplexity();
+	double getComplexity();
 	
 	//BK added for HyperNEAT-light attempt
 	void setNeatGenome(NEAT::Genome & neatGenome);
@@ -311,14 +311,14 @@ private:
 	bool evaluated_;
 
 	// CH - for complexity metric
-	float complexity_;
+	double complexity_;
 	
 	//BK get weight map
 	NeuralNetworkRepresentation::WeightMap getWeightMap();
 
 	void createConnectionTable();
 
-	float getBrainComplexity();
+	double getBrainComplexity();
 	
 	static const int MIN_BODY_COMPLEXITY = 2;
 	static const int MAX_BODY_COMPLEXITY = 120;

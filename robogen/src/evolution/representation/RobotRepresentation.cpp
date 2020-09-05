@@ -1158,8 +1158,8 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 }
 
 // CH - complexity calculation
-float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root){
-	float complexity = 0.0f;
+double RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root){
+	double complexity = 0.0f;
 	int count =0;
 	for (unsigned int i = 0; i < root->getChildren().size(); ++i) {
 		if (root->getChildren()[i].get()) {
@@ -1180,7 +1180,7 @@ float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartReprese
 }
 
 // CH - returns the complexity of a part
-float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
+double RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
 	std::stringstream str;
 	str << part->getType();
 	if(str.str()==PART_TYPE_PASSIVE_HINGE){return part->passiveHingeComplexity;}
@@ -1221,7 +1221,7 @@ void RobotRepresentation::createConnectionTable(){
 	
 }
 
-float RobotRepresentation::getBrainComplexity(){
+double RobotRepresentation::getBrainComplexity(){
 	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
 	//create a unordered set of neuronIDs
 	std::set<std::string> neurons;
@@ -1305,7 +1305,7 @@ float RobotRepresentation::getBrainComplexity(){
 
 
 // CH - returns complexity of robot
-float RobotRepresentation::getComplexity(){
+double RobotRepresentation::getComplexity(){
 	//weighted sum must happen
 	return complexity_;
 }
