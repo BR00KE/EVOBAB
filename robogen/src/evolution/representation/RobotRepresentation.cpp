@@ -48,6 +48,14 @@
 #include "utils/RobogenUtils.h"
 #include "brain/NeuralNetwork.h"
 
+//include boost graph stuff
+#include <boost/config.hpp>
+#include <boost/graph/strong_components.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graphviz.hpp>
+#include <boost/graph/graph_utility.hpp>
+
+
 #define VERIFY_ON_LOAD_TXT
 #ifdef VERIFY_ON_LOAD_TXT
 #include "evolution/engine/BodyVerifier.h"
@@ -1227,7 +1235,10 @@ float RobotRepresentation::getBrainComplexity(){
 	std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
 	int numNeurons = neuronIDs.size();
 
-	
+	//want to pass in a vector<vector<int>> & adjacencyList   of a strongly connected component
+
+
+	//pass the adjacency list representing each strongly connected component to Johnson's algorithm 
 }
 
 
