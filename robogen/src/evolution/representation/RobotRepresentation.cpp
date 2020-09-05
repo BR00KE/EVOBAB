@@ -1262,6 +1262,44 @@ float RobotRepresentation::getBrainComplexity(){
 	std::cout<<numStrongComponents<<std::endl;
 
 	//pass the adjacency list representing each strongly connected component to Johnson's algorithm 
+	// create an adjList poitner, and read in a file
+	std::vector<std::vector<int> >* adjList;
+	// verify data is read correctly by printing size of adjList for each node
+	std::cout << "Adj List:\n";
+	displayVecOfVec (*adjList);
+	// blocked 
+	std::vector<bool> blocked (adjList->size(), false);
+
+	// stack- but use a deque because better than stack
+	std::deque<int>  stackLike;
+
+	// cycles
+	std::vector<std::vector<int> > cycles;
+
+	// B_Fruitless is the book keeping needed to avoid fruitless searches.  It is
+	// referred to as B in Johnson's original algorithm
+
+	// initialize B
+	std::vector<std::vector<int> >  B_Fruitless ;
+
+	for (int i=0; i< adjList->size()  ; i++ ) {
+		std::vector<int>* k = new std::vector<int>;
+		B_Fruitless.push_back(*k);
+	}
+
+	// loop to start new search from each node i
+	for (int i=0; i< adjList->size()  ; i++ ) {
+		// clear all book keeping
+		for (int j =0; j< adjList->size(); j++) {
+		blocked[j] = false;
+		B_Fruitless[j].clear();
+		}
+		std::cout << "START: i=" << i << std::endl;
+		findCycles(i, i, *adjList,  blocked, stackLike, B_Fruitless, cycles) ;
+	}
+
+	std::cout << "Cycles:\n";
+	displayVecOfVec (cycles); 
 }
 
 

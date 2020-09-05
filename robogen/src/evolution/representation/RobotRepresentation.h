@@ -44,6 +44,7 @@
 #include "evolution/representation/PartRepresentation.h"
 #include "evolution/representation/NeuralNetworkRepresentation.h"
 #include "utils/network/TcpSocket.h"
+#include "utils/Johnson.h"
 #include "robogen.pb.h"
 
 #include "evolution/neat/Genome.h"//BK added
