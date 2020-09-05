@@ -1230,7 +1230,6 @@ float RobotRepresentation::getBrainComplexity(){
 	std::vector<int> graph[numNeurons];
 	std::vector<int> cycles[numNeurons];
 	
-	
 	//add edges to graph
 	for(auto connection: weightMap){
 		auto it=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.first );
@@ -1240,8 +1239,76 @@ float RobotRepresentation::getBrainComplexity(){
 		graph[i1].push_back(i2);
 	}
 
-	int um =0;
+	//array required to color the graph
+	int colour[numNeurons];
+	//graph to store parent node
+	int parents[numNeurons];
+	//mark with unique numbers 
+	int mark[numNeurons];
+	//store the numbers of cycles
+	int cycleNumber = 0;
+	int edges = weightMap.size();
 
+	//now must do DFS
+	dfs_cycle(1,0,colour,mark,parents,cycleNumber,graph,cycles);
+
+	//they call print cycles but we use it to record cycle memberships\
+	// push the edges that into the 
+    // cycle adjacency list 
+    for (int i = 1; i <= edges; i++) { 
+        if (mark[i] != 0) 
+            cycles[mark[i]].push_back(i); 
+    } 
+  
+    // print all the vertex with same cycle 
+    for (int i = 1; i <= cycleNumber; i++) { 
+        // Print the i-th cycle 
+        std::cout << "Cycle Number " << i << ": "; 
+        for (int x : cycles[i]) 
+            std::cout << x << " "; 
+        std::cout << std::endl; 
+    }
+}
+
+void RobotRepresentation::dfs_cycle(int u, int p, int color[], int mark[], int par[], int& cyclenumber, std::vector<int> graph[], std::vector<int> cycles[]){
+	// already (completely) visited vertex. 
+    if (color[u] == 2) { 
+        return; 
+    } 
+  
+    // seen vertex, but was not completely visited -> cycle detected. 
+    // backtrack based on parents to find the complete cycle. 
+    if (color[u] == 1) { 
+  
+        cyclenumber++; 
+        int cur = p; 
+        mark[cur] = cyclenumber; 
+  
+        // backtrack the vertex which are 
+        // in the current cycle thats found 
+        while (cur != u) { 
+            cur = par[cur]; 
+            mark[cur] = cyclenumber; 
+        } 
+        return; 
+    } 
+    par[u] = p; 
+  
+    // partially visited. 
+    color[u] = 1; 
+  
+    // simple dfs on graph 
+    for (int v : graph[u]) { 
+  
+        // if it has not been visited previously 
+        if (v == par[u]) { 
+            continue; 
+        } 
+        dfs_cycle(v, u, color, mark, par, cyclenumber, graph, cycles); 
+    } 
+  
+    // completely visited. 
+    color[u] = 2; 
 }
 
 // CH - returns complexity of robot
