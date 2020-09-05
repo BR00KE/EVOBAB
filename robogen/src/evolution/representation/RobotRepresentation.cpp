@@ -1249,7 +1249,14 @@ float RobotRepresentation::getBrainComplexity(){
 		
 		boost::add_edge(i1,i2,neuronNetwork); 
 	}
-	int um =0;
+
+	std::vector<int> components(numNeurons);
+
+	int numStrongComponents = boost::strong_components(neuronNetwork, 
+							boost::make_iterator_property_map(components.begin(),boost::get(boost::vertex_index,neuronNetwork),components[0]));
+
+	std::cout<<numStrongComponents<<std::endl;
+
 	//pass the adjacency list representing each strongly connected component to Johnson's algorithm 
 }
 
