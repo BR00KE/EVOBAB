@@ -1236,8 +1236,20 @@ float RobotRepresentation::getBrainComplexity(){
 	int numNeurons = neuronIDs.size();
 
 	//want to pass in a vector<vector<int>> & adjacencyList   of a strongly connected component
+	typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> DirectedGraph;
+	typedef boost::graph_traits<DirectedGraph>::edge_iterator edge_iterator;
+	DirectedGraph neuronNetwork;
 
-
+	//add edges to graph
+	for(auto connection: weightMap){
+		auto it=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.first );
+		auto it2=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.second );
+		int i1 = it-neuronIDs.begin();
+		int i2 = it2-neuronIDs.begin();
+		
+		boost::add_edge(i1,i2,neuronNetwork); 
+	}
+	int um =0;
 	//pass the adjacency list representing each strongly connected component to Johnson's algorithm 
 }
 
