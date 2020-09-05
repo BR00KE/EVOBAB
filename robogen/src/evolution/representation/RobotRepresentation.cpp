@@ -1165,7 +1165,7 @@ float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartReprese
 	this->complexity_ = complexity;
 
 	//BK for testing
-	this->createConnectionTable();
+	this->getBrainComplexity();
 
 	return complexity;
 }
@@ -1180,8 +1180,73 @@ float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartReprese
 	else { return 0.0f;}
 }
 
+void RobotRepresentation::createConnectionTable(){
+	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
+	//create a unordered set of neuronIDs
+	std::set<std::string> neurons;
+	std::map<StringPair,double>::iterator it = weightMap.begin();
+	while(it!=weightMap.end()){
+		//set insert will only insert an element not already present
+		neurons.insert(it->first.first);
+		neurons.insert(it->first.second);
+		
+		it++;
+	}
+	std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
+
+	std::vector< std::vector<double> > connectionTable;
+	//initialise table
+	for(int fromNeuron=0;fromNeuron<neuronIDs.size();fromNeuron++){
+		connectionTable.push_back( std::vector<double>(neuronIDs.size()));
+		for(int toNeuron=0;toNeuron<neuronIDs.size();toNeuron++){
+			StringPair idpair(neuronIDs[fromNeuron],neuronIDs[toNeuron]);
+			it = weightMap.find(idpair);
+			if(it!=weightMap.end()){//connection present in the map already?
+				connectionTable[fromNeuron][toNeuron]=it->second;
+			}
+			else { 
+				connectionTable[fromNeuron][toNeuron]= (double) 0.0;//no connection weight / influence yet
+			}
+		}
+	}
+	
+}
+
+float RobotRepresentation::getBrainComplexity(){
+	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
+	//create a unordered set of neuronIDs
+	std::set<std::string> neurons;
+	std::map<StringPair,double>::iterator it = weightMap.begin();
+	while(it!=weightMap.end()){
+		//set insert will only insert an element not already present
+		neurons.insert(it->first.first);
+		neurons.insert(it->first.second);
+		
+		it++;
+	}
+	std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
+	int numNeurons = neuronIDs.size();
+
+	std::vector<int> graph[numNeurons];
+	std::vector<int> cycles[numNeurons];
+	
+	
+	//add edges to graph
+	for(auto connection: weightMap){
+		auto it=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.first );
+		auto it2=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.second );
+		int i1 = it-neuronIDs.begin();
+		int i2 = it2-neuronIDs.begin();
+		graph[i1].push_back(i2);
+	}
+
+	int um =0;
+
+}
+
 // CH - returns complexity of robot
 float RobotRepresentation::getComplexity(){
+	//weighted sum must happen
 	return complexity_;
 }
 //BK added for HyperNEAT-light attempt
@@ -1212,44 +1277,6 @@ void RobotRepresentation::setWeightMap(WeightMap weightMap){
 //BK
 NeuralNetworkRepresentation::WeightMap RobotRepresentation::getWeightMap(){
 	return neuralNetwork_->getWeightMap();
-}
-
-void RobotRepresentation::createConnectionTable(){
-	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
-	//create a unordered set of neuronIDs
-	std::set<std::string> neurons;
-	std::map<StringPair,double>::iterator it = weightMap.begin();
-	while(it!=weightMap.end()){
-		//set insert will only insert an element not already present
-		neurons.insert(it->first.first);
-		neurons.insert(it->first.second);
-		
-		it++;
-	}
-	std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
-
-	std::vector< std::vector<double> > connectionTable;
-	//initialise table
-	for(int fromNeuron=0;fromNeuron<neuronIDs.size();fromNeuron++){
-		connectionTable.push_back( std::vector<double>(neuronIDs.size()));
-		for(int toNeuron=0;toNeuron<neuronIDs.size();toNeuron++){
-			StringPair idpair(neuronIDs[fromNeuron],neuronIDs[toNeuron]);
-			it = weightMap.find(idpair);
-			if(it!=weightMap.end()){//connection present in the map already?
-				connectionTable[fromNeuron][toNeuron]=it->second;
-			}
-			//from something to itself has max influence i.e. a value of 1? Not a recurrent connection though 
-			/*
-			else if(fromNeuron==toNeuron){
-				connectionTable[fromNeuron][toNeuron]= (double)1;
-			}
-			*/
-			else { 
-				connectionTable[fromNeuron][toNeuron]= (double) 0.0;//no connection weight / influence yet
-			}
-		}
-	}
-	
 }
 
 

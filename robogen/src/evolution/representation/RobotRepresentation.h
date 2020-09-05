@@ -316,6 +316,8 @@ private:
 	NeuralNetworkRepresentation::WeightMap getWeightMap();
 
 	void createConnectionTable();
+
+	float getBrainComplexity();
 };
 
 /**
