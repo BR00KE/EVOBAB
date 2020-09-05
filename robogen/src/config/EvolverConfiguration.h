@@ -282,6 +282,10 @@ typedef struct EvolverConfiguration {
 
 	double pAddHiddenNeuron;
 
+	/**
+	 * BK attempt to add noveltysearch optional param
+	 */
+	bool noveltySearch;
 
 } EvolverConfiguration;
 
