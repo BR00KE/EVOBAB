@@ -1263,6 +1263,15 @@ double RobotRepresentation::getBrainComplexity(){
 	std::cout<<numStrongComponents<<std::endl;
 
 	//pass the adjacency list representing each strongly connected component to Johnson's algorithm 
+
+	//put all neurons that make up a 'strongly connected component' together
+	std::vector<int> strongComponentMembers[numStrongComponents];
+	for(int i=0; i<numStrongComponents;i++){
+		strongComponentMembers[components[i]].push_back(i);
+	}
+	
+
+
 	// create an adjList poitner, and read in a file
 	std::vector<std::vector<int> >* adjList;
 	// verify data is read correctly by printing size of adjList for each node
