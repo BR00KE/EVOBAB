@@ -319,8 +319,6 @@ private:
 
 	float getBrainComplexity();
 
-	void dfs_cycle(int u, int p, int color[], int mark[], int par[], int& cyclenumber, std::vector<int> graph[], std::vector<int> cycles[]);
-
 };
 
 /**
