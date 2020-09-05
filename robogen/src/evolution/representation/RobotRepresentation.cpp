@@ -1239,7 +1239,7 @@ float RobotRepresentation::getBrainComplexity(){
 	typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> DirectedGraph;
 	typedef boost::graph_traits<DirectedGraph>::edge_iterator edge_iterator;
 	DirectedGraph neuronNetwork;
-
+	std::vector<int> adjLists[numNeurons];//adjacency list for each vertex
 	//add edges to graph
 	for(auto connection: weightMap){
 		auto it=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.first );
@@ -1248,8 +1248,12 @@ float RobotRepresentation::getBrainComplexity(){
 		int i2 = it2-neuronIDs.begin();
 		
 		boost::add_edge(i1,i2,neuronNetwork); 
+
+		//create adjacency list for each vertex at same time 
+		adjLists[i1].push_back(i2);
 	}
 
+	//each neuron (i.e. vertex gets assigned to a strong component)
 	std::vector<int> components(numNeurons);
 
 	int numStrongComponents = boost::strong_components(neuronNetwork, 
