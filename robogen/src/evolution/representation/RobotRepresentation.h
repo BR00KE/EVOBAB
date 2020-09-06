@@ -241,16 +241,24 @@ public:
 
 	float getComplexity();
 	
-	//BK added for HyperNEAT-light attempt
+	//BK added for HyperNEAT-light 
 	void setNeatGenome(NEAT::Genome & neatGenome);
 
 	NEAT::Genome * getNeatGenomePointer();
 	/*
-	* BK: Genome for HyperNEAT-light attempt
+	* BK: Genome for HyperNEAT-light 
 	*/
 	NEAT::Genome neatGenome;
 
+	//added for novelty Search
+	double getNoveltyScore();
+
+	double setNoveltyScore(double noveltyScore);
 private:
+
+	//added for novelty search;
+	double noveltyScore;
+
 	/**
 	 *
 	 */

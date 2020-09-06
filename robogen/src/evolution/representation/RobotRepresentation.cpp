@@ -1191,6 +1191,15 @@ void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
 	this->neatGenome = neatgenome;
 }
 
+//added for novelty Search
+	double RobotRepresentation::getNoveltyScore(){
+		return noveltyScore;
+	}
+
+	double RobotRepresentation::setNoveltyScore(double noveltyScore){
+		this->noveltyScore=noveltyScore;
+	}
+
 }
 
 #endif /* usage of fake robot representation */
