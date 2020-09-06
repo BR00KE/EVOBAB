@@ -1213,6 +1213,10 @@ int RobotRepresentation::label_dist(const boost::shared_ptr<PartRepresentation> 
 		}
 }
 
+int RobotRepresentation::tree_edit_distance(boost::shared_ptr<RobotRepresentation> other){
+
+	return 0;
+}
 
 }
 

@@ -44,6 +44,10 @@
 #include "emscripten.h"
 #include <utils/network/FakeJSSocket.h>
 #include <sstream>
+
+//BK added for novelty
+#include "utils/ZhangShashaTreeEditDistance/TreeEditDistance.h"
+
 #endif
 
 namespace robogen {
