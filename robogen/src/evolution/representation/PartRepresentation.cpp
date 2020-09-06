@@ -91,6 +91,13 @@ const std::string &PartRepresentation::getType() {
 	return type_;
 }
 
+const int & PartRepresentation::getTypeCost(){
+	if(type_==PART_TYPE_PASSIVE_HINGE){return passiveHingeComplexity;}
+	else if(type_==PART_TYPE_ACTIVE_HINGE){return activeHingeComplexity;}
+	else if(type_==PART_TYPE_FIXED_BRICK){ return fixedBrickComplexity;}
+	else { return 0.0f;}
+}
+
 boost::shared_ptr<PartRepresentation> PartRepresentation::getChild(unsigned int n) {
 	if (n  >= arity_ ) {
 		std::cout << "Attempt to access non-existing slot " << n << " of part "

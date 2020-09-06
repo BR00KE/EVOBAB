@@ -98,7 +98,8 @@ public:
 	 * @return type of the part
 	 */
 	const std::string &getType();
-
+	//added by BK
+	const int & getTypeCost();
 	/**
 	 * @return the parameters of the part
 	 */
@@ -207,6 +208,12 @@ public:
 	 */
 	void toString(std::stringstream& str, unsigned int depth);
 
+	//BK made public
+	/**
+	 * Children of this part in the body tree
+	 */
+	std::vector<boost::shared_ptr<PartRepresentation> > children_;
+
 private:
 
 	/**
@@ -229,10 +236,6 @@ private:
 	 */
 	std::string type_;
 
-	/**
-	 * Children of this part in the body tree
-	 */
-	std::vector<boost::shared_ptr<PartRepresentation> > children_;
 
 	/**
 	 * Parent body part - raw pointer as present (or NULL) by design

@@ -46,7 +46,9 @@
 #include "utils/network/TcpSocket.h"
 #include "robogen.pb.h"
 
-#include "evolution/neat/Genome.h"//BK added
+//BK added
+#include "evolution/neat/Genome.h"
+//#include "utils/ZhangShashaTreeEditDistance/TreeEditDistance.h"
 
 namespace robogen {
 
@@ -261,9 +263,28 @@ public:
 	//methods to find tree edit distance between robot representations
 	int label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B);
 
-	int tree_edit_distance(boost::shared_ptr<RobotRepresentation> other);
+	//Tree rep to be used in TreeEditDistanceCalculation
+	// zhang_shasha::Tree treeRepresentation;
+
+	// void createTreeRepresentation();
+
+	// zhang_shasha::Node copyTree(zhang_shasha::Node root);
+	
+	//c++ defaults to pass by value
+
+	int ZhangShashaDistance(boost::shared_ptr<RobotRepresentation> robot1, boost::shared_ptr<RobotRepresentation> robot2 );
 
 private:
+	/**
+	 * Zhang-Shasha stuff
+	 */
+	std::vector<int> l;
+    //list of keyroots. i.e. nodes with a left child and the tree root
+    std::vector<int> keyroots;
+    std::vector<std::string> labels; //postorder labels of tree nodes
+	//helper function to fill post order labels
+	void postOrderTraversal();
+	std::vector<std::string> traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels);
 
 	//added for novelty search;
 	double noveltyScore;

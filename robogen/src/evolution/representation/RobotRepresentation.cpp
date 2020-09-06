@@ -1213,9 +1213,57 @@ int RobotRepresentation::label_dist(const boost::shared_ptr<PartRepresentation> 
 		}
 }
 
-int RobotRepresentation::tree_edit_distance(boost::shared_ptr<RobotRepresentation> other){
+// void RobotRepresentation::createTreeRepresentation(){
+// 	//std::queue
+// 	/**
+// 	 * std::queue<boost::shared_ptr<PartRepresentation> > queue;
+// 	queue.push(bodyTree_);
+// 	while(!queue.empty()){
+// 		int size = queue.size();
+// 		while(size>0){
+// 			boost::shared_ptr<PartRepresentation> part = queue.front();
+// 			complexity+= getPartComplexity(part);
+// 			queue.pop();
+// 			for (unsigned int i = 0; i<part->getArity();i++){
+// 				boost::shared_ptr<PartRepresentation> tempPart = part->getChild(i);
+// 				if (part->getChild(i)!=NULL)
+// 				{
+// 					queue.push(part->getChild(i));
+// 				}
+// 			}
+// 			size--;
+// 		}
+// 	}
+// 	*/
+// 	std::queue<boost::shared_ptr<PartRepresentation> > queue;
+// 	zhang_shasha::Node root = zhang_shasha::Node(bodyTree_->getType(),bodyTree_->getTypeCost());
+// 	for(boost::shared_ptr<PartRepresentation> child : bodyTree_->children_){
+// 		queue.push(child);
+// 	}
+// 	while(!queue.empty()){
+// 		boost::shared_ptr<PartRepresentation> part = queue.pop();
 
-	return 0;
+// 	}	
+// }
+
+// zhang_shasha::Node RobotRepresentation::copyTree(zhang_shasha::Node & root){
+// 	zhang_sasha::Node newNode = new zhang_shasha::Node(root->getType(),root->getTypeCost());
+
+// 	return newNode;
+// }
+
+//helper function to fill post order labels
+void RobotRepresentation::postOrderTraversal(){
+		std::vector<std::string> labels;
+		labels=traverse(bodyTree_, labels);
+}
+//recursive
+std::vector<std::string> RobotRepresentation::traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels){
+	for(auto child: node->children_){
+		labels = traverse(child,labels);
+	}
+	labels.push_back(node->getType());
+	return labels;
 }
 
 }
