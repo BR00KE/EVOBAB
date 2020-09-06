@@ -1174,7 +1174,7 @@ float RobotRepresentation::calculateBodyComplexity(){
 	return complexity;
 }
 
-float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentation> part){
+float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
 	std::stringstream str;
 	str << part->getType();
 	if(str.str()==PART_TYPE_PASSIVE_HINGE){return part->passiveHingeComplexity;}
@@ -1192,13 +1192,27 @@ void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
 }
 
 //added for novelty Search
-	double RobotRepresentation::getNoveltyScore(){
-		return noveltyScore;
-	}
+double RobotRepresentation::getNoveltyScore(){
+	return noveltyScore;
+}
 
-	double RobotRepresentation::setNoveltyScore(double noveltyScore){
-		this->noveltyScore=noveltyScore;
-	}
+double RobotRepresentation::setNoveltyScore(double noveltyScore){
+	this->noveltyScore=noveltyScore;
+}
+
+//Methods implemented for tree edit distance between robot representations
+int RobotRepresentation::label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B){
+        if(A==nullptr){ //insert operation
+            return getPartComplexity(B);
+        }
+		else if(B==nullptr){//delete operation
+			return getPartComplexity(A);
+		}
+		else{
+			return std::abs(getPartComplexity(A)-getPartComplexity(B));
+		}
+}
+
 
 }
 

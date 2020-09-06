@@ -237,7 +237,7 @@ public:
 
 	float calculateBodyComplexity();
 
-	float getPartComplexity(boost::shared_ptr<PartRepresentation> part);
+	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
 
 	float getComplexity();
 	
@@ -250,10 +250,19 @@ public:
 	*/
 	NEAT::Genome neatGenome;
 
+	/**
+	 * BK NOVELTY SCORE THINGS
+	 */
 	//added for novelty Search
 	double getNoveltyScore();
 
 	double setNoveltyScore(double noveltyScore);
+
+	//methods to find tree edit distance between robot representations
+	int label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B);
+
+	int tree_edit_distance(boost::shared_ptr<RobotRepresentation> other);
+
 private:
 
 	//added for novelty search;

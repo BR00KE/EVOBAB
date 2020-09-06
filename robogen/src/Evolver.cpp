@@ -144,7 +144,6 @@ void parseArgsThenInit(int argc, char* argv[]) {
 			exitRobogen(EXIT_FAILURE);
 		}
 
-		//BK: add a novelty tag here to set selection method, probs the easiest way
 	}
 
 	init(seed, outputDirectory, confFileName, overwrite, saveAll);
