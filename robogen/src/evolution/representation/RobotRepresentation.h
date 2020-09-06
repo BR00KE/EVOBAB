@@ -269,12 +269,7 @@ public:
 	// void createTreeRepresentation();
 
 	// zhang_shasha::Node copyTree(zhang_shasha::Node root);
-	
-	//c++ defaults to pass by value
 
-	int ZhangShashaDistance(boost::shared_ptr<RobotRepresentation> robot1, boost::shared_ptr<RobotRepresentation> robot2 );
-
-private:
 	/**
 	 * Zhang-Shasha stuff
 	 */
@@ -284,6 +279,15 @@ private:
     std::vector<std::string> labels; //postorder labels of tree nodes
 	//helper function to fill post order labels
 	void postOrderTraversal();
+	//c++ defaults to pass by value
+
+	/**
+	 * The Zhang-Shasha tree edit distance between this robot representation and the one passed as argument
+	 */
+	int zhangShashaDistance( boost::shared_ptr<RobotRepresentation> robot2 );
+
+private:
+	
 	std::vector<std::string> traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels);
 
 	//added for novelty search;

@@ -285,6 +285,13 @@ void init(unsigned int seed, std::string outputDirectory,
 		}
 	}
 
+	//BK novelty testing
+	Population::iterator i = population->begin();
+	boost::shared_ptr<RobotRepresentation> r1 = *i;
+	i++;
+	boost::shared_ptr<RobotRepresentation> r2 = *i;
+	int diff = r1->zhangShashaDistance(r2);
+
 	generation = 1;
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
 }//end of init

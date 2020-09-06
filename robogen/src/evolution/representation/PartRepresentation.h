@@ -208,13 +208,15 @@ public:
 	 */
 	void toString(std::stringstream& str, unsigned int depth);
 
-	//BK made public
+
+	int index_zs;//for zhang-shasha
+
+private:
+
 	/**
 	 * Children of this part in the body tree
 	 */
 	std::vector<boost::shared_ptr<PartRepresentation> > children_;
-
-private:
 
 	/**
 	 * Identifier string (name) of this part

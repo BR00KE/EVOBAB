@@ -1255,15 +1255,20 @@ int RobotRepresentation::label_dist(const boost::shared_ptr<PartRepresentation> 
 //helper function to fill post order labels
 void RobotRepresentation::postOrderTraversal(){
 		std::vector<std::string> labels;
-		labels=traverse(bodyTree_, labels);
+		this->labels=traverse(bodyTree_, labels);
 }
 //recursive
 std::vector<std::string> RobotRepresentation::traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels){
-	for(auto child: node->children_){
-		labels = traverse(child,labels);
+	for(int i=0; i<node->getChildrenCount();i++){
+		labels = traverse(node->getChild(i),labels);
 	}
 	labels.push_back(node->getType());
 	return labels;
+}
+int RobotRepresentation::zhangShashaDistance(boost::shared_ptr<RobotRepresentation> robot2 ){
+	this->postOrderTraversal();
+	robot2->postOrderTraversal();
+	return 0;//for now
 }
 
 }
