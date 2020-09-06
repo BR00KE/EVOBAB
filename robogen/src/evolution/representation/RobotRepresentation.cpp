@@ -1213,51 +1213,12 @@ int RobotRepresentation::label_dist(const boost::shared_ptr<PartRepresentation> 
 		}
 }
 
-// void RobotRepresentation::createTreeRepresentation(){
-// 	//std::queue
-// 	/**
-// 	 * std::queue<boost::shared_ptr<PartRepresentation> > queue;
-// 	queue.push(bodyTree_);
-// 	while(!queue.empty()){
-// 		int size = queue.size();
-// 		while(size>0){
-// 			boost::shared_ptr<PartRepresentation> part = queue.front();
-// 			complexity+= getPartComplexity(part);
-// 			queue.pop();
-// 			for (unsigned int i = 0; i<part->getArity();i++){
-// 				boost::shared_ptr<PartRepresentation> tempPart = part->getChild(i);
-// 				if (part->getChild(i)!=NULL)
-// 				{
-// 					queue.push(part->getChild(i));
-// 				}
-// 			}
-// 			size--;
-// 		}
-// 	}
-// 	*/
-// 	std::queue<boost::shared_ptr<PartRepresentation> > queue;
-// 	zhang_shasha::Node root = zhang_shasha::Node(bodyTree_->getType(),bodyTree_->getTypeCost());
-// 	for(boost::shared_ptr<PartRepresentation> child : bodyTree_->children_){
-// 		queue.push(child);
-// 	}
-// 	while(!queue.empty()){
-// 		boost::shared_ptr<PartRepresentation> part = queue.pop();
-
-// 	}	
-// }
-
-// zhang_shasha::Node RobotRepresentation::copyTree(zhang_shasha::Node & root){
-// 	zhang_sasha::Node newNode = new zhang_shasha::Node(root->getType(),root->getTypeCost());
-
-// 	return newNode;
-// }
-
 //helper function to fill post order labels
 void RobotRepresentation::postOrderTraversal(){
 		std::vector<std::string> labels;
 		this->labels=traverse(bodyTree_, labels);
 }
-//recursive
+//recursive helper for post order
 std::vector<std::string> RobotRepresentation::traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels){
 	for(int i=0; i<node->getChildrenCount();i++){
 		labels = traverse(node->getChild(i),labels);
@@ -1270,6 +1231,28 @@ int RobotRepresentation::zhangShashaDistance(boost::shared_ptr<RobotRepresentati
 	robot2->postOrderTraversal();
 	return 0;//for now
 }
+void RobotRepresentation::leftmost(boost::shared_ptr<PartRepresentation> node){
+	if (node == nullptr)
+		return;
+	for (int i = 0; i < node->getChildrenCount(); i++) {
+		leftmost(node->getChild(i));
+	}
+	if (node->getChildrenCount() == 0) {
+		node->leftmost_zs = node;
+	} else {
+		node->leftmost_zs = node->getChild(0)->leftmost_zs;
+	}
+}
+void RobotRepresentation::leftmost(){
+	leftmost(bodyTree_);
+}
+void RobotRepresentation::l(){
+
+}
+/**
+	std::vector<int> RobotRepresentation::l(boost::shared_ptr<PartRepresentation> node, std::vector<int> l);
+	void RobotRepresentation::keyroots();
+*/
 
 }
 

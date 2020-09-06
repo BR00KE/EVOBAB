@@ -263,15 +263,8 @@ public:
 	//methods to find tree edit distance between robot representations
 	int label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B);
 
-	//Tree rep to be used in TreeEditDistanceCalculation
-	// zhang_shasha::Tree treeRepresentation;
-
-	// void createTreeRepresentation();
-
-	// zhang_shasha::Node copyTree(zhang_shasha::Node root);
-
 	/**
-	 * Zhang-Shasha stuff
+	 * Zhang-Shasha tree edit distance functions and variables
 	 */
 	std::vector<int> l;
     //list of keyroots. i.e. nodes with a left child and the tree root
@@ -279,8 +272,14 @@ public:
     std::vector<std::string> labels; //postorder labels of tree nodes
 	//helper function to fill post order labels
 	void postOrderTraversal();
-	//c++ defaults to pass by value
+	void l();
+	void leftmost(boost::shared_ptr<PartRepresentation> node);
+	void leftmost();
+	std::vector<int> l(boost::shared_ptr<PartRepresentation> node, std::vector<int> l);
 
+	void keyroots();
+
+	//c++ defaults to pass by value
 	/**
 	 * The Zhang-Shasha tree edit distance between this robot representation and the one passed as argument
 	 */
