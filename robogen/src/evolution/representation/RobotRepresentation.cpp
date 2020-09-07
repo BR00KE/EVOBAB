@@ -1223,6 +1223,10 @@ void RobotRepresentation::createConnectionTable(){
 }
 
 double RobotRepresentation::getBrainComplexity(){
+
+	/*
+	 * Create directed graph and adjacency list representations for the neuron network
+	 */ 
 	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
 	//create a unordered set of neuronIDs
 	std::set<std::string> neurons;
@@ -1253,7 +1257,9 @@ double RobotRepresentation::getBrainComplexity(){
 		adjLists[i1].push_back(i2);
 	}
 
-	//each neuron (i.e. vertex gets assigned to a strong component)
+	/*
+	* Group neurons into strongly connected components 
+	*/
 	std::vector<int> components(numNeurons);
 
 	int numStrongComponents = boost::strong_components(neuronNetwork, 
@@ -1261,34 +1267,30 @@ double RobotRepresentation::getBrainComplexity(){
 
 	std::cout<<numStrongComponents<<std::endl;
 
-	/**
-	 * BK: I am thinking a 'strongly connected component' is a better indication of specialisation than a cycle (any neuron can be reached from any other)
-	 * local behaviour can still be created through interaction but not necessarily a cycle.
-	 * anyway if we decide to go with this I have added a count of strongly connected components of more than one neuron
-	 * and a count of edges that connect such 'strongly connected components'
-	 * if we decide to go cycle route need to put more thought into how to preserve original index in adjacency list
-	 */
-
-	//count strong components with more than one neuron. //could maybe add more logic to increase importance of having more neurons in a complex
-	int countStrongComponentComplexes=0;
-	std::vector<int> indexOfStrongComplexes;
+	int countStrongComponentComplexes=0;//count strong components with more than one neuron. //could maybe add more logic to increase importance of having more neurons in a complex
 	//put all neurons that make up a 'strongly connected component' together (count at same time)
+	std::set<int> indexStrongComplexes;//indexes of the strongly connected components with >1 neuron
 	std::vector<int> strongComponentMembers[numStrongComponents];
 	for(int i=0; i<numNeurons;i++){
-		if(strongComponentMembers[components[i]].size()>0){countStrongComponentComplexes++;} //now more than one member
+		if(strongComponentMembers[components[i]].size()>0){ //now more than one member
+			countStrongComponentComplexes++; 
+			indexStrongComplexes.insert(components[i]);
+		} 
 		strongComponentMembers[components[i]].push_back(i);
 	}
 	
-	//count inter-complex connections (incl. those from single neuron complexes)
+	/*
+	* count inter-complex connections (incl. those from single neuron complexes)
+	* at the same time remove such connections from the adjacency list of neuron in question
+	*/
 	int interStrongComplexConnections=0;
 	for(auto members: strongComponentMembers){
 		//count where there is an adjacent vertex to one of the members not in the cluster
 		for(int member: members){
 			int i=0;
 			for(int adjacent: adjLists[member]){
-				//adjacent not present in members then increment count
 				auto it = std::find(members.begin(),members.end(),adjacent);
-				if(it==members.end()){
+				if(it==members.end()){ //adjacent not present in strong component members then increment count
 					interStrongComplexConnections++;
 					if(adjLists[member].size()==1){adjLists[member].clear();}
 					else{adjLists[member].erase(adjLists[member].begin()+i);}
@@ -1297,41 +1299,47 @@ double RobotRepresentation::getBrainComplexity(){
 			}
 		}
 	}
-	int componentNodeCount =0;
-	for(auto strongComponent:strongComponentMembers ){
-		if(strongComponent.size()>1){
-			for(int member:strongComponent){
-				componentNodeCount++;
+	/*
+	* for each strongly connected component with >1 neuron, pass to johnson's algorithm to detect the number of cycles
+	* Calculate the average number of cycles found in such strongly connected components
+	*/
+	int totalNumCycles=0; //counter for all the cycles found in strongly connected components
+
+	for(int strongComplex:indexStrongComplexes){
+		//create an adjacency list for the complex
+		std::map<int, int> indexMapping;
+		std::vector<std::vector<int> > adjList;
+		int index = 0;
+		for(int neuron: strongComponentMembers[strongComplex]){
+			if(indexMapping.count(neuron)==0){
+				indexMapping.insert({neuron,index});
+				index++;
 			}
 		}
+		std::vector<int> indexAdjustedNeurons;
+		for(int neuron: strongComponentMembers[strongComplex]){
+			std::vector<int> indexAdjustedNeurons;
+			for (int adjNeuron : adjLists[neuron]){
+				indexAdjustedNeurons.push_back(indexMapping[adjNeuron]);
+			}
+			adjList.push_back(indexAdjustedNeurons);
+		}
+		// for (int adjNeuron : adjLists[neuron]){
+				
+		// }
+		// adjList.push_back(adjLists[neuron]);
+		
+
+		//MUST STILL INITIALISE EVERYTHING ELSE NEEDED FOR JOHNSON
+		//THEN CALL JOHNSON FOR THIS STRONG COMPONENT AND INCREMENT totalNumCycles BY THE NUMBER OF CYCLES FOUND
 	}
-	// std::vector<std::vector<int> > * johnsonAdjList = new std::vector<std::vector<int> > [numNeurons];
-	// for (int i = 0; i <numNeurons; i++){
-	// 	johnsonAdjList->insert(johnsonAdjList->begin(), std::begin(adjLists[i]), std::end(adjLists[i]));
-
-	// }
-	// // for(auto strongComponent:strongComponentMembers ){
-	// // 	if(strongComponent.size()>1){
-	// 		for(int member:strongComponent){
-	// 			johnsonAdjList.push_back(adjLists[member]);
-	// 		}
-	// 	}
-	// }
-	// for (int i = 0; i < numNeurons;i++){
-	// 		std::cout << i << ": ";
-
-	// 	for(int adjacent: adjLists[i]){
-	// 		std::cout << adjacent << ", ";
-	// 	}
-	// 	std::cout << std::endl;
-	// }
 	//pass the adjacency list representing each strongly connected component to Johnson's algorithm 
 	/**
 	 * Johnson stuff for cycles commented out for now
 	 */
-	// // create an adjList poitner, and read in a file
-	// // verify data is read correctly by printing size of adjList for each node
-	// std::vector<bool> blocked (johnsonAdjList->size(), false);
+	// create an adjList poitner, and read in a file
+	// verify data is read correctly by printing size of adjList for each node
+	//std::vector<bool> blocked (johnsonAdjList->size(), false);//BK commented out
 
 	// // stack- but use a deque because better than stack
 	// std::deque<int>  stackLike;
