@@ -37,16 +37,11 @@ namespace robogen{
     static void unblock(int  node, std::vector<bool> & blocked, std::vector<std::vector<int> > & B_Fruitless)
     {
         // state of B_Fruitless
-        std::cout << "state of B_Fruitless\n";
-        displayVecOfVec (B_Fruitless);
-
-        std::cout << "Unblocking " << node << std::endl; 
         blocked[node] = false;
         while (B_Fruitless[node].size() > 0) {
             int w = B_Fruitless[node][0];
             B_Fruitless[node].erase(find (B_Fruitless[node].begin(), B_Fruitless[node].end(), w) ) ;
             if (blocked[w]) {
-            std::cout << "RECURSIVE!!" << std::endl;
             unblock(w, blocked, B_Fruitless);
             }
         }
@@ -58,12 +53,6 @@ namespace robogen{
         stackLike.push_front(v);  // insert like a stack:  so at the front
         blocked[v] = true;
         
-        std::cout << "BLOCKED list from visiting node" << v << ":::\t" ;
-        for (int i =0; i<adjList.size() ;i++) {
-            std::cout << blocked[i] << "\t";
-        }
-        std::cout << std::endl;
-
 
         // explore all neighbours -- recursively 
         for (int i = 0; i < adjList[v].size(); i++) {
@@ -71,14 +60,11 @@ namespace robogen{
                     
             // found cycle through ANY of my neighbours w.
             if (w == s) {
-            std::cout << "----- FoUND cycle with s=" << s <<  "and v=" << v << " and Size=" << stackLike.size() << ": " ;
             std::vector<int>* cycle = new std::vector<int>;
             for (int j = 0; j < stackLike.size(); j++) {
                 cycle->push_back( stackLike.at (stackLike.size() - j  - 1) );
-                std::cout << stackLike.at(stackLike.size() - j -1) << " ";
             }
             cycles.push_back(*cycle);
-            std::cout << std::endl;
             f = true;
             } else if (!blocked[w]) {
             if (findCycles(w, s, adjList, blocked, stackLike, B_Fruitless, cycles)) {
@@ -89,10 +75,8 @@ namespace robogen{
 
 
         if (f) {
-            std::cout << "F is true! just found a cycle, and unblock starting with " << v << std::endl; 
             unblock(v, blocked, B_Fruitless);
         } else {
-            std::cout << "--no cycles found for " << v << std::endl;
 
             // go through all my neighbors w.
             //  v is pushed on B_Fruitless[w].
@@ -109,7 +93,6 @@ namespace robogen{
             std::vector<int>::iterator it;
             it = find(B_Fruitless[w].begin(), B_Fruitless[w].end(), v);
             if (it == B_Fruitless[w].end()) {
-                std::cout << "Pushing v=" << v << "on B_Fruitless list for w=" << w << "\n";
                 B_Fruitless[w].push_back(v);
             }
             }

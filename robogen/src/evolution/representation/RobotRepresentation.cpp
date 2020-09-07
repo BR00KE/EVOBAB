@@ -1345,7 +1345,6 @@ double RobotRepresentation::getBrainComplexity(){
 			blocked[j] = false;
 			B_Fruitless[j].clear();
 			}
-			std::cout << "START: i=" << i << std::endl;
 			findCycles(i, i, adjList,  blocked, stackLike, B_Fruitless, cycles);
 		}
 
