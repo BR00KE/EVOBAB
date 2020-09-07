@@ -268,14 +268,15 @@ public:
 	 */
 	std::vector<int> l;
     //list of keyroots. i.e. nodes with a left child and the tree root
-    std::vector<int> keyroots;
+    std::vector<int> keyroots_zs;
     std::vector<std::string> labels; //postorder labels of tree nodes
 	//helper function to fill post order labels
 	void postOrderTraversal();
-	void l();
+	std::vector<int> RobotRepresentation::l_func(boost::shared_ptr<PartRepresentation> node, std::vector<int>& l);
+	void l_func();
 	void leftmost(boost::shared_ptr<PartRepresentation> node);
 	void leftmost();
-	std::vector<int> l(boost::shared_ptr<PartRepresentation> node, std::vector<int> l);
+	
 
 	void keyroots();
 

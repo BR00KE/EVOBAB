@@ -1246,13 +1246,23 @@ void RobotRepresentation::leftmost(boost::shared_ptr<PartRepresentation> node){
 void RobotRepresentation::leftmost(){
 	leftmost(bodyTree_);
 }
-void RobotRepresentation::l(){
-
+std::vector<int> RobotRepresentation::l_func(boost::shared_ptr<PartRepresentation> node, std::vector<int>& l){
+	for(int i=0; i<node->getChildrenCount();i++){
+		l = l_func(node->getChild(i),l);
+	}
+	l.push_back(node->leftmost_zs->index_zs);
+	return l;
 }
-/**
-	std::vector<int> RobotRepresentation::l(boost::shared_ptr<PartRepresentation> node, std::vector<int> l);
-	void RobotRepresentation::keyroots();
-*/
+void RobotRepresentation::l_func(){
+	leftmost();
+	std::vector<int> vec;
+	l = l_func(bodyTree_,vec);
+}
+	
+void RobotRepresentation::keyroots(){
+	//calculate the keyroots
+}
+
 
 }
 
