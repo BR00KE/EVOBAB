@@ -1264,8 +1264,6 @@ double RobotRepresentation::getBrainComplexity(){
 	int numStrongComponents = boost::strong_components(neuronNetwork, 
 							boost::make_iterator_property_map(components.begin(),boost::get(boost::vertex_index,neuronNetwork),components[0]));
 
-	std::cout<<numStrongComponents<<std::endl;
-
 	int countStrongComponentComplexes=0;//count strong components with more than one neuron. //could maybe add more logic to increase importance of having more neurons in a complex
 	//put all neurons that make up a 'strongly connected component' together (count at same time)
 	std::set<int> indexStrongComplexes;//indexes of the strongly connected components with >1 neuron
@@ -1310,47 +1308,40 @@ double RobotRepresentation::getBrainComplexity(){
 		for(int neuron: strongComponentMembers[strongComplex]){
 			adjList.push_back(adjLists[neuron]);
 		}
+
+		
 		//MUST STILL INITIALISE EVERYTHING ELSE NEEDED FOR JOHNSON
-		//THEN CALL JOHNSON FOR THIS STRONG COMPONENT AND INCREMENT totalNumCycles BY THE NUMBER OF CYCLES FOUND
+		//blocked
+		std::vector<bool> blocked (adjList.size(), false);
+		// stack- but use a deque because better than stack
+		std::deque<int>  stackLike;
+		// cycles
+		std::vector<std::vector<int> > cycles;
+		// initialize B
+		std::vector<std::vector<int> >  B_Fruitless ;
+
+		for (int i=0; i< adjList.size()  ; i++ ) {
+			std::vector<int>* k = new std::vector<int>;
+			B_Fruitless.push_back(*k);
+		}
+		// loop to start new search from each node i
+		for (int i=0; i< adjList.size()  ; i++ ) {
+			// clear all book keeping
+			for (int j =0; j< adjList.size(); j++) {
+			blocked[j] = false;
+			B_Fruitless[j].clear();
+			}
+			std::cout << "START: i=" << i << std::endl;
+			findCycles(i, i, adjList,  blocked, stackLike, B_Fruitless, cycles);
+		}
+
+		totalNumCycles+=cycles.size();
+		//for testing print out the cycles
+		std::cout << "Cycles:\n";
+		displayVecOfVec (cycles); 
+
 	}
-	//pass the adjacency list representing each strongly connected component to Johnson's algorithm 
-	/**
-	 * Johnson stuff for cycles commented out for now
-	 */
-	// create an adjList poitner, and read in a file
-	// verify data is read correctly by printing size of adjList for each node
-	//std::vector<bool> blocked (johnsonAdjList->size(), false);//BK commented out
-
-	// stack- but use a deque because better than stack
-	std::deque<int>  stackLike;
-
-	// cycles
-	std::vector<std::vector<int> > cycles;
-
-	// B_Fruitless is the book keeping needed to avoid fruitless searches.  It is
-	// referred to as B in Johnson's original algorithm
-
-	// // initialize B
-	// std::vector<std::vector<int> >  B_Fruitless ;
-
-	// for (int i=0; i< johnsonAdjList->size()  ; i++ ) {
-	// 	std::vector<int>* k = new std::vector<int>;
-	// 	B_Fruitless.push_back(*k);
-	// }
-
-	// // loop to start new search from each node i
-	// for (int i=0; i< johnsonAdjList->size()  ; i++ ) {
-	// 	// clear all book keeping
-	// 	for (int j =0; j< johnsonAdjList->size(); j++) {
-	// 	blocked[j] = false;
-	// 	B_Fruitless[j].clear();
-	// 	}
-	// 	std::cout << "START: i=" << i << std::endl;
-	// 	findCycles(i, i, *johnsonAdjList,  blocked, stackLike, B_Fruitless, cycles) ;
-	// }
-
-	// std::cout << "Cycles:\n";
-	// displayVecOfVec (cycles); 
+	
 }
 
 
