@@ -96,8 +96,9 @@ RobotRepresentation::RobotRepresentation(const RobotRepresentation &r) {
 	evaluated_ = r.evaluated_;
 	maxid_ = r.maxid_;
 	
-	neatGenome = r.neatGenome;//BK added
-	
+	//BK added
+	neatGenome = r.neatGenome;
+	noveltyScore=r.noveltyScore;
 }
 
 /**
@@ -359,6 +360,11 @@ RobotRepresentation &RobotRepresentation::operator=(
 	fitness_ = r.fitness_;
 	evaluated_ = r.evaluated_;
 	maxid_ = r.maxid_;
+
+	//BK added
+	neatGenome = r.neatGenome;
+	noveltyScore=r.noveltyScore;
+
 	return *this;
 }
 
@@ -1261,6 +1267,17 @@ void RobotRepresentation::l_func(){
 	
 void RobotRepresentation::keyroots(){
 	//calculate the keyroots
+	for(int i=0; i<l.size();i++){
+		int flag =0;
+		for (int j = i + 1; j < l.size(); j++) {
+				if (l[j] == l[i]) {
+					flag = 1;
+				}
+		}
+		if (flag == 0) {
+			keyroots_zs.push_back(i + 1);
+		}
+	}
 }
 
 
