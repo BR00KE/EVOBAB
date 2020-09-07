@@ -101,7 +101,7 @@ bool Robot::init(dWorldID odeWorld, dSpaceID odeSpace,
 
 	connectionJointGroup_ = dJointGroupCreate(0);
 	this->id_ = robotSpec.id();
-
+	complexity_ = robotSpec.get_complexity();
 	const robogenMessage::Body& body = robotSpec.body();
 	const robogenMessage::Brain& brain = robotSpec.brain();
 	if (!this->decodeBody(body)) {

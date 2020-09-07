@@ -230,6 +230,7 @@ unsigned int runSimulations(boost::shared_ptr<Scenario> scenario,
 		double step = configuration->getTimeStepLength();
 
 		// this is where we will penalise simulation ticks by setting t = whatever you FEEL MEEEEEEEEEEEEE
+		//t = configuration->getSimulationTime()-((1-robot->complexity_)*configuration->getSimulationTime());
 		while ((t < configuration->getSimulationTime())
 			   && (!(visualize && viewer->done()))) {
 
