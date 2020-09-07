@@ -1173,11 +1173,6 @@ double RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepres
 		}
 	}
 	complexity = (complexity - MIN_BODY_COMPLEXITY)/(MAX_BODY_COMPLEXITY - MIN_BODY_COMPLEXITY);
-	this->complexity_ = complexity;
-
-	//BK for testing
-	this->getBrainComplexity();
-
 	return complexity;
 }
 
@@ -1367,6 +1362,10 @@ double RobotRepresentation::getBrainComplexity(){
 		numNeuronsInSpecialisations+=strongComponentMembers[index].size();
 	}
 	double proportionOfBrainSpecialised = (double) numNeuronsInSpecialisations/numNeurons;
+
+	double specialisationScore = avgDegreeOfSpecialisation*proportionOfBrainSpecialised;
+
+	if (specialisationScore>1) specialisationScore = 1;
 	
 	double globalIntegration = 0;
 	if(countStrongComponentComplexes>interStrongComplexConnections){
@@ -1375,8 +1374,21 @@ double RobotRepresentation::getBrainComplexity(){
 	else{
 		globalIntegration=(double)countStrongComponentComplexes/interStrongComplexConnections;
 	}
+	double neuralComplexity = 0;
+	if (specialisationScore>globalIntegration) {neuralComplexity = (double) specialisationScore/ globalIntegration;}
+	else {neuralComplexity = (double) globalIntegration/specialisationScore;}
+
+	return neuralComplexity;
+
 }
 
+// CH DDDDDDDDDDDDD
+
+void RobotRepresentation::calculateRobotComplexity(){
+	double body = this->calculateBodyComplexity(bodyTree_);
+	double brain = this->getBrainComplexity();
+	complexity_ = (double) (0.6*this->calculateBodyComplexity(bodyTree_) + 0.4*this->getBrainComplexity());
+}
 
 // CH - returns complexity of robot
 double RobotRepresentation::getComplexity(){

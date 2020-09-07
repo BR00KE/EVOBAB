@@ -71,7 +71,7 @@ public:
 
 	void evaluateComplexity();
 
-	float getComplexity();
+	double getComplexity();
 
 
 protected:
@@ -81,7 +81,7 @@ protected:
 private:
 
 	bool sorted_;
-	float complexity_;
+	double complexity_;
 
 };
 

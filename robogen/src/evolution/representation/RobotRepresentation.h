@@ -263,6 +263,10 @@ public:
 	// CH - set weight map
 	void setWeightMap(WeightMap weightMap);
 
+	// CH - ?
+
+	void calculateRobotComplexity();
+
 
 private:
 	/**

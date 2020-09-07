@@ -179,14 +179,15 @@ bool IndividualContainer::areEvaluated() const {
 }
 
 void IndividualContainer::evaluateComplexity() {
-	float complexity = 0.0f;
+	double complexity = 0;
 	for (int i = 0; i<this->size();i++){
-		complexity += this->at(i)->calculateBodyComplexity(this->at(i)->getBodyRoot());
+		this->at(i)->calculateRobotComplexity();
+		complexity += this->at(i)->getComplexity();
 	}
 	complexity_ = complexity;
 }
 
-float IndividualContainer::getComplexity(){
+double IndividualContainer::getComplexity(){
 	return complexity_;
 }
 
