@@ -55,6 +55,7 @@
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/graph_utility.hpp>
 
+#include <algorithm>
 
 #define VERIFY_ON_LOAD_TXT
 #ifdef VERIFY_ON_LOAD_TXT
@@ -1348,11 +1349,16 @@ double RobotRepresentation::getBrainComplexity(){
 			findCycles(i, i, adjList,  blocked, stackLike, B_Fruitless, cycles);
 		}
 
-		totalNumCycles+=cycles.size();
-		//for testing print out the cycles
-		std::cout << "Cycles:\n";
-		displayVecOfVec (cycles); 
-
+		std::vector<std::vector<int> >::iterator cyc = cycles.begin();
+		int singleCyclesCount=0;
+		for(auto & cyc: cycles){
+			std::sort(cyc.begin(),cyc.end());
+			if(cyc.size()==1){
+				singleCyclesCount++;
+			}
+		}
+		cycles.erase(std::unique(cycles.begin(),cycles.end() ),cycles.end());
+		totalNumCycles+=cycles.size()-singleCyclesCount;
 	}
 	
 }
