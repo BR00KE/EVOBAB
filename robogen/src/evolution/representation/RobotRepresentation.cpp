@@ -586,6 +586,7 @@ robogenMessage::Robot RobotRepresentation::serialize() const {
 	robogenMessage::Robot message;
 	// id - this can probably be removed
 	message.set_id(1);
+	message.set_complexity(complexity_);
 	// body
 	bodyTree_->addSubtreeToBodyMessage(message.mutable_body(), true);
 	// brain
@@ -1304,13 +1305,13 @@ double RobotRepresentation::getBrainComplexity(){
 			}
 		}
 	}
-	std::vector<std::vector<int> > * johnsonAdjList = new std::vector<std::vector<int> > [numNeurons];
-	for (int i = 0; i <numNeurons; i++){
-		johnsonAdjList->insert(johnsonAdjList->begin(), std::begin(adjLists[i]), std::end(adjLists[i]));
+	// std::vector<std::vector<int> > * johnsonAdjList = new std::vector<std::vector<int> > [numNeurons];
+	// for (int i = 0; i <numNeurons; i++){
+	// 	johnsonAdjList->insert(johnsonAdjList->begin(), std::begin(adjLists[i]), std::end(adjLists[i]));
 
-	}
-	// for(auto strongComponent:strongComponentMembers ){
-	// 	if(strongComponent.size()>1){
+	// }
+	// // for(auto strongComponent:strongComponentMembers ){
+	// // 	if(strongComponent.size()>1){
 	// 		for(int member:strongComponent){
 	// 			johnsonAdjList.push_back(adjLists[member]);
 	// 		}
@@ -1328,40 +1329,40 @@ double RobotRepresentation::getBrainComplexity(){
 	/**
 	 * Johnson stuff for cycles commented out for now
 	 */
-	// create an adjList poitner, and read in a file
-	// verify data is read correctly by printing size of adjList for each node
-	std::vector<bool> blocked (johnsonAdjList->size(), false);
+	// // create an adjList poitner, and read in a file
+	// // verify data is read correctly by printing size of adjList for each node
+	// std::vector<bool> blocked (johnsonAdjList->size(), false);
 
-	// stack- but use a deque because better than stack
-	std::deque<int>  stackLike;
+	// // stack- but use a deque because better than stack
+	// std::deque<int>  stackLike;
 
-	// cycles
-	std::vector<std::vector<int> > cycles;
+	// // cycles
+	// std::vector<std::vector<int> > cycles;
 
-	// B_Fruitless is the book keeping needed to avoid fruitless searches.  It is
-	// referred to as B in Johnson's original algorithm
+	// // B_Fruitless is the book keeping needed to avoid fruitless searches.  It is
+	// // referred to as B in Johnson's original algorithm
 
-	// initialize B
-	std::vector<std::vector<int> >  B_Fruitless ;
+	// // initialize B
+	// std::vector<std::vector<int> >  B_Fruitless ;
 
-	for (int i=0; i< johnsonAdjList->size()  ; i++ ) {
-		std::vector<int>* k = new std::vector<int>;
-		B_Fruitless.push_back(*k);
-	}
+	// for (int i=0; i< johnsonAdjList->size()  ; i++ ) {
+	// 	std::vector<int>* k = new std::vector<int>;
+	// 	B_Fruitless.push_back(*k);
+	// }
 
-	// loop to start new search from each node i
-	for (int i=0; i< johnsonAdjList->size()  ; i++ ) {
-		// clear all book keeping
-		for (int j =0; j< johnsonAdjList->size(); j++) {
-		blocked[j] = false;
-		B_Fruitless[j].clear();
-		}
-		std::cout << "START: i=" << i << std::endl;
-		findCycles(i, i, *johnsonAdjList,  blocked, stackLike, B_Fruitless, cycles) ;
-	}
+	// // loop to start new search from each node i
+	// for (int i=0; i< johnsonAdjList->size()  ; i++ ) {
+	// 	// clear all book keeping
+	// 	for (int j =0; j< johnsonAdjList->size(); j++) {
+	// 	blocked[j] = false;
+	// 	B_Fruitless[j].clear();
+	// 	}
+	// 	std::cout << "START: i=" << i << std::endl;
+	// 	findCycles(i, i, *johnsonAdjList,  blocked, stackLike, B_Fruitless, cycles) ;
+	// }
 
-	std::cout << "Cycles:\n";
-	displayVecOfVec (cycles); 
+	// std::cout << "Cycles:\n";
+	// displayVecOfVec (cycles); 
 }
 
 
