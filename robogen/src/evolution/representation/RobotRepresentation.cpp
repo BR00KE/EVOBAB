@@ -1359,7 +1359,22 @@ double RobotRepresentation::getBrainComplexity(){
 		cycles.erase(std::unique(cycles.begin(),cycles.end() ),cycles.end());
 		totalNumCycles+=cycles.size()-singleCyclesCount;
 	}
+
+	double avgDegreeOfSpecialisation = (double) totalNumCycles/countStrongComponentComplexes;
+
+	int numNeuronsInSpecialisations = 0;
+	for(int index: indexStrongComplexes){
+		numNeuronsInSpecialisations+=strongComponentMembers[index].size();
+	}
+	double proportionOfBrainSpecialised = (double) numNeuronsInSpecialisations/numNeurons;
 	
+	double globalIntegration = 0;
+	if(countStrongComponentComplexes>interStrongComplexConnections){
+		globalIntegration=(double)interStrongComplexConnections/countStrongComponentComplexes;
+	}
+	else{
+		globalIntegration=(double)countStrongComponentComplexes/interStrongComplexConnections;
+	}
 }
 
 
