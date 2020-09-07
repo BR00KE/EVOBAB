@@ -1283,14 +1283,20 @@ double RobotRepresentation::getBrainComplexity(){
 	for(auto members: strongComponentMembers){
 		//count where there is an adjacent vertex to one of the members not in the cluster
 		for(int member: members){
+			int i=0;
 			for(int adjacent: adjLists[member]){
 				//adjacent not present in members then increment count
 				auto it = std::find(members.begin(),members.end(),adjacent);
-				if(it!=members.end()){interStrongComplexConnections++;}
+				if(it==members.end()){
+					interStrongComplexConnections++;
+					if(adjLists[member].size()==1){adjLists[member].clear();}
+					else{adjLists[member].erase(adjLists[member].begin()+i);}
+				}
+				i++;
 			}
 		}
 	}
-
+	int um =0;
 	//pass the adjacency list representing each strongly connected component to Johnson's algorithm 
 	/**
 	 * Johnson stuff for cycles commented out for now
