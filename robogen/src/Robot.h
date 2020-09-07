@@ -163,6 +163,10 @@ public:
 	 */
 	void optimizePhysics();
 
+	// CH help
+
+	double complexity_;
+
 private:
 
 	/**
