@@ -1340,9 +1340,13 @@ class Robot : public ::google::protobuf::Message /* @@protoc_insertion_point(cla
   static const int kIdFieldNumber = 1;
   ::google::protobuf::int32 id() const;
   void set_id(::google::protobuf::int32 value);
-  void set_complexity(double value);
+
+    // CH added this
+  void set_complexity(float value);
   // CH added this
-  double get_complexity() const;
+  float get_complexity() const;
+  void set_complexity_cost(float value);
+  float get_complexity_cost() const;
 
   // @@protoc_insertion_point(class_scope:robogenMessage.Robot)
  private:
@@ -1362,7 +1366,8 @@ class Robot : public ::google::protobuf::Message /* @@protoc_insertion_point(cla
   ::robogenMessage::Body* body_;
   ::robogenMessage::Brain* brain_;
   ::google::protobuf::int32 id_;
-  double complexity_;
+  float complexity_;
+  float complexityCost_;
   friend struct ::protobuf_robogen_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
@@ -3792,15 +3797,25 @@ inline void Robot::set_allocated_brain(::robogenMessage::Brain* brain) {
   // @@protoc_insertion_point(field_set_allocated:robogenMessage.Robot.brain)
 }
 
-// CH ADDED THIS
+// CH added to set and return robot complexity
 
-inline void Robot::set_complexity(double value){
+inline void Robot::set_complexity(float value){
   complexity_ = value;
 }
 
-inline double Robot::get_complexity() const {
+inline float Robot::get_complexity() const {
   return complexity_;
 }
+
+inline void Robot::set_complexity_cost(float value){
+  complexityCost_ = value;
+}
+
+inline float Robot::get_complexity_cost() const {
+  return complexityCost_;
+}
+
+
 
 // -------------------------------------------------------------------
 

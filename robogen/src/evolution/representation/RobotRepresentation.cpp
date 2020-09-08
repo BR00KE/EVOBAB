@@ -69,7 +69,7 @@ NEAT::Genome * RobotRepresentation::getNeatGenomePointer(){
 	}
 
 RobotRepresentation::RobotRepresentation() :
-		maxid_(1000), evaluated_(false) {
+		maxid_(1000), evaluated_(false), complexityCost_(false) {
 
 }
 
@@ -588,6 +588,8 @@ robogenMessage::Robot RobotRepresentation::serialize() const {
 	// id - this can probably be removed
 	message.set_id(1);
 	message.set_complexity(complexity_);
+	if (complexityCost_) { message.set_complexity_cost(1);}
+	else {message.set_complexity_cost(0);}
 	// body
 	bodyTree_->addSubtreeToBodyMessage(message.mutable_body(), true);
 	// brain
@@ -625,7 +627,6 @@ void RobotRepresentation::evaluate(Socket *socket,
 	robogenMessage::SimulatorConf* evalConf = evalReq->mutable_configuration();
 	*evalRobot = serialize();
 	*evalConf = robotConf->serialize();
-
 	ProtobufPacket<robogenMessage::EvaluationRequest> robotPacket(evalReq);
 	std::vector<unsigned char> forgedMessagePacket;
 	robotPacket.forge(forgedMessagePacket);
@@ -1160,24 +1161,21 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 }
 
 // CH - complexity calculation
-double RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root){
-	double complexity = 0.0f;
+float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root){
+	float complexity = 0.0f;
 	int count =0;
 	for (unsigned int i = 0; i < root->getChildren().size(); ++i) {
 		if (root->getChildren()[i].get()) {
 			complexity += getPartComplexity(root->getChildren()[i]);
-			std::vector<boost::shared_ptr<PartRepresentation > > descendants = root->getChildren()[i]->getDescendants();
-			std::vector<boost::weak_ptr<NeuronRepresentation> > descendantNeurons = getDescendantNeurons(descendants);
 			int count1 = 0;
 			complexity += calculateBodyComplexity(root->getChildren()[i]);
 		}
 	}
-	complexity = (complexity - MIN_BODY_COMPLEXITY)/(MAX_BODY_COMPLEXITY - MIN_BODY_COMPLEXITY);
 	return complexity;
 }
 
 // CH - returns the complexity of a part
-double RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
+float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
 	std::stringstream str;
 	str << part->getType();
 	if(str.str()==PART_TYPE_PASSIVE_HINGE){return part->passiveHingeComplexity;}
@@ -1218,180 +1216,186 @@ void RobotRepresentation::createConnectionTable(){
 	
 }
 
-double RobotRepresentation::getBrainComplexity(){
+float RobotRepresentation::calculateBrainComplexity(){
 
 	/*
 	 * Create directed graph and adjacency list representations for the neuron network
 	 */ 
-	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
-	//create a unordered set of neuronIDs
-	std::set<std::string> neurons;
-	std::map<StringPair,double>::iterator it = weightMap.begin();
-	while(it!=weightMap.end()){
-		//set insert will only insert an element not already present
-		neurons.insert(it->first.first);
-		neurons.insert(it->first.second);
-		it++;
-	}
-	std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
-	int numNeurons = neuronIDs.size();
+	if (getWeightMap().size()!=0){
+		NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
+		//create a unordered set of neuronIDs
+		std::set<std::string> neurons;
+		std::map<StringPair,double>::iterator it = weightMap.begin();
+		while(it!=weightMap.end()){
+			//set insert will only insert an element not already present
+			neurons.insert(it->first.first);
+			neurons.insert(it->first.second);
+			it++;
+		}
+		std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
+		int numNeurons = neuronIDs.size();
 
-	//want to pass in a vector<vector<int>> & adjacencyList   of a strongly connected component
-	typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> DirectedGraph;
-	typedef boost::graph_traits<DirectedGraph>::edge_iterator edge_iterator;
-	DirectedGraph neuronNetwork;
-	std::vector<int> adjLists[numNeurons];//adjacency list for each vertex
-	//add edges to graph
-	for(auto connection: weightMap){
-		auto it=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.first );
-		auto it2=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.second );
-		int i1 = it-neuronIDs.begin();
-		int i2 = it2-neuronIDs.begin();
+		//want to pass in a vector<vector<int>> & adjacencyList   of a strongly connected component
+		typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> DirectedGraph;
+		typedef boost::graph_traits<DirectedGraph>::edge_iterator edge_iterator;
+		DirectedGraph neuronNetwork;
+		std::vector<int> adjLists[numNeurons];//adjacency list for each vertex
+		//add edges to graph
+		for(auto connection: weightMap){
+			auto it=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.first );
+			auto it2=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.second );
+			int i1 = it-neuronIDs.begin();
+			int i2 = it2-neuronIDs.begin();
 
-		boost::add_edge(i1,i2,neuronNetwork); 
-		//create adjacency list for each vertex at same time 
-		adjLists[i1].push_back(i2);
-	}
+			boost::add_edge(i1,i2,neuronNetwork); 
+			//create adjacency list for each vertex at same time 
+			adjLists[i1].push_back(i2);
+		}
 
-	/*
-	* Group neurons into strongly connected components 
-	*/
-	std::vector<int> components(numNeurons);
+		/*
+		* Group neurons into strongly connected components 
+		*/
+		std::vector<int> components(numNeurons);
+		
+		int numStrongComponents = boost::strong_components(neuronNetwork, 
+								boost::make_iterator_property_map(components.begin(),boost::get(boost::vertex_index,neuronNetwork),components[0]));
 
-	int numStrongComponents = boost::strong_components(neuronNetwork, 
-							boost::make_iterator_property_map(components.begin(),boost::get(boost::vertex_index,neuronNetwork),components[0]));
-
-	int countStrongComponentComplexes=0;//count strong components with more than one neuron. //could maybe add more logic to increase importance of having more neurons in a complex
-	//put all neurons that make up a 'strongly connected component' together (count at same time)
-	std::set<int> indexStrongComplexes;//indexes of the strongly connected components with >1 neuron
-	std::vector<int> strongComponentMembers[numStrongComponents];
-	for(int i=0; i<numNeurons;i++){
-		if(strongComponentMembers[components[i]].size()>0){ //now more than one member
-			countStrongComponentComplexes++; 
-			indexStrongComplexes.insert(components[i]);
-		} 
-		strongComponentMembers[components[i]].push_back(i);
-	}
-	
-	/*
-	* count inter-complex connections (incl. those from single neuron complexes)
-	* at the same time remove such connections from the adjacency list of neuron in question
-	*/
-	int interStrongComplexConnections=0;
-	for(auto members: strongComponentMembers){
-		//count where there is an adjacent vertex to one of the members not in the cluster
-		for(int member: members){
-			int i=0;
-			for(int adjacent: adjLists[member]){
-				auto it = std::find(members.begin(),members.end(),adjacent);
-				if(it==members.end()){ //adjacent not present in strong component members then increment count
-					interStrongComplexConnections++;
-					if(adjLists[member].size()==1){adjLists[member].clear();}
-					else{adjLists[member].erase(adjLists[member].begin()+i);}
+		int countStrongComponentComplexes=0;//count strong components with more than one neuron. //could maybe add more logic to increase importance of having more neurons in a complex
+		//put all neurons that make up a 'strongly connected component' together (count at same time)
+		std::set<int> indexStrongComplexes;//indexes of the strongly connected components with >1 neuron
+		std::vector<int> strongComponentMembers[numStrongComponents];
+		for(int i=0; i<numNeurons;i++){
+			if(strongComponentMembers[components[i]].size()>0){ //now more than one member
+				countStrongComponentComplexes++; 
+				indexStrongComplexes.insert(components[i]);
+			} 
+			strongComponentMembers[components[i]].push_back(i);
+		}
+		
+		/*
+		* count inter-complex connections (incl. those from single neuron complexes)
+		* at the same time remove such connections from the adjacency list of neuron in question
+		*/
+		int interStrongComplexConnections=0;
+		for(auto members: strongComponentMembers){
+			//count where there is an adjacent vertex to one of the members not in the cluster
+			for(int member: members){
+				int i=0;
+				for(int adjacent: adjLists[member]){
+					auto it = std::find(members.begin(),members.end(),adjacent);
+					if(it==members.end()){ //adjacent not present in strong component members then increment count
+						interStrongComplexConnections++;
+						if(adjLists[member].size()==1){adjLists[member].clear();}
+						else{adjLists[member].erase(adjLists[member].begin()+i);i--;}
+					}
+					i++;
 				}
-				i++;
 			}
 		}
-	}
-	/*
-	* for each strongly connected component with >1 neuron, pass to johnson's algorithm to detect the number of cycles
-	* Calculate the average number of cycles found in such strongly connected components
-	*/
-	int totalNumCycles=0; //counter for all the cycles found in strongly connected components
+		/*
+		* for each strongly connected component with >1 neuron, pass to johnson's algorithm to detect the number of cycles
+		* Calculate the average number of cycles found in such strongly connected components
+		*/
+		int totalNumCycles=0; //counter for all the cycles found in strongly connected components
 
-	for(int strongComplex:indexStrongComplexes){
-		//create an adjacency list for the complex
-		std::map<int, int> indexMapping;
-		std::vector<std::vector<int> > adjList;
-		int index = 0;
-		for(int neuron: strongComponentMembers[strongComplex]){
-			if(indexMapping.count(neuron)==0){
-				indexMapping.insert({neuron,index});
-				index++;
+		for(int strongComplex:indexStrongComplexes){
+			//create an adjacency list for the complex
+			std::map<int, int> indexMapping;
+			std::vector<std::vector<int> > adjList;
+			int index = 0;
+			for(int neuron: strongComponentMembers[strongComplex]){
+				if(indexMapping.count(neuron)==0){
+					indexMapping.insert({neuron,index});
+					index++;
+				}
 			}
-		}
-		std::vector<int> indexAdjustedNeurons;
-		for(int neuron: strongComponentMembers[strongComplex]){
 			std::vector<int> indexAdjustedNeurons;
-			for (int adjNeuron : adjLists[neuron]){
-				indexAdjustedNeurons.push_back(indexMapping[adjNeuron]);
+			for(int neuron: strongComponentMembers[strongComplex]){
+				std::vector<int> indexAdjustedNeurons;
+				for (int adjNeuron : adjLists[neuron]){
+					indexAdjustedNeurons.push_back(indexMapping[adjNeuron]);
+				}
+				adjList.push_back(indexAdjustedNeurons);
 			}
-			adjList.push_back(indexAdjustedNeurons);
-		}
+		
 
-		//MUST STILL INITIALISE EVERYTHING ELSE NEEDED FOR JOHNSON
-		//blocked
-		std::vector<bool> blocked (adjList.size(), false);
-		// stack- but use a deque because better than stack
-		std::deque<int>  stackLike;
-		// cycles
-		std::vector<std::vector<int> > cycles;
-		// initialize B
-		std::vector<std::vector<int> >  B_Fruitless ;
+			//MUST STILL INITIALISE EVERYTHING ELSE NEEDED FOR JOHNSON
+			//blocked
+			std::vector<bool> blocked (adjList.size(), false);
+			// stack- but use a deque because better than stack
+			std::deque<int>  stackLike;
+			// cycles
+			std::vector<std::vector<int> > cycles;
+			// initialize B
+			std::vector<std::vector<int> >  B_Fruitless ;
 
-		for (int i=0; i< adjList.size()  ; i++ ) {
-			std::vector<int>* k = new std::vector<int>;
-			B_Fruitless.push_back(*k);
-		}
-		// loop to start new search from each node i
-		for (int i=0; i< adjList.size()  ; i++ ) {
-			// clear all book keeping
-			for (int j =0; j< adjList.size(); j++) {
-			blocked[j] = false;
-			B_Fruitless[j].clear();
+			for (int i=0; i< adjList.size()  ; i++ ) {
+				std::vector<int>* k = new std::vector<int>;
+				B_Fruitless.push_back(*k);
 			}
-			findCycles(i, i, adjList,  blocked, stackLike, B_Fruitless, cycles);
-		}
-
-		std::vector<std::vector<int> >::iterator cyc = cycles.begin();
-		int singleCyclesCount=0;
-		for(auto & cyc: cycles){
-			std::sort(cyc.begin(),cyc.end());
-			if(cyc.size()==1){
-				singleCyclesCount++;
+			// loop to start new search from each node i
+			for (int i=0; i< adjList.size()  ; i++ ) {
+				// clear all book keeping
+				for (int j =0; j< adjList.size(); j++) {
+				blocked[j] = false;
+				B_Fruitless[j].clear();
+				}
+				findCycles(i, i, adjList,  blocked, stackLike, B_Fruitless, cycles);
 			}
+
+			std::vector<std::vector<int> >::iterator cyc = cycles.begin();
+			int singleCyclesCount=0;
+			for(auto & cyc: cycles){
+				std::sort(cyc.begin(),cyc.end());
+				if(cyc.size()==1){
+					singleCyclesCount++;
+				}
+			}
+			cycles.erase(std::unique(cycles.begin(),cycles.end() ),cycles.end());
+			totalNumCycles+=cycles.size()-singleCyclesCount;
 		}
-		cycles.erase(std::unique(cycles.begin(),cycles.end() ),cycles.end());
-		totalNumCycles+=cycles.size()-singleCyclesCount;
-	}
 
-	double avgDegreeOfSpecialisation = (double) totalNumCycles/countStrongComponentComplexes;
+		float avgDegreeOfSpecialisation = (float) totalNumCycles/countStrongComponentComplexes;
 
-	int numNeuronsInSpecialisations = 0;
-	for(int index: indexStrongComplexes){
-		numNeuronsInSpecialisations+=strongComponentMembers[index].size();
-	}
-	double proportionOfBrainSpecialised = (double) numNeuronsInSpecialisations/numNeurons;
+		int numNeuronsInSpecialisations = 0.0f;
+		for(int index: indexStrongComplexes){
+			numNeuronsInSpecialisations+=strongComponentMembers[index].size();
+		}
+		float proportionOfBrainSpecialised = (float) numNeuronsInSpecialisations/numNeurons;
 
-	double specialisationScore = avgDegreeOfSpecialisation*proportionOfBrainSpecialised;
+		float specialisationScore = avgDegreeOfSpecialisation*proportionOfBrainSpecialised;
 
-	if (specialisationScore>1) specialisationScore = 1;
-	
-	double globalIntegration = 0;
-	if(countStrongComponentComplexes>interStrongComplexConnections){
-		globalIntegration=(double)interStrongComplexConnections/countStrongComponentComplexes;
+		if (specialisationScore>1) specialisationScore = 1;
+		
+		float globalIntegration = 0.0f;
+		// if(countStrongComponentComplexes<interStrongComplexConnections){
+		// 	globalIntegration=(float)interStrongComplexConnections/countStrongComponentComplexes;
+		// }
+		// else{
+		// 	globalIntegration=(float)countStrongComponentComplexes/interStrongComplexConnections;
+		// }
+		globalIntegration = (float) numStrongComponents / interStrongComplexConnections;
+		float neuralComplexity = 0.0f;
+		if (specialisationScore<globalIntegration) {neuralComplexity = (float) specialisationScore/ globalIntegration;}
+		else {neuralComplexity = (float) globalIntegration/specialisationScore;}
+
+		return neuralComplexity;
 	}
 	else{
-		globalIntegration=(double)countStrongComponentComplexes/interStrongComplexConnections;
-	}
-	double neuralComplexity = 0;
-	if (specialisationScore>globalIntegration) {neuralComplexity = (double) specialisationScore/ globalIntegration;}
-	else {neuralComplexity = (double) globalIntegration/specialisationScore;}
-
-	return neuralComplexity;
+		return 0.0f;}
 
 }
 
 // CH DDDDDDDDDDDDD
 
 void RobotRepresentation::calculateRobotComplexity(){
-	double body = this->calculateBodyComplexity(bodyTree_);
-	double brain = this->getBrainComplexity();
-	complexity_ = (double) (0.6*this->calculateBodyComplexity(bodyTree_) + 0.4*this->getBrainComplexity());
+	float body = (float) (this->calculateBodyComplexity(bodyTree_) - MIN_BODY_COMPLEXITY)/(MAX_BODY_COMPLEXITY - MIN_BODY_COMPLEXITY);
+	float brain = this->calculateBrainComplexity();
+	complexity_ = (double) (0.7*body + 0.3*brain);
 }
 
 // CH - returns complexity of robot
-double RobotRepresentation::getComplexity(){
+float RobotRepresentation::getComplexity(){
 	//weighted sum must happen
 	return complexity_;
 }
@@ -1425,6 +1429,14 @@ NeuralNetworkRepresentation::WeightMap RobotRepresentation::getWeightMap(){
 	return neuralNetwork_->getWeightMap();
 }
 
+// CH - added for setting the complexity cost flag in the simulator
+void RobotRepresentation::setComplexityCost(bool val){
+	complexityCost_ = val;
+}
+// CH - added for setting the complexity cost flag in the simulator
+bool RobotRepresentation::isComplexityCost(){
+	return complexityCost_;
+}
 
 }
 

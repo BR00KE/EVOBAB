@@ -58,7 +58,6 @@ unsigned int runSimulations(boost::shared_ptr<Scenario> scenario,
 		bool onlyOnce, boost::shared_ptr<FileViewerLog> log) {
 
 	bool constraintViolated = false;
-
 	boost::random::normal_distribution<float> normalDistribution;
 	boost::random::uniform_01<float> uniformDistribution;
 
@@ -229,8 +228,12 @@ unsigned int runSimulations(boost::shared_ptr<Scenario> scenario,
 
 		double step = configuration->getTimeStepLength();
 
-		// this is where we will penalise simulation ticks by setting t = whatever you FEEL MEEEEEEEEEEEEE
-		//t = configuration->getSimulationTime()-((1-robot->complexity_)*configuration->getSimulationTime());
+		// CH - imposes a complexity cost on a given robot's simulation run
+
+		// 	//double propTime = (double) 1-static_cast<double>(robot->complexity_);
+		// 	// t = configuration->getSimulationTime()-(propTime*configuration->getSimulationTime());
+		// }
+
 		while ((t < configuration->getSimulationTime())
 			   && (!(visualize && viewer->done()))) {
 

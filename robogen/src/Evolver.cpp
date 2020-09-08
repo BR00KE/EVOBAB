@@ -166,6 +166,7 @@ void init(unsigned int seed, std::string outputDirectory,
 
 	robotConf = ConfigurationReader::parseConfigurationFile(
 			conf->simulatorConfFile);
+
 	if (robotConf == NULL) {
 		std::cerr << "Problems parsing the robot configuration file. Quit."
 				<< std::endl;
@@ -285,7 +286,7 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 
 	generation = 1;
-	population->evaluateComplexity();
+	population->evaluateComplexity(robotConf->getComplexityCost());
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
 	//BK added - evaluate population complexity for gen 0
 }//end of init
@@ -411,7 +412,7 @@ void mainEvolutionLoop() {
 					numOffspring++;
 				}
 			}
-			children.evaluateComplexity();
+			children.evaluateComplexity(robotConf->getComplexityCost());
 			children.evaluate(robotConf, sockets);
 
 		} else {

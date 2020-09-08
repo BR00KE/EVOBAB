@@ -52,7 +52,7 @@ namespace robogen{
         bool f = false;
         stackLike.push_front(v);  // insert like a stack:  so at the front
         blocked[v] = true;
-        
+         
 
         // explore all neighbours -- recursively 
         for (int i = 0; i < adjList[v].size(); i++) {

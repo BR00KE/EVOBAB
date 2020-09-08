@@ -238,12 +238,8 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
-	// CH - W T F 
-	double calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
-	// CH - W T F 
-	double getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
-	// CH - W T F 
-	double getComplexity();
+	// CH - returns the complexity of a robot
+	float getComplexity();
 	
 	//BK added for HyperNEAT-light attempt
 	void setNeatGenome(NEAT::Genome & neatGenome);
@@ -263,9 +259,13 @@ public:
 	// CH - set weight map
 	void setWeightMap(WeightMap weightMap);
 
-	// CH - ?
-
+	// CH - calculates and combines neural and physical complexity
 	void calculateRobotComplexity();
+
+	// CH - added for setting the complexity cost flag in the simulator
+	void setComplexityCost(bool val);
+	// CH - added for setting the complexity cost flag in the simulator
+	bool isComplexityCost();
 
 
 private:
@@ -322,10 +322,18 @@ private:
 
 	void createConnectionTable();
 
-	double getBrainComplexity();
+	// BK - calculates neural complexity of a robot
+	float calculateBrainComplexity();
+	// CH - calculates the body complexity of a robot
+	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
+	// CH - gets the complexity of a given body part
+	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
 	
+	// CH - added them for body complexity scaling
 	static const int MIN_BODY_COMPLEXITY = 2;
-	static const int MAX_BODY_COMPLEXITY = 120;
+	static const int MAX_BODY_COMPLEXITY = 90;
+
+	bool complexityCost_;
 
 };
 

@@ -67,7 +67,7 @@ public:
 			bool capAcceleration, float maxLinearAcceleration,
 			float maxAngularAcceleration, int maxDirectionShiftsPerSecond,
 			osg::Vec3 gravity, bool disallowObstacleCollisions,
-			unsigned int obstacleOverlapPolicy) :
+			unsigned int obstacleOverlapPolicy, bool complexityCost=false) :
 				scenario_(scenario), scenarioFile_(scenarioFile),
 				timeSteps_(timeSteps),
 				timeStepLength_(timeStepLength),
@@ -86,7 +86,8 @@ public:
 				maxDirectionShiftsPerSecond_(maxDirectionShiftsPerSecond),
 				gravity_(gravity),
 				disallowObstacleCollisions_(disallowObstacleCollisions),
-				obstacleOverlapPolicy_(obstacleOverlapPolicy) {
+				obstacleOverlapPolicy_(obstacleOverlapPolicy), 
+				complexityCost_(complexityCost) {
 
 		simulationTime_ = timeSteps * timeStepLength;
 
@@ -263,6 +264,13 @@ public:
 		return obstacleOverlapPolicy_;
 	}
 
+	// CH added for complexity cost
+
+	bool getComplexityCost(){
+		return complexityCost_;
+	}
+
+
 	/**
 	 * Convert configuration into configuration message.
 	 */
@@ -408,6 +416,11 @@ private:
 	 * initial AABB
 	 */
 	unsigned int obstacleOverlapPolicy_;
+
+	// CH - for complexity cost flag in simulator
+
+	bool complexityCost_;
+
 };
 
 }

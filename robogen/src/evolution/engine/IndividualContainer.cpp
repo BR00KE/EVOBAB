@@ -178,11 +178,12 @@ bool IndividualContainer::areEvaluated() const {
 	return evaluated_;
 }
 
-void IndividualContainer::evaluateComplexity() {
+void IndividualContainer::evaluateComplexity(bool cost) {
 	double complexity = 0;
 	for (int i = 0; i<this->size();i++){
 		this->at(i)->calculateRobotComplexity();
 		complexity += this->at(i)->getComplexity();
+		this->at(i)->setComplexityCost(cost);
 	}
 	complexity_ = complexity;
 }

@@ -69,7 +69,7 @@ public:
 	 */
 	bool areEvaluated() const;
 
-	void evaluateComplexity();
+	void evaluateComplexity(bool cost);
 
 	double getComplexity();
 
