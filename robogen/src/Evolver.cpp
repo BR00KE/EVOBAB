@@ -282,11 +282,18 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 
 	generation = 1;
-	if(conf->noveltySearch){
-		population->evaluateNovelty();
-	}
+	
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
 	population->evaluateComplexity();
+	if(conf->noveltySearch){
+		//initialise novelty archive
+		for(int i=0; i<population->size(); i++){
+			if(i%3==0){
+				population->addToArchive(population->at(i));
+			}
+		}
+		population->evaluateNovelty(population->noveltyArchive);
+	}
 
 }//end of init
 
@@ -406,6 +413,10 @@ void mainEvolutionLoop() {
 				}
 			}
 			children.evaluate(robotConf, sockets);
+			children.evaluateComplexity();
+			if(conf->noveltySearch){
+				children.evaluateNovelty(population->noveltyArchive);
+			}
 
 		} else {
 			selector->initPopulation(population);

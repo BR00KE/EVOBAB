@@ -195,7 +195,7 @@ void IndividualContainer::evaluateComplexity() {
 	complexity_ = complexity;
 }
 
-void IndividualContainer::evaluateNovelty(){
+void IndividualContainer::evaluateNovelty(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive){
 	float novelty =0.0f;
 	for (int i = 0; i<this->size();i++){
 		novelty+= this->at(i)->calculateNoveltyScore(noveltyArchive);

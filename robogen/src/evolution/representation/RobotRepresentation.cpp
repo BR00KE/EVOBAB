@@ -60,7 +60,7 @@ NEAT::Genome * RobotRepresentation::getNeatGenomePointer(){
 	}
 
 RobotRepresentation::RobotRepresentation() :
-		maxid_(1000), evaluated_(false) {
+		maxid_(1000), evaluated_(false), noveltyScore(0) {
 
 }
 

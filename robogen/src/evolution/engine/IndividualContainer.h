@@ -76,7 +76,7 @@ public:
 	/**
 	 * BK - novelty search: evaluateNovelty() function to set the novelty for new members of the population against the 15 in the archive
 	 */
-	void evaluateNovelty();
+	void evaluateNovelty(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive);
 	//probabalistically maintain an archive of 15 individuals
 	std::vector<boost::shared_ptr<RobotRepresentation> > noveltyArchive;
 
