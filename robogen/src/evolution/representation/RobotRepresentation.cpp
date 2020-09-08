@@ -99,6 +99,10 @@ RobotRepresentation::RobotRepresentation(const RobotRepresentation &r) {
 	//BK added
 	neatGenome = r.neatGenome;
 	noveltyScore=r.noveltyScore;
+	l=r.l;
+	keyroots_zs=r.keyroots_zs;
+	labels = r.labels;
+	TD=r.TD;
 }
 
 /**
@@ -364,6 +368,10 @@ RobotRepresentation &RobotRepresentation::operator=(
 	//BK added
 	neatGenome = r.neatGenome;
 	noveltyScore=r.noveltyScore;
+	l=r.l;
+	keyroots_zs=r.keyroots_zs;
+	labels = r.labels;
+	TD=r.TD;
 
 	return *this;
 }
