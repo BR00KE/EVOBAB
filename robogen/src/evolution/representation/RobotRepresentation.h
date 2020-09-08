@@ -238,11 +238,6 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
-	// CH - W T F 
-	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
-	// CH - W T F 
-	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
-	// CH - W T F 
 	// CH - returns the complexity of a robot
 	float getComplexity();
 	
