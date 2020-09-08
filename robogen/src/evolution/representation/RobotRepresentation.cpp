@@ -1232,9 +1232,42 @@ std::vector<std::string> RobotRepresentation::traverse(const boost::shared_ptr<P
 	labels.push_back(node->getType());
 	return labels;
 }
-int RobotRepresentation::zhangShashaDistance(boost::shared_ptr<RobotRepresentation> robot2 ){
+//helper functions to index each node in the tree according to traversal method
+int RobotRepresentation::index(boost::shared_ptr<PartRepresentation> node, int index){
+	for(int i=0; i<node->getChildrenCount();i++){
+		index = this->index(node->getChild(i),index);
+	}
+	index++;
+	node->index_zs=index;
+	return index;
+}
+void RobotRepresentation::index(){
+	index(bodyTree_,0);
+}
+int RobotRepresentation::zhangShasha(boost::shared_ptr<RobotRepresentation> & robot2 ){
 	this->postOrderTraversal();
+	this->index();
+	this->l_func();
+	this->keyroots();
+	this->traverse(this->bodyTree_,this->labels);
+	//won't need to do this for robot 2 (will have been calculated before insertion into archive)
 	robot2->postOrderTraversal();
+	robot2->index();
+	robot2->l_func();
+	robot2->keyroots();
+	robot2->traverse(robot2->bodyTree_,robot2->labels);
+
+	std::vector<int> l1 = this->l;
+	std::vector<int> keyroots1 = this->keyroots_zs;
+	std::vector<int> l2 = robot2->l;
+	std::vector<int> keyroots2= robot2->keyroots_zs;
+
+	//initialise TD 2D vector
+	TD.resize(l1.size()+1);
+	for(int i=0; i<TD.size();i++){
+		TD[i].resize(l2.size()+1);
+	}
+
 	return 0;//for now
 }
 void RobotRepresentation::leftmost(boost::shared_ptr<PartRepresentation> node){

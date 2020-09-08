@@ -209,9 +209,14 @@ public:
 	void toString(std::stringstream& str, unsigned int depth);
 
 	//BK: for zhang-shasha
-	int index_zs;//preorder index
-	boost::shared_ptr<PartRepresentation> leftmost_zs; //used by the recursive leftmost() function
-
+	/**
+	 * preorder index
+	 */
+	int index_zs;
+	/**
+	 * used by the recursive leftmost() function zhang-shasha
+	 */
+	boost::shared_ptr<PartRepresentation> leftmost_zs; 
 private:
 
 	/**

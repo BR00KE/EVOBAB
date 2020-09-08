@@ -272,20 +272,23 @@ public:
     std::vector<std::string> labels; //postorder labels of tree nodes
 	//helper function to fill post order labels
 	void postOrderTraversal();
-	std::vector<int> RobotRepresentation::l_func(boost::shared_ptr<PartRepresentation> node, std::vector<int>& l);
+	//helper functions to index each node in the tree according to traversal method
+	int index(boost::shared_ptr<PartRepresentation> node, int index);
+	void index();
+	std::vector<int> l_func(boost::shared_ptr<PartRepresentation> node, std::vector<int>& l);
 	void l_func();
 	void leftmost(boost::shared_ptr<PartRepresentation> node);
 	void leftmost();
-	
-
 	void keyroots();
-
+	std::vector<std::vector<int> > TD;
+	
 	//c++ defaults to pass by value
 	/**
 	 * The Zhang-Shasha tree edit distance between this robot representation and the one passed as argument
 	 */
-	int zhangShashaDistance( boost::shared_ptr<RobotRepresentation> robot2 );
+	int zhangShasha(boost::shared_ptr<RobotRepresentation> & robot2 );
 
+	
 private:
 	
 	std::vector<std::string> traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels);
