@@ -1244,6 +1244,50 @@ int RobotRepresentation::index(boost::shared_ptr<PartRepresentation> node, int i
 void RobotRepresentation::index(){
 	index(bodyTree_,0);
 }
+
+int RobotRepresentation::treedist(std::vector<int> & l1, std::vector<int> & l2, int i, int j, boost::shared_ptr<RobotRepresentation> tree2){
+	std::vector<std::vector<int>> forestdist(i+1, std::vector<int>(j+1, 0));
+	// costs of the three atomic operations
+		int Delete = 2;
+		int Insert = 2;
+		int Relabel = 1;
+
+		forestdist[0][0] = 0;
+		for (int i1 = l1.at(i - 1); i1 <= i; i1++) {
+			forestdist[i1][0] = forestdist[i1 - 1][0] + Delete;
+		}
+		for (int j1 = l2.at(j - 1); j1 <= j; j1++) {
+			forestdist[0][j1] = forestdist[0][j1 - 1] + Insert;
+		}
+		for (int i1 = l1.at(i - 1); i1 <= i; i1++) {
+			for (int j1 = l2.at(j - 1); j1 <= j; j1++) {
+				int i_temp = (l1.at(i - 1) > i1 - 1) ? 0 : i1 - 1;
+				int j_temp = (l2.at(j - 1) > j1 - 1) ? 0 : j1 - 1;
+				if ((l1.at(i1 - 1) == l1.at(i - 1)) && (l2.at(j1 - 1) == l2.at(j - 1))) {
+
+					int Cost = (this->labels.at(i1 - 1).compare(tree2->labels.at(j1 - 1))==0) ? 0 : Relabel;
+					forestdist[i1][j1] = std::min(
+							std::min(forestdist[i_temp][j1] + Delete, forestdist[i1][j_temp] + Insert),
+							forestdist[i_temp][j_temp] + Cost);
+					TD[i1][j1] = forestdist[i1][j1];
+				} else {
+					int i1_temp = l1.at(i1 - 1) - 1;
+					int j1_temp = l2.at(j1 - 1) - 1;
+
+					int i_temp2 = (l1.at(i - 1) > i1_temp) ? 0 : i1_temp;
+					int j_temp2 = (l2.at(j - 1) > j1_temp) ? 0 : j1_temp;
+
+					forestdist[i1][j1] = std::min(
+							std::min(forestdist[i_temp][j1] + Delete, forestdist[i1][j_temp] + Insert),
+							forestdist[i_temp2][j_temp2] + TD[i1][j1]);
+				}
+			}
+		}
+
+
+	return forestdist[i][j];
+}
+
 int RobotRepresentation::zhangShasha(boost::shared_ptr<RobotRepresentation> & robot2 ){
 	this->postOrderTraversal();
 	this->index();
@@ -1268,7 +1312,18 @@ int RobotRepresentation::zhangShasha(boost::shared_ptr<RobotRepresentation> & ro
 		TD[i].resize(l2.size()+1);
 	}
 
-	return 0;//for now
+	// solve subproblems
+	for (int i1 = 1; i1 < keyroots1.size() + 1; i1++) {
+		for (int j1 = 1; j1 < keyroots2.size() + 1; j1++) {
+			int i = keyroots1[i1 - 1];
+			int j = keyroots2[j1 - 1];
+			TD[i][j] = this->treedist(l1, l2, i, j,robot2);
+		}
+	}
+
+	return TD[l1.size()][l2.size()];
+
+	
 }
 void RobotRepresentation::leftmost(boost::shared_ptr<PartRepresentation> node){
 	if (node == nullptr)
