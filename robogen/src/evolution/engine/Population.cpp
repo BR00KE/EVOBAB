@@ -87,13 +87,8 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 		if (i == 0 || randomizeBrains) {
 			this->push_back(
 				boost::shared_ptr<RobotRepresentation>(
-						new RobotRepresentation(*robot.get()))); //BK change the RobotRepresentation Constructor to make a CPPN
-			
-			if (randomizeBrains) {
-				//BK - This changed to randomly initialise neatGenome and then fill the brain
-				
-			}
-			
+						new RobotRepresentation(*robot.get()))); 
+						
 		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
 			this->push_back( mutator->createOffspring(robot)[0] );
 		}
@@ -119,7 +114,7 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
 		this->push_back(origin[i]);
 	}
 
-	this->sort();
+	this->sort(false);
 
 	// idea was to call this->resize(popSize);, but that requires a default
 	// constructor to be present for RobotRepresentation, which is not the case

@@ -253,10 +253,9 @@ public:
 	NEAT::Genome neatGenome;
 
 	/**
-	 * BK NOVELTY SCORE THINGS
+	 * BK Get and set novelty score
 	 */
-	//added for novelty Search
-	double getNoveltyScore();
+	double getNoveltyScore() const;
 
 	double setNoveltyScore(double noveltyScore);
 

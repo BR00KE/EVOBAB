@@ -1206,7 +1206,7 @@ void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
 }
 
 //added for novelty Search
-double RobotRepresentation::getNoveltyScore(){
+double RobotRepresentation::getNoveltyScore() const{
 	return noveltyScore;
 }
 

@@ -45,9 +45,6 @@
 #include <utils/network/FakeJSSocket.h>
 #include <sstream>
 
-//BK added for novelty
-#include "utils/ZhangShashaTreeEditDistance/TreeEditDistance.h"
-
 #endif
 
 namespace robogen {
@@ -240,7 +237,6 @@ void init(unsigned int seed, std::string outputDirectory,
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
-	population->evaluateComplexity();
 
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
@@ -287,6 +283,10 @@ void init(unsigned int seed, std::string outputDirectory,
 
 	generation = 1;
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
+	population->evaluateComplexity();
+	//BK: add evaluate Novelty?
+	
+
 }//end of init
 
 void mainEvolutionLoop();
