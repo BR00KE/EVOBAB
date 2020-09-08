@@ -101,7 +101,9 @@ bool Robot::init(dWorldID odeWorld, dSpaceID odeSpace,
 
 	connectionJointGroup_ = dJointGroupCreate(0);
 	this->id_ = robotSpec.id();
-
+	// CH - added this to get the complexity from the serialized robot
+	complexity_ = robotSpec.get_complexity();
+	complexityCost_ = robotSpec.get_complexity_cost();
 	const robogenMessage::Body& body = robotSpec.body();
 	const robogenMessage::Brain& brain = robotSpec.brain();
 	if (!this->decodeBody(body)) {

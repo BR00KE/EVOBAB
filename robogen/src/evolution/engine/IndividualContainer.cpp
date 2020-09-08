@@ -178,16 +178,17 @@ bool IndividualContainer::areEvaluated() const {
 	return evaluated_;
 }
 
-//BK - i don't really get this method?
-void IndividualContainer::evaluateComplexity() {
-	float complexity = 0.0f;
+void IndividualContainer::evaluateComplexity(bool cost) {
+	double complexity = 0;
 	for (int i = 0; i<this->size();i++){
-		complexity += this->at(i)->calculateBodyComplexity(this->at(i)->getBodyRoot());
+		this->at(i)->calculateRobotComplexity();
+		complexity += this->at(i)->getComplexity();
+		this->at(i)->setComplexityCost(cost);
 	}
 	complexity_ = complexity;
 }
 
-float IndividualContainer::getComplexity(){
+double IndividualContainer::getComplexity(){
 	return complexity_;
 }
 

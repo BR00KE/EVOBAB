@@ -44,6 +44,7 @@
 #include "evolution/representation/PartRepresentation.h"
 #include "evolution/representation/NeuralNetworkRepresentation.h"
 #include "utils/network/TcpSocket.h"
+#include "utils/Johnson.h"
 #include "robogen.pb.h"
 
 #include "evolution/neat/Genome.h"//BK added
@@ -242,6 +243,7 @@ public:
 	// CH - W T F 
 	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
 	// CH - W T F 
+	// CH - returns the complexity of a robot
 	float getComplexity();
 	
 	//BK added for HyperNEAT-light attempt
@@ -264,6 +266,14 @@ public:
 
 	// CH - set weight map
 	void setWeightMap(WeightMap weightMap);
+
+	// CH - calculates and combines neural and physical complexity
+	void calculateRobotComplexity();
+
+	// CH - added for setting the complexity cost flag in the simulator
+	void setComplexityCost(bool val);
+	// CH - added for setting the complexity cost flag in the simulator
+	bool isComplexityCost();
 
 
 private:
@@ -313,7 +323,25 @@ private:
 	bool evaluated_;
 
 	// CH - for complexity metric
-	float complexity_;
+	double complexity_;
+	
+	//BK get weight map
+	NeuralNetworkRepresentation::WeightMap getWeightMap();
+
+	void createConnectionTable();
+
+	// BK - calculates neural complexity of a robot
+	float calculateBrainComplexity();
+	// CH - calculates the body complexity of a robot
+	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
+	// CH - gets the complexity of a given body part
+	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
+	
+	// CH - added them for body complexity scaling
+	static const int MIN_BODY_COMPLEXITY = 2;
+	static const int MAX_BODY_COMPLEXITY = 90;
+
+	bool complexityCost_;
 
 };
 

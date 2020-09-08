@@ -12,7 +12,7 @@
  * This file is part of the ROBOGEN Framework.
  *
  * The ROBOGEN Framework is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License (GPL)
+ * it under the terms of the GNU General Pcomplexity += ublic License (GPL)
  * as published by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -166,6 +166,7 @@ void init(unsigned int seed, std::string outputDirectory,
 
 	robotConf = ConfigurationReader::parseConfigurationFile(
 			conf->simulatorConfFile);
+
 	if (robotConf == NULL) {
 		std::cerr << "Problems parsing the robot configuration file. Quit."
 				<< std::endl;
@@ -237,7 +238,7 @@ void init(unsigned int seed, std::string outputDirectory,
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
-	population->evaluateComplexity();
+	//population->evaluateComplexity(); //This shouldn't be called before fillBrains
 
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
@@ -248,6 +249,8 @@ void init(unsigned int seed, std::string outputDirectory,
 			//std::cout<<typeid(i).name()<<std::endl;
 			boost::shared_ptr<RobotRepresentation> rep = *i;
 			rep->neatGenome = initialNEATPop[c];
+			rep->setWeightMap(neatContainer->queryCppn(rep->getNeatGenomePointer(),rep)->getWeightMap());
+
 			c++;
 		}
 	}
@@ -283,13 +286,18 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 
 	generation = 1;
+	population->evaluateComplexity(robotConf->getComplexityCost());
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
+	//BK added - evaluate population complexity for gen 0
 }//end of init
 
 void mainEvolutionLoop();
 
 void postEvaluateNEAT() {
 	population->sort(true); //after neat sorted best to worst
+	//We should add the complexity calculation here to happen at the end of each generation
+
+
 	mainEvolutionLoop();
 }
 
@@ -391,6 +399,7 @@ void mainEvolutionLoop() {
 						std::cerr << "Filling offspring weights from NEAT failed." << std::endl;
 						exitRobogen(EXIT_FAILURE);
 					}
+					rep->setWeightMap(neatContainer->queryCppn(rep->getNeatGenomePointer(),rep)->getWeightMap());
 				}
 				
 				// no crossover, or can fit both new individuals
@@ -403,9 +412,8 @@ void mainEvolutionLoop() {
 					numOffspring++;
 				}
 			}
+			children.evaluateComplexity(robotConf->getComplexityCost());
 			children.evaluate(robotConf, sockets);
-			children.evaluateComplexity();
-
 
 		} else {
 			selector->initPopulation(population);

@@ -515,4 +515,8 @@ void NeuralNetworkRepresentation::setWeightMap(WeightMap weightMap){
 	weights_ = weightMap;
 }
 
+NeuralNetworkRepresentation::WeightMap NeuralNetworkRepresentation::getWeightMap() const{
+	return weights_;
+}
+
 } /* namespace robogen */

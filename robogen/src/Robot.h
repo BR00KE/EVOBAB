@@ -163,6 +163,11 @@ public:
 	 */
 	void optimizePhysics();
 
+
+	// CH - added this for complexity cost 
+	float complexity_;
+	float complexityCost_;
+
 private:
 
 	/**

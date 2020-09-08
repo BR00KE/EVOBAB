@@ -69,9 +69,9 @@ public:
 	 */
 	bool areEvaluated() const;
 
-	void evaluateComplexity();
+	void evaluateComplexity(bool cost);
 
-	float getComplexity();
+	double getComplexity();
 
 
 protected:
@@ -81,7 +81,7 @@ protected:
 private:
 
 	bool sorted_;
-	float complexity_;
+	double complexity_;
 
 };
 

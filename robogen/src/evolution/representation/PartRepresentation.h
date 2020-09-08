@@ -48,9 +48,9 @@ namespace robogen {
 class PartRepresentation {
 
 public:
-	static constexpr float fixedBrickComplexity = 1;
-	static constexpr float passiveHingeComplexity = 2;
-	static constexpr float activeHingeComplexity = 3; 
+	static constexpr double fixedBrickComplexity = 1;
+	static constexpr double passiveHingeComplexity = 2;
+	static constexpr double activeHingeComplexity = 3; 
 
 	static std::map<class PartRepresentation, std::string> PART_REPRESENTATION_TYPE_MAP;
 

@@ -58,7 +58,6 @@ unsigned int runSimulations(boost::shared_ptr<Scenario> scenario,
 		bool onlyOnce, boost::shared_ptr<FileViewerLog> log) {
 
 	bool constraintViolated = false;
-
 	boost::random::normal_distribution<float> normalDistribution;
 	boost::random::uniform_01<float> uniformDistribution;
 
@@ -228,6 +227,13 @@ unsigned int runSimulations(boost::shared_ptr<Scenario> scenario,
 				new CollisionData(scenario) );
 
 		double step = configuration->getTimeStepLength();
+
+		// CH - imposes a complexity cost on a given robot's simulation run
+
+		// 	//double propTime = (double) 1-static_cast<double>(robot->complexity_);
+		// 	// t = configuration->getSimulationTime()-(propTime*configuration->getSimulationTime());
+		// }
+
 		while ((t < configuration->getSimulationTime())
 			   && (!(visualize && viewer->done()))) {
 
@@ -415,7 +421,6 @@ unsigned int runSimulations(boost::shared_ptr<Scenario> scenario,
 			if(webGLlogger) {
 				webGLlogger->log(t);
 			}
-
 			t += step;
 
 		}
