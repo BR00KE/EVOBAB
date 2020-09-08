@@ -285,6 +285,7 @@ public:
 	//c++ defaults to pass by value
 	/**
 	 * The Zhang-Shasha tree edit distance between this robot representation and the one passed as argument
+	 * This implementation made reference to ijkilchenko's Java open-source java implementation https://github.com/ijkilchenko/ZhangShasha
 	 */
 	int treedist(std::vector<int> & l1, std::vector<int> & l2, int i, int j, boost::shared_ptr<RobotRepresentation> tree2);
 	int zhangShasha(boost::shared_ptr<RobotRepresentation> & robot2 );
