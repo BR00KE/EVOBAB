@@ -1206,11 +1206,11 @@ void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
 }
 
 //added for novelty Search
-double RobotRepresentation::getNoveltyScore() const{
+float RobotRepresentation::getNoveltyScore() const{
 	return noveltyScore;
 }
 
-double RobotRepresentation::setNoveltyScore(double noveltyScore){
+float RobotRepresentation::setNoveltyScore(float noveltyScore){
 	this->noveltyScore=noveltyScore;
 }
 
@@ -1376,6 +1376,14 @@ void RobotRepresentation::keyroots(){
 	}
 }
 
+float RobotRepresentation::calculateNoveltyScore(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive){
+	int totalTreeEditDistance=0;
+	for(int i=0; i<noveltyArchive.size(); i++){ //should be size 15
+		totalTreeEditDistance += this->zhangShasha(noveltyArchive.at(i));
+	}
+	this->setNoveltyScore((float) totalTreeEditDistance/noveltyArchive.size());
+	return this->getNoveltyScore();
+}
 
 }
 

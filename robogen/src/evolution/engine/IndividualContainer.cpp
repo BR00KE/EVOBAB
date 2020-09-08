@@ -31,6 +31,7 @@
 #include <queue>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <random>
 #ifdef EMSCRIPTEN
 #include <utils/network/FakeJSSocket.h>
 #include <boost/lexical_cast.hpp>
@@ -194,8 +195,33 @@ void IndividualContainer::evaluateComplexity() {
 	complexity_ = complexity;
 }
 
+void IndividualContainer::evaluateNovelty(){
+	float novelty =0.0f;
+	for (int i = 0; i<this->size();i++){
+		novelty+= this->at(i)->calculateNoveltyScore(noveltyArchive);
+	}
+	novelty_ = novelty;
+}
+
 float IndividualContainer::getComplexity(){
 	return complexity_;
+}
+
+void IndividualContainer::addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
+	boost::shared_ptr<RobotRepresentation> clone = boost::make_shared<RobotRepresentation>(RobotRepresentation(*individual));
+
+	if(noveltyArchive.size()<15){
+		noveltyArchive.push_back(clone);
+	}
+	//replace individual at random position in the archive
+	else{ 
+		std::random_device rd;     // only used once to initialise (seed) engine
+		std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+		std::uniform_int_distribution<int> uni(0,15); // guaranteed unbiased
+
+		int random_integer = uni(rng);
+		noveltyArchive[random_integer]=clone;
+	}
 }
 
 } /* namespace robogen */

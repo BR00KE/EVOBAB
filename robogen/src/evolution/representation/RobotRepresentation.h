@@ -255,9 +255,14 @@ public:
 	/**
 	 * BK Get and set novelty score
 	 */
-	double getNoveltyScore() const;
+	float getNoveltyScore() const;
 
-	double setNoveltyScore(double noveltyScore);
+	float setNoveltyScore(float noveltyScore);
+
+	/**
+	 * Calculate and set novelty score for individual given an archive
+	 */
+	float calculateNoveltyScore(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive);
 
 	//methods to find tree edit distance between robot representations
 	int label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B);
@@ -294,7 +299,7 @@ private:
 	std::vector<std::string> traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels);
 
 	//added for novelty search;
-	double noveltyScore;
+	float noveltyScore;
 
 	/**
 	 *

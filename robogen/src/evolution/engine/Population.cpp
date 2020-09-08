@@ -135,7 +135,7 @@ boost::shared_ptr<RobotRepresentation> Population::best() {
 	if (!this->areEvaluated()) { // undefined behavior. No exception (hint)
 		return this->at(0);
 	}
-	this->sort();
+	this->sort(); //force the sort for novelty sake?
 	return this->at(0);
 }
 

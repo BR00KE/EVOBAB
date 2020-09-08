@@ -282,10 +282,11 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 
 	generation = 1;
+	if(conf->noveltySearch){
+		population->evaluateNovelty();
+	}
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
 	population->evaluateComplexity();
-	//BK: add evaluate Novelty?
-	
 
 }//end of init
 
