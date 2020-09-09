@@ -1505,8 +1505,8 @@ void RobotRepresentation::index(){
 int RobotRepresentation::treedist(std::vector<int> & l1, std::vector<int> & l2, int i, int j, boost::shared_ptr<RobotRepresentation> tree2){
 	std::vector<std::vector<int>> forestdist(i+1, std::vector<int>(j+1, 0));
 	// costs of the three atomic operations
-		int Delete = 2;
-		int Insert = 2;
+		int Delete = 1;
+		int Insert = 1;
 		int Relabel = 1;
 
 		forestdist[0][0] = 0;
