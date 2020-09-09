@@ -315,10 +315,16 @@ public:
 	 */
 	int treedist(std::vector<int> & l1, std::vector<int> & l2, int i, int j, boost::shared_ptr<RobotRepresentation> tree2);
 	int zhangShasha(boost::shared_ptr<RobotRepresentation> & robot2 );
+	std::vector<std::string> traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels);
+	
+
+	
+	/**
+	 * Points to the root of the robot body tree
+	 */
+	boost::shared_ptr<PartRepresentation> bodyTree_;
 	
 private:
-	
-	std::vector<std::string> traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels);
 
 	//added for novelty search;
 	float noveltyScore;
@@ -337,10 +343,6 @@ private:
 	bool addClonesToMap(boost::shared_ptr<PartRepresentation> part,
 			std::map<std::string, std::string> &neuronReMapping);
 
-	/**
-	 * Points to the root of the robot body tree
-	 */
-	boost::shared_ptr<PartRepresentation> bodyTree_;
 
 	/**
 	 * Neural network representation of the robot

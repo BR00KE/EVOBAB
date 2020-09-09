@@ -1552,11 +1552,13 @@ int RobotRepresentation::zhangShasha(boost::shared_ptr<RobotRepresentation> & ro
 	this->keyroots();
 	this->traverse(this->bodyTree_,this->labels);
 	//won't need to do this for robot 2 (will have been calculated before insertion into archive)
+	/**
 	robot2->postOrderTraversal();
 	robot2->index();
 	robot2->l_func();
 	robot2->keyroots();
 	robot2->traverse(robot2->bodyTree_,robot2->labels);
+	*/
 
 	std::vector<int> l1 = this->l;
 	std::vector<int> keyroots1 = this->keyroots_zs;
