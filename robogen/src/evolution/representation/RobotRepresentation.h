@@ -47,7 +47,9 @@
 #include "utils/Johnson.h"
 #include "robogen.pb.h"
 
-#include "evolution/neat/Genome.h"//BK added
+//BK added
+#include "evolution/neat/Genome.h"
+//#include "utils/ZhangShashaTreeEditDistance/TreeEditDistance.h"
 
 namespace robogen {
 
@@ -238,20 +240,16 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
-	// CH - W T F 
-	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
-	// CH - W T F 
-	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
-	// CH - W T F 
+	
 	// CH - returns the complexity of a robot
 	float getComplexity();
 	
-	//BK added for HyperNEAT-light attempt
+	//BK added for HyperNEAT-light 
 	void setNeatGenome(NEAT::Genome & neatGenome);
 
 	NEAT::Genome * getNeatGenomePointer();
 	/*
-	* BK: Genome for HyperNEAT-light attempt
+	* BK: Genome for HyperNEAT-light 
 	*/
 	NEAT::Genome neatGenome;
 	
@@ -276,7 +274,55 @@ public:
 	bool isComplexityCost();
 
 
+	/**
+	 * BK Get and set novelty score
+	 */
+	float getNoveltyScore() const;
+
+	float setNoveltyScore(float noveltyScore);
+
+	/**
+	 * Calculate and set novelty score for individual given an archive
+	 */
+	float calculateNoveltyScore(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive);
+
+	//methods to find tree edit distance between robot representations
+	int label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B);
+
+	/**
+	 * Zhang-Shasha tree edit distance functions and variables
+	 */
+	std::vector<int> l;
+    //list of keyroots. i.e. nodes with a left child and the tree root
+    std::vector<int> keyroots_zs;
+    std::vector<std::string> labels; //postorder labels of tree nodes
+	//helper function to fill post order labels
+	void postOrderTraversal();
+	//helper functions to index each node in the tree according to traversal method
+	int index(boost::shared_ptr<PartRepresentation> node, int index);
+	void index();
+	std::vector<int> l_func(boost::shared_ptr<PartRepresentation> node, std::vector<int>& l);
+	void l_func();
+	void leftmost(boost::shared_ptr<PartRepresentation> node);
+	void leftmost();
+	void keyroots();
+	std::vector<std::vector<int> > TD;
+	
+	//c++ defaults to pass by value
+	/**
+	 * The Zhang-Shasha tree edit distance between this robot representation and the one passed as argument
+	 * This implementation made reference to ijkilchenko's Java open-source java implementation https://github.com/ijkilchenko/ZhangShasha
+	 */
+	int treedist(std::vector<int> & l1, std::vector<int> & l2, int i, int j, boost::shared_ptr<RobotRepresentation> tree2);
+	int zhangShasha(boost::shared_ptr<RobotRepresentation> & robot2 );
+	
 private:
+	
+	std::vector<std::string> traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels);
+
+	//added for novelty search;
+	float noveltyScore;
+
 	/**
 	 *
 	 */

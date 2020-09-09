@@ -30,3 +30,4 @@ pParameterModify=0.3
 evolutionaryAlgorithm=HyperNEAT
 socket=127.0.0.1:8006
 maxBodyParts=50
+noveltySearch=true

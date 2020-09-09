@@ -71,8 +71,15 @@ public:
 
 	void evaluateComplexity(bool cost);
 
-	double getComplexity();
+	float getComplexity();
 
+	/**
+	 * BK - novelty search: evaluateNovelty() function to set the novelty for new members of the population against the 15 in the archive
+	 */
+	void evaluateNovelty(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive);
+	
+
+	
 
 protected:
 
@@ -81,7 +88,8 @@ protected:
 private:
 
 	bool sorted_;
-	double complexity_;
+	float complexity_;
+	float novelty_;
 
 };
 

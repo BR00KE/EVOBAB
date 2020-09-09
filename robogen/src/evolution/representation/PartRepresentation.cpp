@@ -74,7 +74,10 @@ unsigned int PartRepresentation::getChildrenCount() {
 	return count;
 
 }
-
+bool PartRepresentation::childExists(int index){
+	if(children_[index].get()) return true;
+	else return false;
+}
 std::vector<unsigned int> PartRepresentation::getFreeSlots() {
 
 	std::vector<unsigned int> freeSlots;
@@ -89,6 +92,13 @@ std::vector<unsigned int> PartRepresentation::getFreeSlots() {
 
 const std::string &PartRepresentation::getType() {
 	return type_;
+}
+
+const int & PartRepresentation::getTypeCost(){
+	if(type_==PART_TYPE_PASSIVE_HINGE){return passiveHingeComplexity;}
+	else if(type_==PART_TYPE_ACTIVE_HINGE){return activeHingeComplexity;}
+	else if(type_==PART_TYPE_FIXED_BRICK){ return fixedBrickComplexity;}
+	else { return 0.0f;}
 }
 
 boost::shared_ptr<PartRepresentation> PartRepresentation::getChild(unsigned int n) {

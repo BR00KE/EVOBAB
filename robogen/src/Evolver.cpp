@@ -28,6 +28,7 @@
  */
 
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/lexical_cast.hpp>
 #include "config/EvolverConfiguration.h"
 #include "evolution/representation/RobotRepresentation.h"
@@ -38,12 +39,13 @@
 #include "evolution/engine/selectors/DeterministicTournament.h"
 
 #include "evolution/engine/neat/NeatContainer.h"
-
+#include <random>
 #ifdef EMSCRIPTEN
 #include <emscripten/bind.h>
 #include "emscripten.h"
 #include <utils/network/FakeJSSocket.h>
 #include <sstream>
+
 #endif
 
 namespace robogen {
@@ -84,6 +86,25 @@ void printHelp() {
 			ConfigurationReader::parseConfigurationFile("help");
 }
 
+//BK - novelty - probabalistically maintain an archive of 15 individuals
+std::vector<boost::shared_ptr<RobotRepresentation> > noveltyArchive;
+void addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
+	boost::shared_ptr<RobotRepresentation> clone = boost::make_shared<RobotRepresentation>(RobotRepresentation(*individual));
+	
+	if(noveltyArchive.size()<15){
+		noveltyArchive.push_back(clone);
+	}
+	//replace individual at random position in the archive
+	else{ 
+		std::random_device rd;     // only used once to initialise (seed) engine
+		std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+		std::uniform_int_distribution<int> uni(0,15); // guaranteed unbiased
+
+		int random_integer = uni(rng);
+		noveltyArchive[random_integer]=clone;
+	}
+}
+
 boost::shared_ptr<Population> population;
 IndividualContainer children;
 boost::shared_ptr<NeatContainer> neatContainer;
@@ -95,6 +116,7 @@ boost::shared_ptr<Selector> selector;
 boost::shared_ptr<Mutator> mutator;
 unsigned int generation;
 boost::random::mt19937 rng;
+
 
 std::vector<Socket*> sockets;
 
@@ -144,7 +166,6 @@ void parseArgsThenInit(int argc, char* argv[]) {
 			exitRobogen(EXIT_FAILURE);
 		}
 
-		//BK: add a novelty tag here to set selection method, probs the easiest way
 	}
 
 	init(seed, outputDirectory, confFileName, overwrite, saveAll);
@@ -238,7 +259,6 @@ void init(unsigned int seed, std::string outputDirectory,
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
-	//population->evaluateComplexity(); //This shouldn't be called before fillBrains
 
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
@@ -289,6 +309,17 @@ void init(unsigned int seed, std::string outputDirectory,
 	population->evaluateComplexity(robotConf->getComplexityCost());
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
 	//BK added - evaluate population complexity for gen 0
+	
+	if(conf->noveltySearch){
+		//initialise novelty archive
+		for(int i=0; i<population->size(); i++){
+			if(i%3==0){
+				addToArchive(population->at(i));
+			}
+		}
+		population->evaluateNovelty(noveltyArchive);
+	}
+
 }//end of init
 
 void mainEvolutionLoop();
@@ -366,6 +397,7 @@ void mainEvolutionLoop() {
 			// population->evaluate(robotConf, sockets);
 
 			selector->initPopulation(population);
+			//population->noveltyArchive = noveltyArchive;
 			unsigned int numOffspring = 0;
 			while (numOffspring < conf->lambda) {
 
@@ -414,6 +446,21 @@ void mainEvolutionLoop() {
 			}
 			children.evaluateComplexity(robotConf->getComplexityCost());
 			children.evaluate(robotConf, sockets);
+			if(conf->noveltySearch){
+				children.evaluateNovelty(noveltyArchive);
+				//probabalistically add children to novelty archive
+				std::vector<boost::shared_ptr<RobotRepresentation> >::iterator childIt = children.begin();
+				std::random_device rd;     
+				std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+				std::uniform_int_distribution<int> uni(0,11); 
+				while(childIt!=children.end()){
+					int random_integer = uni(rng);
+					if(random_integer<=3){
+						addToArchive(*childIt);
+					}
+					childIt++;
+				}
+			}
 
 		} else {
 			selector->initPopulation(population);

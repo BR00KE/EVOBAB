@@ -67,7 +67,7 @@ public:
 	/**
 	 * BK - For HyperNEAT light
 	 * Aim to initialise population with random bodies and random CPPNs
-	 * Then use CPPNs to fill brain?
+	 * Then use CPPNs to fill brain
 	 */
 	bool init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 			boost::shared_ptr<Mutator> mutator, bool growBodies,

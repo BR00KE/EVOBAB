@@ -87,13 +87,8 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 		if (i == 0 || randomizeBrains) {
 			this->push_back(
 				boost::shared_ptr<RobotRepresentation>(
-						new RobotRepresentation(*robot.get()))); //BK change the RobotRepresentation Constructor to make a CPPN
-			
-			if (randomizeBrains) {
-				//BK - This changed to randomly initialise neatGenome and then fill the brain
-				
-			}
-			
+						new RobotRepresentation(*robot.get()))); 
+						
 		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
 			this->push_back( mutator->createOffspring(robot)[0] );
 		}
@@ -101,8 +96,7 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 		if (growBodies) {
 			mutator->growBodyRandomly(this->back());
 		}
-		//BodyVerifier::fixRobotBody(this->back());
-
+		
 	}
 	return true;
 }
@@ -119,7 +113,7 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
 		this->push_back(origin[i]);
 	}
 
-	this->sort();
+	this->sort(false);
 
 	// idea was to call this->resize(popSize);, but that requires a default
 	// constructor to be present for RobotRepresentation, which is not the case
@@ -129,7 +123,6 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
 	}
 
 	this->evaluated_ = true;
-
 	return true;
 }
 
@@ -140,7 +133,7 @@ boost::shared_ptr<RobotRepresentation> Population::best() {
 	if (!this->areEvaluated()) { // undefined behavior. No exception (hint)
 		return this->at(0);
 	}
-	this->sort();
+	this->sort(true); //force the sort for novelty sake?
 	return this->at(0);
 }
 

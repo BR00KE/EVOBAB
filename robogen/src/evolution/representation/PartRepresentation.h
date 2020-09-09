@@ -99,7 +99,8 @@ public:
 	 * @return type of the part
 	 */
 	const std::string &getType();
-
+	//added by BK
+	const int & getTypeCost();
 	/**
 	 * @return the parameters of the part
 	 */
@@ -215,7 +216,23 @@ public:
 	std::vector<boost::shared_ptr<PartRepresentation> > getChildren() const;
 
 
+	//BK: for zhang-shasha
+	/**
+	 * preorder index
+	 */
+	int index_zs;
+	/**
+	 * used by the recursive leftmost() function zhang-shasha
+	 */
+	boost::shared_ptr<PartRepresentation> leftmost_zs; 
+
+	bool childExists(int index);
 private:
+
+	/**
+	 * Children of this part in the body tree
+	 */
+	std::vector<boost::shared_ptr<PartRepresentation> > children_;
 
 	/**
 	 * Identifier string (name) of this part
@@ -237,10 +254,6 @@ private:
 	 */
 	std::string type_;
 
-	/**
-	 * Children of this part in the body tree
-	 */
-	std::vector<boost::shared_ptr<PartRepresentation> > children_;
 
 	/**
 	 * Parent body part - raw pointer as present (or NULL) by design

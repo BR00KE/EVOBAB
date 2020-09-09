@@ -122,6 +122,9 @@ bool EvolverConfiguration::init(std::string configFileName) {
 
     bodyParamSigma = 0.1;
 
+	//BK attempt to add noveltySearch optional parameter
+	noveltySearch = false; //default is false
+
 	// DON'T AUTO-INDENT THE FOLLOWING ON ECLIPSE:
 	desc.add_options()
 		("referenceRobotFile",
@@ -210,6 +213,11 @@ bool EvolverConfiguration::init(std::string configFileName) {
 				&pAddHiddenNeuron),
 				"Probability of adding a hidden neuron (currently only works "\
 				"if pBrainCrossover==0.0"
+		)
+		("noveltySearch", //BK added this
+				boost::program_options::value<bool>(
+				&noveltySearch),
+				"If novelty search true selection will be performed based on novelty score"
 		)
 		("pOscillatorNeuron",
 					boost::program_options::value<double>(

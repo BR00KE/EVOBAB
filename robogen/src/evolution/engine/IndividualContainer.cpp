@@ -31,6 +31,7 @@
 #include <queue>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <random>
 #ifdef EMSCRIPTEN
 #include <utils/network/FakeJSSocket.h>
 #include <boost/lexical_cast.hpp>
@@ -155,6 +156,13 @@ bool robotFitnessComparator(const boost::shared_ptr<RobotRepresentation>& a,
 
 }
 
+bool robotNoveltyComparator(const boost::shared_ptr<RobotRepresentation>& a,
+		const boost::shared_ptr<RobotRepresentation>& b) {
+
+	return a->getNoveltyScore() > b->getNoveltyScore();
+
+}
+
 void IndividualContainer::sort(bool forceSort) {
 
 	if (sorted_  && (!forceSort)) {
@@ -162,6 +170,7 @@ void IndividualContainer::sort(bool forceSort) {
 	}
 
 	std::sort(this->begin(), this->end(), robotFitnessComparator);
+	
 	sorted_ = true;
 }
 
@@ -188,8 +197,18 @@ void IndividualContainer::evaluateComplexity(bool cost) {
 	complexity_ = complexity;
 }
 
-double IndividualContainer::getComplexity(){
+void IndividualContainer::evaluateNovelty(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive){
+	float novelty =0.0f;
+	for (int i = 0; i<this->size();i++){
+		novelty+= this->at(i)->calculateNoveltyScore(noveltyArchive);
+	}
+	novelty_ = novelty;
+}
+
+float IndividualContainer::getComplexity(){
 	return complexity_;
 }
+
+
 
 } /* namespace robogen */
