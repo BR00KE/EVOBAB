@@ -38,7 +38,7 @@
 #include "evolution/engine/selectors/DeterministicTournament.h"
 
 #include "evolution/engine/neat/NeatContainer.h"
-
+#include <random>
 #ifdef EMSCRIPTEN
 #include <emscripten/bind.h>
 #include "emscripten.h"
@@ -416,6 +416,18 @@ void mainEvolutionLoop() {
 			children.evaluateComplexity();
 			if(conf->noveltySearch){
 				children.evaluateNovelty(population->noveltyArchive);
+				//probabalistically add children to novelty archive
+				std::vector<boost::shared_ptr<RobotRepresentation> >::iterator childIt = children.begin();
+				std::random_device rd;     
+				std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+				std::uniform_int_distribution<int> uni(0,11); 
+				while(childIt!=children.end()){
+					int random_integer = uni(rng);
+					if(random_integer<=3){
+						population->addToArchive(*childIt);
+					}
+					childIt++;
+				}
 			}
 
 		} else {

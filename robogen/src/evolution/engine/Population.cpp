@@ -123,7 +123,8 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
 	}
 
 	this->evaluated_ = true;
-
+	//BK added for novelty search
+	this->noveltyArchive=origin.noveltyArchive;
 	return true;
 }
 
