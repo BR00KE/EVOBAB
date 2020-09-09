@@ -74,7 +74,10 @@ unsigned int PartRepresentation::getChildrenCount() {
 	return count;
 
 }
-
+bool PartRepresentation::childExists(int index){
+	if(children_[index].get()) return true;
+	else return false;
+}
 std::vector<unsigned int> PartRepresentation::getFreeSlots() {
 
 	std::vector<unsigned int> freeSlots;

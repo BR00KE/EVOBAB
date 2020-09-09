@@ -1230,12 +1230,15 @@ int RobotRepresentation::label_dist(const boost::shared_ptr<PartRepresentation> 
 //helper function to fill post order labels
 void RobotRepresentation::postOrderTraversal(){
 		std::vector<std::string> labels;
+		this->labels.clear();
 		this->labels=traverse(bodyTree_, labels);
 }
 //recursive helper for post order
 std::vector<std::string> RobotRepresentation::traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels){
 	for(int i=0; i<node->getChildrenCount();i++){
-		labels = traverse(node->getChild(i),labels);
+		if(node->childExists(i)){
+			labels = traverse(node->getChild(i),labels);
+		}
 	}
 	labels.push_back(node->getType());
 	return labels;
@@ -1243,7 +1246,8 @@ std::vector<std::string> RobotRepresentation::traverse(const boost::shared_ptr<P
 //helper functions to index each node in the tree according to traversal method
 int RobotRepresentation::index(boost::shared_ptr<PartRepresentation> node, int index){
 	for(int i=0; i<node->getChildrenCount();i++){
-		index = this->index(node->getChild(i),index);
+		if(node->childExists(i))
+			index = this->index(node->getChild(i),index);
 	}
 	index++;
 	node->index_zs=index;
@@ -1318,6 +1322,7 @@ int RobotRepresentation::zhangShasha(boost::shared_ptr<RobotRepresentation> & ro
 	TD.resize(l1.size()+1);
 	for(int i=0; i<TD.size();i++){
 		TD[i].resize(l2.size()+1);
+		std::fill(TD[i].begin(), TD[i].end(), 0);
 	}
 
 	// solve subproblems
@@ -1337,12 +1342,21 @@ void RobotRepresentation::leftmost(boost::shared_ptr<PartRepresentation> node){
 	if (node == nullptr)
 		return;
 	for (int i = 0; i < node->getChildrenCount(); i++) {
-		leftmost(node->getChild(i));
+		if(node->childExists(i))
+			leftmost(node->getChild(i));
 	}
 	if (node->getChildrenCount() == 0) {
 		node->leftmost_zs = node;
 	} else {
-		node->leftmost_zs = node->getChild(0)->leftmost_zs;
+		for (int i = 0; i < node->getChildrenCount(); i++) {
+			if(node->childExists(i)){
+				node->leftmost_zs = node->getChild(i)->leftmost_zs;
+				i=node->getChildrenCount();
+			}
+		}
+		if(!node->leftmost_zs.get()){
+			node->leftmost_zs = node;
+		}
 	}
 }
 void RobotRepresentation::leftmost(){
@@ -1350,7 +1364,8 @@ void RobotRepresentation::leftmost(){
 }
 std::vector<int> RobotRepresentation::l_func(boost::shared_ptr<PartRepresentation> node, std::vector<int>& l){
 	for(int i=0; i<node->getChildrenCount();i++){
-		l = l_func(node->getChild(i),l);
+		if(node->childExists(i))
+			l = l_func(node->getChild(i),l);
 	}
 	l.push_back(node->leftmost_zs->index_zs);
 	return l;
@@ -1363,6 +1378,7 @@ void RobotRepresentation::l_func(){
 	
 void RobotRepresentation::keyroots(){
 	//calculate the keyroots
+	keyroots_zs.clear();
 	for(int i=0; i<l.size();i++){
 		int flag =0;
 		for (int j = i + 1; j < l.size(); j++) {

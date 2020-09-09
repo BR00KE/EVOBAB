@@ -217,6 +217,8 @@ public:
 	 * used by the recursive leftmost() function zhang-shasha
 	 */
 	boost::shared_ptr<PartRepresentation> leftmost_zs; 
+
+	bool childExists(int index);
 private:
 
 	/**
