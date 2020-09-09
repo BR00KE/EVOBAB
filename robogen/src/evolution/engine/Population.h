@@ -76,7 +76,7 @@ public:
 	/**
 	 * Creates a population from the popSize best individuals of origin.
 	 */
-	bool init(const IndividualContainer &origin, unsigned int popSize);
+	bool init(const IndividualContainer &origin, unsigned int popSize, bool noveltySearch=false);
 
 	virtual ~Population();
 

@@ -155,7 +155,13 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 		std::cout << " " << population[i]->getFitness();
 	}
 	std::cout << std::endl;
-
+	/**
+	std::cout << "All novelty scores:";//BK added for debugging
+	for(unsigned int i = 0; i<population.size(); ++i) {
+		std::cout << " " << population[i]->getNoveltyScore();
+	}
+	std::cout << std::endl;
+	*/
 	// save robot file of best robot (don't do with fake robot representation)
 	#ifndef FAKEROBOTREPRESENTATION_H
 

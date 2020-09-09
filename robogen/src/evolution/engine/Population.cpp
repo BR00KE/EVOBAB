@@ -99,7 +99,7 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 	return true;
 }
 
-bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
+bool Population::init(const IndividualContainer &origin, unsigned int popSize, bool noveltySearch) {
 
 	if (!origin.areEvaluated()) {
 		std::cout << "Trying to initialize population of n best Robots from "
@@ -111,7 +111,8 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
 		this->push_back(origin[i]);
 	}
 
-	this->sort(false);
+	//this->sort(false);
+	this->sort(true,noveltySearch);
 
 	// idea was to call this->resize(popSize);, but that requires a default
 	// constructor to be present for RobotRepresentation, which is not the case

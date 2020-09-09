@@ -314,10 +314,14 @@ void init(unsigned int seed, std::string outputDirectory,
 		//initialise novelty archive
 		for(int i=0; i<population->size(); i++){
 			if(i%3==0){
+				population->at(i)->calculateNoveltyScore(noveltyArchive);
 				addToArchive(population->at(i));
 			}
 		}
 		population->evaluateNovelty(noveltyArchive);
+		std::sort(population->begin(),population->end(),
+					[](boost::shared_ptr<RobotRepresentation> & a, boost::shared_ptr<RobotRepresentation> & b)
+					{return a->getNoveltyScore()>b->getNoveltyScore();});
 	}
 
 }//end of init
@@ -341,7 +345,7 @@ void postEvaluateStd() {
 
 	// replace
 	population.reset(new Population());
-	if (!population->init(children, conf->mu)) {
+	if (!population->init(children, conf->mu,conf->noveltySearch)) {
 		std::cout << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
@@ -388,7 +392,13 @@ void mainEvolutionLoop() {
 
 		// create children
 		if (neat) {
-		
+			/**
+			if(conf->noveltySearch){ //if novelty search sort population by novelty search
+				std::sort(population->begin(),population->end(),
+					[](boost::shared_ptr<RobotRepresentation> & a, boost::shared_ptr<RobotRepresentation> & b)
+					{return a->getNoveltyScore()>b->getNoveltyScore();});
+			}
+			*/
 			selector->initPopulation(population);
 			unsigned int numOffspring = 0;
 			while (numOffspring < conf->lambda) {

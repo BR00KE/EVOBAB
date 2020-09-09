@@ -163,13 +163,17 @@ bool robotNoveltyComparator(const boost::shared_ptr<RobotRepresentation>& a,
 
 }
 
-void IndividualContainer::sort(bool forceSort) {
+void IndividualContainer::sort(bool forceSort, bool novelty) {
 
 	if (sorted_  && (!forceSort)) {
 		return;
 	}
-
-	std::sort(this->begin(), this->end(), robotFitnessComparator);
+	if(novelty){
+		std::sort(this->begin(), this->end(), robotNoveltyComparator);
+	}
+	else{
+		std::sort(this->begin(), this->end(), robotFitnessComparator);
+	}
 	
 	sorted_ = true;
 }

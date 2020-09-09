@@ -1642,7 +1642,9 @@ float RobotRepresentation::calculateNoveltyScore(std::vector<boost::shared_ptr<R
 	for(int i=0; i<noveltyArchive.size(); i++){ //should be size 15
 		totalTreeEditDistance += this->zhangShasha(noveltyArchive.at(i));
 	}
-	this->setNoveltyScore((float) totalTreeEditDistance/noveltyArchive.size());
+	if(noveltyArchive.size()>0)
+		this->setNoveltyScore((float) totalTreeEditDistance/noveltyArchive.size());
+	else this->setNoveltyScore(0.0f);
 	return this->getNoveltyScore();
 }
 
