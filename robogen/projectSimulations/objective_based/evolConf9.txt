@@ -1,9 +1,9 @@
-simulatorConfFile=sim_configs/conf0.txt
-mu=50
-lambda=50
+simulatorConfFile=sim_configs/conf9.txt
+mu=100
+lambda=100
 selection=deterministic-tournament
 referenceRobotFile=../simpleRobot.txt
-replacement=comma
+replacement=plus
 tournamentSize=2
 numGenerations=100
 evolutionMode=full

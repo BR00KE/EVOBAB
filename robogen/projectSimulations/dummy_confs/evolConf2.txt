@@ -1,11 +1,11 @@
 simulatorConfFile=sim_configs/conf0.txt
-mu=5
-lambda=5
+mu=75
+lambda=75
 selection=deterministic-tournament
 referenceRobotFile=../simpleRobot.txt
-replacement=comma
+replacement=plus
 tournamentSize=2
-numGenerations=5
+numGenerations=100
 evolutionMode=full
 pBrainMutate=.3
 brainSigma=.7
