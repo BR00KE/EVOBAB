@@ -95,6 +95,8 @@ private:
 	void copyConfFile(std::string fileName);
 
 	void saveRobotComplexity(boost::shared_ptr<RobotRepresentation> robot, std::string fileName);
+	void savePopulationComplexity(float complexity, std::string fileName);
+
 };
 
 } /* namespace robogen */

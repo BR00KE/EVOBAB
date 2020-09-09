@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=24
+#PBS -l walltime=60:00:00
+#PBS -q smp
+#PBS -P CSCI1142
+#PBS -M spnchr005@myuct.ac.za
+#PBS -m abe
+#PBS -e /mnt/lustre/users/cspanellis/EVOBAB/std_err.txt
+#PBS -o /mnt/lustre/users/cspanellis/EVOBAB/std_out.txt
+#PBS -N EVOBABObjective
+ 
+ 
+cd /mnt/lustre/users/cspanellis/EVOBAB/robogen/build
+./objective_based.sh

@@ -186,6 +186,8 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 			ss << logPath_+"/Generation-"+ std::to_string(generation) + "/Individual-" << (i+1) << "-Complexity-Fitness-Novelty.txt";
 			saveRobotComplexity(population[i], ss.str());
 		}
+		savePopulationComplexity(population.getComplexity(),logPath_+"/Generation-"+ std::to_string(generation) + "/PopulationComplexity.txt" );
+
 	}
 
 
@@ -212,6 +214,12 @@ void EvolverLog::saveRobotComplexity(boost::shared_ptr<RobotRepresentation> robo
 	complexityFile << robot->getNoveltyScore()<<std::endl;
 	complexityFile.close();
 }
+void EvolverLog::savePopulationComplexity(float complexity, std::string fileName){
+	std::ofstream complexityFile(fileName.c_str(),std::ios::out|std::ios::trunc);
+	complexityFile << complexity << std::endl;
+	complexityFile.close();
+}
+
 
 
 } /* namespace robogen */
