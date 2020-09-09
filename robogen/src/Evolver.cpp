@@ -28,6 +28,7 @@
  */
 
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/lexical_cast.hpp>
 #include "config/EvolverConfiguration.h"
 #include "evolution/representation/RobotRepresentation.h"
@@ -85,6 +86,25 @@ void printHelp() {
 			ConfigurationReader::parseConfigurationFile("help");
 }
 
+//BK - novelty - probabalistically maintain an archive of 15 individuals
+std::vector<boost::shared_ptr<RobotRepresentation> > noveltyArchive;
+void addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
+	boost::shared_ptr<RobotRepresentation> clone = boost::make_shared<RobotRepresentation>(RobotRepresentation(*individual));
+	
+	if(noveltyArchive.size()<15){
+		noveltyArchive.push_back(clone);
+	}
+	//replace individual at random position in the archive
+	else{ 
+		std::random_device rd;     // only used once to initialise (seed) engine
+		std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+		std::uniform_int_distribution<int> uni(0,15); // guaranteed unbiased
+
+		int random_integer = uni(rng);
+		noveltyArchive[random_integer]=clone;
+	}
+}
+
 boost::shared_ptr<Population> population;
 IndividualContainer children;
 boost::shared_ptr<NeatContainer> neatContainer;
@@ -96,6 +116,7 @@ boost::shared_ptr<Selector> selector;
 boost::shared_ptr<Mutator> mutator;
 unsigned int generation;
 boost::random::mt19937 rng;
+
 
 std::vector<Socket*> sockets;
 
@@ -289,10 +310,10 @@ void init(unsigned int seed, std::string outputDirectory,
 		//initialise novelty archive
 		for(int i=0; i<population->size(); i++){
 			if(i%3==0){
-				population->addToArchive(population->at(i));
+				addToArchive(population->at(i));
 			}
 		}
-		population->evaluateNovelty(population->noveltyArchive);
+		population->evaluateNovelty(noveltyArchive);
 	}
 
 }//end of init
@@ -368,6 +389,7 @@ void mainEvolutionLoop() {
 			// population->evaluate(robotConf, sockets);
 
 			selector->initPopulation(population);
+			//population->noveltyArchive = noveltyArchive;
 			unsigned int numOffspring = 0;
 			while (numOffspring < conf->lambda) {
 
@@ -415,7 +437,7 @@ void mainEvolutionLoop() {
 			children.evaluate(robotConf, sockets);
 			children.evaluateComplexity();
 			if(conf->noveltySearch){
-				children.evaluateNovelty(population->noveltyArchive);
+				children.evaluateNovelty(noveltyArchive);
 				//probabalistically add children to novelty archive
 				std::vector<boost::shared_ptr<RobotRepresentation> >::iterator childIt = children.begin();
 				std::random_device rd;     
@@ -424,7 +446,7 @@ void mainEvolutionLoop() {
 				while(childIt!=children.end()){
 					int random_integer = uni(rng);
 					if(random_integer<=3){
-						population->addToArchive(*childIt);
+						addToArchive(*childIt);
 					}
 					childIt++;
 				}
