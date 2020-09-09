@@ -388,16 +388,8 @@ void mainEvolutionLoop() {
 
 		// create children
 		if (neat) {
-			// //neatPopulation->Epoch();
-			// if(!neatContainer->produceNextGeneration(population)) { //next generation of brains?
-			// 	std::cerr << "Producing next generation from NEAT failed."
-			// 			<< std::endl;
-			// 	exitRobogen(EXIT_FAILURE);
-			// }
-			// population->evaluate(robotConf, sockets);
-
+		
 			selector->initPopulation(population);
-			//population->noveltyArchive = noveltyArchive;
 			unsigned int numOffspring = 0;
 			while (numOffspring < conf->lambda) {
 

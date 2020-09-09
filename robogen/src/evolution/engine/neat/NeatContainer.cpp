@@ -71,29 +71,7 @@ std::vector<NEAT::Genome> NeatContainer::getInitialGenomePop(){
 
 bool NeatContainer::fillPopulationWeights(
 		boost::shared_ptr<Population> &population) {
-	/*
-	for(NeatIdToGenomeMap::iterator i = neatIdToGenomeMap_.begin();
-			i != neatIdToGenomeMap_.end(); i++) {
-		unsigned int id = i->first;
-		NEAT::Genome *genome = i->second;
-		if(neatIdToRobotMap_.count(id) == 0) {
-			std::cout << "No robot in map with id " << id << std::endl;
-			return false;
-		}
-		boost::shared_ptr<RobotRepresentation> robot = neatIdToRobotMap_[id];
-		if(!this->fillBrain(genome, robot)) {
-			return false;
-		}
 
-	}
-	return true;
-	*/
-	
-	// for(auto i : *population){
-	// 	if(!this->fillBrain(i->getNeatGenomePointer(),i)){
-	// 		return false;
-	// 	}
-	// }
 	for(Population::iterator i = population->begin(); i!=population->end(); i++){
 		//std::cout<<typeid(i).name()<<std::endl;
 		boost::shared_ptr<RobotRepresentation> rep = *i;

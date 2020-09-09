@@ -88,13 +88,11 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 			this->push_back(
 				boost::shared_ptr<RobotRepresentation>(
 						new RobotRepresentation(*robot.get()))); 
+			mutator->growBodyRandomly(this->back());
+
 						
 		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
 			this->push_back( mutator->createOffspring(robot)[0] );
-		}
-
-		if (growBodies) {
-			mutator->growBodyRandomly(this->back());
 		}
 		
 	}
