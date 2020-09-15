@@ -602,8 +602,11 @@ robogenMessage::Robot RobotRepresentation::serialize() const {
 	// id - this can probably be removed
 	message.set_id(1);
 	message.set_complexity(complexity_);
-	if (complexityCost_) { message.set_complexity_cost(1);}
-	else {message.set_complexity_cost(0);}
+	if (complexityCost_) { message.set_complexitycost(1);}
+	else {message.set_complexitycost(0);}
+	//BK added 
+	//message.endPosX_=0;
+	//message.endPosY_=0;
 	// body
 	bodyTree_->addSubtreeToBodyMessage(message.mutable_body(), true);
 	// brain
@@ -673,10 +676,18 @@ void RobotRepresentation::evaluate(Socket *socket,
 		exit(EXIT_FAILURE);
 	} else {
 		fitness_ = resultPacket.getMessage()->fitness();
+		//BK added
+		this->setEndPosition(resultPacket.getMessage()->getEndPosX(),resultPacket.getMessage()->getEndPosY());
+		//endPosY_
 		evaluated_ = true;
 	}
 #endif
 
+}
+
+//BK added for novelty attempt 2
+void RobotRepresentation::setEndPosition(float x, float y){
+	endPosition = std::make_pair(x,y);
 }
 
 double RobotRepresentation::getFitness() const {

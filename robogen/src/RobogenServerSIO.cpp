@@ -177,6 +177,7 @@ void bind_events(sio::socket::ptr &socket) {
 					fitness = MIN_FITNESS;
 				} else {
 					fitness = scenario->getFitness();
+					endPosition = scenario->getEndPosition(); //BK added, not sure if needed
 				}
 
 				sio::message::ptr output = sio::object_message::create();

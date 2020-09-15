@@ -101,7 +101,7 @@ void IndividualContainer::evaluate(boost::shared_ptr<RobogenConfig> robotConf,
 		FakeJSSocket socket;
 		boost::shared_ptr<RobotRepresentation> currentRobot = indiQueue.front();
 		indiQueue.pop();
-		currentRobot->evaluate(&socket, robotConf);
+		currentRobot->&socket, robotConf);
 		int ptrToIndividual = (int) currentRobot.get();
 		if (!firstIndividual) {
 			message += ",";

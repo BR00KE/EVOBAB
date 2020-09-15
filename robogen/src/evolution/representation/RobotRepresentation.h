@@ -286,6 +286,13 @@ public:
 	 */
 	float calculateNoveltyScore(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive);
 
+	//BK added for novelty attempt two
+	/**
+	 * get and set end position
+	 */
+	std::pair<float,float> endPosition;
+	void setEndPosition(float x, float y);
+
 	//methods to find tree edit distance between robot representations
 	int label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B);
 
