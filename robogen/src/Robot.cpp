@@ -104,6 +104,11 @@ bool Robot::init(dWorldID odeWorld, dSpaceID odeSpace,
 	// CH - added this to get the complexity from the serialized robot
 	complexity_ = robotSpec.get_complexity();
 	complexityCost_ = robotSpec.get_complexity_cost();
+	
+	//BK added this to get end position from serialised robot
+	endPosX_ = robotSpec.get_endPosX();
+	endPosY_ = robotSpec.get_endPosY();
+
 	const robogenMessage::Body& body = robotSpec.body();
 	const robogenMessage::Brain& brain = robotSpec.brain();
 	if (!this->decodeBody(body)) {

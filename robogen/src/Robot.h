@@ -168,6 +168,10 @@ public:
 	float complexity_;
 	float complexityCost_;
 
+	//BK added for novelty
+	float endPosX_;
+	float endPosY_;
+
 private:
 
 	/**

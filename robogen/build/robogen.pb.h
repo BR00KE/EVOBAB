@@ -1343,10 +1343,15 @@ class Robot : public ::google::protobuf::Message /* @@protoc_insertion_point(cla
 
     // CH added this
   void set_complexity(float value);
-  // CH added this
   float get_complexity() const;
   void set_complexity_cost(float value);
   float get_complexity_cost() const;
+
+  //BK added 
+  void set_endPosX(float value);
+  float get_endPosX() const;
+  void set_endPosY(float value);
+  float get_endPosY() const;
 
   // @@protoc_insertion_point(class_scope:robogenMessage.Robot)
  private:
@@ -1368,6 +1373,11 @@ class Robot : public ::google::protobuf::Message /* @@protoc_insertion_point(cla
   ::google::protobuf::int32 id_;
   float complexity_;
   float complexityCost_;
+
+  //BK added
+  float endPosX_;
+  float endPosY_;
+
   friend struct ::protobuf_robogen_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
@@ -2502,6 +2512,12 @@ class EvaluationResult : public ::google::protobuf::Message /* @@protoc_insertio
   float fitness() const;
   void set_fitness(float value);
 
+  //added by BK
+  void setEndPosX(float value);
+  void setEndPosY(float value);
+  float getEndPosX();
+  float getEndPosY();
+
   // @@protoc_insertion_point(class_scope:robogenMessage.EvaluationResult)
  private:
   void set_has_id();
@@ -2518,6 +2534,9 @@ class EvaluationResult : public ::google::protobuf::Message /* @@protoc_insertio
   ::google::protobuf::RepeatedField< float > objectives_;
   ::google::protobuf::int32 id_;
   float fitness_;
+  //BK added
+  float endPosX_;
+  float endPosY_;
   friend struct ::protobuf_robogen_2eproto::TableStruct;
 };
 // ===================================================================
@@ -3814,7 +3833,20 @@ inline void Robot::set_complexity_cost(float value){
 inline float Robot::get_complexity_cost() const {
   return complexityCost_;
 }
-
+//BK added this
+//BK added 
+inline void Robot::set_endPosX(float value){
+  endPosX_ = value;
+}
+inline float Robot::get_endPosX() const{
+  return endPosX_;
+}
+inline void Robot::set_endPosY(float value){
+  endPosY_ = value;
+}
+inline float Robot::get_endPosY() const{
+  return endPosY_;
+}
 
 
 // -------------------------------------------------------------------
@@ -5113,6 +5145,20 @@ inline void EvaluationResult::set_fitness(float value) {
   set_has_fitness();
   fitness_ = value;
   // @@protoc_insertion_point(field_set:robogenMessage.EvaluationResult.fitness)
+}
+
+//added by BK for novelty attempt 2
+inline void EvaluationResult::setEndPosX(float value){
+  endPosX_=value;
+}
+inline void EvaluationResult::setEndPosY(float value){
+  endPosY_=value;
+}
+inline float EvaluationResult::getEndPosX(){
+  return endPosX_;
+}
+inline float EvaluationResult::getEndPosY(){
+  return endPosY_;
 }
 
 // repeated float objectives = 3;
