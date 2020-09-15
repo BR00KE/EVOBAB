@@ -213,8 +213,8 @@ int main(int argc, char* argv[]) {
 							new robogenMessage::EvaluationResult());
 					evalResultPacket->set_fitness(fitness);
 					//BK added
-					evalResultPacket->setEndPosX(endPosition[0]);
-					evalResultPacket->setEndPosY(endPosition[1]);
+					evalResultPacket->set_endposx(endPosition[0]);
+					evalResultPacket->set_endposy(endPosition[1]);
 					
 					evalResultPacket->set_id(packet.getMessage()->robot().id());
 					ProtobufPacket<robogenMessage::EvaluationResult> evalResult;

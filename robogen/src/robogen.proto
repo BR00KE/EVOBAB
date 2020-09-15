@@ -54,8 +54,6 @@ message Robot {
   required Brain brain = 3;
   required float complexity = 4;
   required float complexityCost = 5;
-  required float endPosX = 6;
-  required float endPosY = 7;
 }
 
 message Obstacle {

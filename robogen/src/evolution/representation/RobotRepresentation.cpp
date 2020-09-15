@@ -604,9 +604,6 @@ robogenMessage::Robot RobotRepresentation::serialize() const {
 	message.set_complexity(complexity_);
 	if (complexityCost_) { message.set_complexitycost(1);}
 	else {message.set_complexitycost(0);}
-	//BK added 
-	//message.endPosX_=0;
-	//message.endPosY_=0;
 	// body
 	bodyTree_->addSubtreeToBodyMessage(message.mutable_body(), true);
 	// brain
@@ -677,7 +674,7 @@ void RobotRepresentation::evaluate(Socket *socket,
 	} else {
 		fitness_ = resultPacket.getMessage()->fitness();
 		//BK added
-		this->setEndPosition(resultPacket.getMessage()->getEndPosX(),resultPacket.getMessage()->getEndPosY());
+		this->setEndPosition(resultPacket.getMessage()->endposx(),resultPacket.getMessage()->endposy());
 		//endPosY_
 		evaluated_ = true;
 	}

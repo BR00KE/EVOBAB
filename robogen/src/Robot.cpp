@@ -105,10 +105,6 @@ bool Robot::init(dWorldID odeWorld, dSpaceID odeSpace,
 	complexity_ = robotSpec.complexity();
 	complexityCost_ = robotSpec.complexitycost();
 	
-	//BK added this to get end position from serialised robot
-	endPosX_ = robotSpec.endposx();
-	endPosY_ = robotSpec.endposy();
-
 	const robogenMessage::Body& body = robotSpec.body();
 	const robogenMessage::Brain& brain = robotSpec.brain();
 	if (!this->decodeBody(body)) {
