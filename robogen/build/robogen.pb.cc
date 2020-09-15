@@ -431,9 +431,13 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::Robot, id_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::Robot, body_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::Robot, brain_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::Robot, complexity_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::Robot, complexitycost_),
   2,
   0,
   1,
+  3,
+  4,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::Obstacle, _has_bits_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::Obstacle, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -555,9 +559,13 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::EvaluationResult, id_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::EvaluationResult, fitness_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::EvaluationResult, objectives_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::EvaluationResult, endposx_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::robogenMessage::EvaluationResult, endposy_),
   0,
   1,
   ~0u,
+  2,
+  3,
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, 6, sizeof(::robogenMessage::EvolvableParameter)},
@@ -567,13 +575,13 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROT
   { 44, 52, sizeof(::robogenMessage::NeuralConnection)},
   { 55, 70, sizeof(::robogenMessage::Neuron)},
   { 80, 87, sizeof(::robogenMessage::Brain)},
-  { 89, 97, sizeof(::robogenMessage::Robot)},
-  { 100, 116, sizeof(::robogenMessage::Obstacle)},
-  { 127, 136, sizeof(::robogenMessage::LightSource)},
-  { 140, 148, sizeof(::robogenMessage::StartPosition)},
-  { 151, 180, sizeof(::robogenMessage::SimulatorConf)},
-  { 204, 211, sizeof(::robogenMessage::EvaluationRequest)},
-  { 213, 221, sizeof(::robogenMessage::EvaluationResult)},
+  { 89, 99, sizeof(::robogenMessage::Robot)},
+  { 104, 120, sizeof(::robogenMessage::Obstacle)},
+  { 131, 140, sizeof(::robogenMessage::LightSource)},
+  { 144, 152, sizeof(::robogenMessage::StartPosition)},
+  { 155, 184, sizeof(::robogenMessage::SimulatorConf)},
+  { 208, 215, sizeof(::robogenMessage::EvaluationRequest)},
+  { 217, 227, sizeof(::robogenMessage::EvaluationResult)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -631,43 +639,45 @@ void AddDescriptorsImpl() {
       "\001(\002\022\023\n\013phaseOffset\030\010 \001(\002\022\016\n\006period\030\t \001(\002"
       "\022\014\n\004gain\030\n \001(\002\"e\n\005Brain\022&\n\006neuron\030\001 \003(\0132"
       "\026.robogenMessage.Neuron\0224\n\nconnection\030\002 "
-      "\003(\0132 .robogenMessage.NeuralConnection\"]\n"
-      "\005Robot\022\n\n\002id\030\001 \002(\005\022\"\n\004body\030\002 \002(\0132\024.robog"
-      "enMessage.Body\022$\n\005brain\030\003 \002(\0132\025.robogenM"
-      "essage.Brain\"\271\001\n\010Obstacle\022\t\n\001x\030\001 \002(\002\022\t\n\001"
-      "y\030\002 \002(\002\022\t\n\001z\030\003 \002(\002\022\r\n\005xSize\030\004 \002(\002\022\r\n\005ySi"
-      "ze\030\005 \002(\002\022\r\n\005zSize\030\006 \002(\002\022\017\n\007density\030\007 \002(\002"
-      "\022\021\n\txRotation\030\010 \002(\002\022\021\n\tyRotation\030\t \002(\002\022\021"
-      "\n\tzRotation\030\n \002(\002\022\025\n\rrotationAngle\030\013 \002(\002"
-      "\"A\n\013LightSource\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\022\t\n"
-      "\001z\030\003 \002(\002\022\021\n\tintensity\030\007 \002(\002\"6\n\rStartPosi"
-      "tion\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\022\017\n\007azimuth\030\003 "
-      "\002(\002\"\266\005\n\rSimulatorConf\022\024\n\014terrainWidth\030\001 "
-      "\002(\002\022\025\n\rterrainLength\030\002 \002(\002\022+\n\tobstacles\030"
-      "\003 \003(\0132\030.robogenMessage.Obstacle\022\020\n\010scena"
-      "rio\030\004 \002(\t\0221\n\014lightSources\030\005 \003(\0132\033.roboge"
-      "nMessage.LightSource\022\020\n\010timeStep\030\006 \002(\002\022\022"
-      "\n\nnTimeSteps\030\007 \002(\005\0225\n\016startPositions\030\010 \003"
-      "(\0132\035.robogenMessage.StartPosition\022\027\n\017act"
-      "uationPeriod\030\t \002(\005\022\027\n\017terrainFriction\030\n "
-      "\002(\002\022\030\n\020sensorNoiseLevel\030\013 \002(\002\022\027\n\017motorNo"
-      "iseLevel\030\014 \002(\002\022\027\n\017capAcceleration\030\r \002(\010\022"
-      "\035\n\025maxLinearAcceleration\030\016 \002(\002\022\036\n\026maxAng"
-      "ularAcceleration\030\017 \002(\002\022#\n\033maxDirectionSh"
-      "iftsPerSecond\030\020 \002(\005\022\020\n\010gravityX\030\021 \002(\002\022\020\n"
-      "\010gravityY\030\022 \002(\002\022\020\n\010gravityZ\030\023 \002(\002\022\023\n\013ter"
-      "rainType\030\024 \002(\005\022\025\n\rterrainHeight\030\025 \002(\002\022\"\n"
-      "\032terrainHeightFieldFileName\030\026 \002(\t\022\"\n\032dis"
-      "allowObstacleCollisions\030\027 \002(\010\022\035\n\025obstacl"
-      "eOverlapPolicy\030\030 \002(\r\"o\n\021EvaluationReques"
-      "t\022$\n\005robot\030\001 \002(\0132\025.robogenMessage.Robot\022"
-      "4\n\rconfiguration\030\002 \002(\0132\035.robogenMessage."
-      "SimulatorConf\"C\n\020EvaluationResult\022\n\n\002id\030"
-      "\001 \002(\005\022\017\n\007fitness\030\002 \002(\002\022\022\n\nobjectives\030\003 \003"
-      "(\002"
+      "\003(\0132 .robogenMessage.NeuralConnection\"\211\001"
+      "\n\005Robot\022\n\n\002id\030\001 \002(\005\022\"\n\004body\030\002 \002(\0132\024.robo"
+      "genMessage.Body\022$\n\005brain\030\003 \002(\0132\025.robogen"
+      "Message.Brain\022\022\n\ncomplexity\030\004 \002(\002\022\026\n\016com"
+      "plexityCost\030\005 \002(\002\"\271\001\n\010Obstacle\022\t\n\001x\030\001 \002("
+      "\002\022\t\n\001y\030\002 \002(\002\022\t\n\001z\030\003 \002(\002\022\r\n\005xSize\030\004 \002(\002\022\r"
+      "\n\005ySize\030\005 \002(\002\022\r\n\005zSize\030\006 \002(\002\022\017\n\007density\030"
+      "\007 \002(\002\022\021\n\txRotation\030\010 \002(\002\022\021\n\tyRotation\030\t "
+      "\002(\002\022\021\n\tzRotation\030\n \002(\002\022\025\n\rrotationAngle\030"
+      "\013 \002(\002\"A\n\013LightSource\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002"
+      "(\002\022\t\n\001z\030\003 \002(\002\022\021\n\tintensity\030\007 \002(\002\"6\n\rStar"
+      "tPosition\022\t\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\022\017\n\007azimu"
+      "th\030\003 \002(\002\"\266\005\n\rSimulatorConf\022\024\n\014terrainWid"
+      "th\030\001 \002(\002\022\025\n\rterrainLength\030\002 \002(\002\022+\n\tobsta"
+      "cles\030\003 \003(\0132\030.robogenMessage.Obstacle\022\020\n\010"
+      "scenario\030\004 \002(\t\0221\n\014lightSources\030\005 \003(\0132\033.r"
+      "obogenMessage.LightSource\022\020\n\010timeStep\030\006 "
+      "\002(\002\022\022\n\nnTimeSteps\030\007 \002(\005\0225\n\016startPosition"
+      "s\030\010 \003(\0132\035.robogenMessage.StartPosition\022\027"
+      "\n\017actuationPeriod\030\t \002(\005\022\027\n\017terrainFricti"
+      "on\030\n \002(\002\022\030\n\020sensorNoiseLevel\030\013 \002(\002\022\027\n\017mo"
+      "torNoiseLevel\030\014 \002(\002\022\027\n\017capAcceleration\030\r"
+      " \002(\010\022\035\n\025maxLinearAcceleration\030\016 \002(\002\022\036\n\026m"
+      "axAngularAcceleration\030\017 \002(\002\022#\n\033maxDirect"
+      "ionShiftsPerSecond\030\020 \002(\005\022\020\n\010gravityX\030\021 \002"
+      "(\002\022\020\n\010gravityY\030\022 \002(\002\022\020\n\010gravityZ\030\023 \002(\002\022\023"
+      "\n\013terrainType\030\024 \002(\005\022\025\n\rterrainHeight\030\025 \002"
+      "(\002\022\"\n\032terrainHeightFieldFileName\030\026 \002(\t\022\""
+      "\n\032disallowObstacleCollisions\030\027 \002(\010\022\035\n\025ob"
+      "stacleOverlapPolicy\030\030 \002(\r\"o\n\021EvaluationR"
+      "equest\022$\n\005robot\030\001 \002(\0132\025.robogenMessage.R"
+      "obot\0224\n\rconfiguration\030\002 \002(\0132\035.robogenMes"
+      "sage.SimulatorConf\"e\n\020EvaluationResult\022\n"
+      "\n\002id\030\001 \002(\005\022\017\n\007fitness\030\002 \002(\002\022\022\n\nobjective"
+      "s\030\003 \003(\002\022\017\n\007endPosX\030\004 \002(\002\022\017\n\007endPosY\030\005 \002("
+      "\002"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 2002);
+      descriptor, 2081);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "robogen.proto", &protobuf_RegisterTypes);
 }
@@ -3451,6 +3461,8 @@ void Robot::InitAsDefaultInstance() {
 const int Robot::kIdFieldNumber;
 const int Robot::kBodyFieldNumber;
 const int Robot::kBrainFieldNumber;
+const int Robot::kComplexityFieldNumber;
+const int Robot::kComplexityCostFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Robot::Robot()
@@ -3475,14 +3487,16 @@ Robot::Robot(const Robot& from)
   } else {
     brain_ = NULL;
   }
-  id_ = from.id_;
+  ::memcpy(&id_, &from.id_,
+    static_cast<size_t>(reinterpret_cast<char*>(&complexitycost_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(complexitycost_));
   // @@protoc_insertion_point(copy_constructor:robogenMessage.Robot)
 }
 
 void Robot::SharedCtor() {
   ::memset(&body_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&id_) -
-      reinterpret_cast<char*>(&body_)) + sizeof(id_));
+      reinterpret_cast<char*>(&complexitycost_) -
+      reinterpret_cast<char*>(&body_)) + sizeof(complexitycost_));
 }
 
 Robot::~Robot() {
@@ -3526,7 +3540,11 @@ void Robot::Clear() {
       brain_->Clear();
     }
   }
-  id_ = 0;
+  if (cached_has_bits & 28u) {
+    ::memset(&id_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&complexitycost_) -
+        reinterpret_cast<char*>(&id_)) + sizeof(complexitycost_));
+  }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
 }
@@ -3579,6 +3597,34 @@ bool Robot::MergePartialFromCodedStream(
         break;
       }
 
+      // required float complexity = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(37u /* 37 & 0xFF */)) {
+          set_has_complexity();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &complexity_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required float complexityCost = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(45u /* 45 & 0xFF */)) {
+          set_has_complexitycost();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &complexitycost_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -3623,6 +3669,16 @@ void Robot::SerializeWithCachedSizes(
       3, this->_internal_brain(), output);
   }
 
+  // required float complexity = 4;
+  if (cached_has_bits & 0x00000008u) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(4, this->complexity(), output);
+  }
+
+  // required float complexityCost = 5;
+  if (cached_has_bits & 0x00000010u) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(5, this->complexitycost(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -3655,6 +3711,16 @@ void Robot::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         3, this->_internal_brain(), deterministic, target);
+  }
+
+  // required float complexity = 4;
+  if (cached_has_bits & 0x00000008u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(4, this->complexity(), target);
+  }
+
+  // required float complexityCost = 5;
+  if (cached_has_bits & 0x00000010u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(5, this->complexitycost(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3690,6 +3756,16 @@ size_t Robot::RequiredFieldsByteSizeFallback() const {
         this->id());
   }
 
+  if (has_complexity()) {
+    // required float complexity = 4;
+    total_size += 1 + 4;
+  }
+
+  if (has_complexitycost()) {
+    // required float complexityCost = 5;
+    total_size += 1 + 4;
+  }
+
   return total_size;
 }
 size_t Robot::ByteSizeLong() const {
@@ -3701,7 +3777,7 @@ size_t Robot::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         _internal_metadata_.unknown_fields());
   }
-  if (((_has_bits_[0] & 0x00000007) ^ 0x00000007) == 0) {  // All required fields are present.
+  if (((_has_bits_[0] & 0x0000001f) ^ 0x0000001f) == 0) {  // All required fields are present.
     // required .robogenMessage.Body body = 2;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
@@ -3716,6 +3792,12 @@ size_t Robot::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->id());
+
+    // required float complexity = 4;
+    total_size += 1 + 4;
+
+    // required float complexityCost = 5;
+    total_size += 1 + 4;
 
   } else {
     total_size += RequiredFieldsByteSizeFallback();
@@ -3748,7 +3830,7 @@ void Robot::MergeFrom(const Robot& from) {
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 7u) {
+  if (cached_has_bits & 31u) {
     if (cached_has_bits & 0x00000001u) {
       mutable_body()->::robogenMessage::Body::MergeFrom(from.body());
     }
@@ -3757,6 +3839,12 @@ void Robot::MergeFrom(const Robot& from) {
     }
     if (cached_has_bits & 0x00000004u) {
       id_ = from.id_;
+    }
+    if (cached_has_bits & 0x00000008u) {
+      complexity_ = from.complexity_;
+    }
+    if (cached_has_bits & 0x00000010u) {
+      complexitycost_ = from.complexitycost_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
@@ -3777,7 +3865,7 @@ void Robot::CopyFrom(const Robot& from) {
 }
 
 bool Robot::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
   if (has_body()) {
     if (!this->body_->IsInitialized()) return false;
   }
@@ -3796,6 +3884,8 @@ void Robot::InternalSwap(Robot* other) {
   swap(body_, other->body_);
   swap(brain_, other->brain_);
   swap(id_, other->id_);
+  swap(complexity_, other->complexity_);
+  swap(complexitycost_, other->complexitycost_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
@@ -6684,6 +6774,8 @@ void EvaluationResult::InitAsDefaultInstance() {
 const int EvaluationResult::kIdFieldNumber;
 const int EvaluationResult::kFitnessFieldNumber;
 const int EvaluationResult::kObjectivesFieldNumber;
+const int EvaluationResult::kEndPosXFieldNumber;
+const int EvaluationResult::kEndPosYFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 EvaluationResult::EvaluationResult()
@@ -6700,15 +6792,15 @@ EvaluationResult::EvaluationResult(const EvaluationResult& from)
       objectives_(from.objectives_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&id_, &from.id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&fitness_) -
-    reinterpret_cast<char*>(&id_)) + sizeof(fitness_));
+    static_cast<size_t>(reinterpret_cast<char*>(&endposy_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(endposy_));
   // @@protoc_insertion_point(copy_constructor:robogenMessage.EvaluationResult)
 }
 
 void EvaluationResult::SharedCtor() {
   ::memset(&id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&fitness_) -
-      reinterpret_cast<char*>(&id_)) + sizeof(fitness_));
+      reinterpret_cast<char*>(&endposy_) -
+      reinterpret_cast<char*>(&id_)) + sizeof(endposy_));
 }
 
 EvaluationResult::~EvaluationResult() {
@@ -6741,10 +6833,10 @@ void EvaluationResult::Clear() {
 
   objectives_.Clear();
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 3u) {
+  if (cached_has_bits & 15u) {
     ::memset(&id_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&fitness_) -
-        reinterpret_cast<char*>(&id_)) + sizeof(fitness_));
+        reinterpret_cast<char*>(&endposy_) -
+        reinterpret_cast<char*>(&id_)) + sizeof(endposy_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -6807,6 +6899,34 @@ bool EvaluationResult::MergePartialFromCodedStream(
         break;
       }
 
+      // required float endPosX = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(37u /* 37 & 0xFF */)) {
+          set_has_endposx();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &endposx_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required float endPosY = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(45u /* 45 & 0xFF */)) {
+          set_has_endposy();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &endposy_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -6850,6 +6970,16 @@ void EvaluationResult::SerializeWithCachedSizes(
       3, this->objectives(i), output);
   }
 
+  // required float endPosX = 4;
+  if (cached_has_bits & 0x00000004u) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(4, this->endposx(), output);
+  }
+
+  // required float endPosY = 5;
+  if (cached_has_bits & 0x00000008u) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(5, this->endposy(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -6879,6 +7009,16 @@ void EvaluationResult::SerializeWithCachedSizes(
   target = ::google::protobuf::internal::WireFormatLite::
     WriteFloatToArray(3, this->objectives_, target);
 
+  // required float endPosX = 4;
+  if (cached_has_bits & 0x00000004u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(4, this->endposx(), target);
+  }
+
+  // required float endPosY = 5;
+  if (cached_has_bits & 0x00000008u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(5, this->endposy(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -6903,6 +7043,16 @@ size_t EvaluationResult::RequiredFieldsByteSizeFallback() const {
     total_size += 1 + 4;
   }
 
+  if (has_endposx()) {
+    // required float endPosX = 4;
+    total_size += 1 + 4;
+  }
+
+  if (has_endposy()) {
+    // required float endPosY = 5;
+    total_size += 1 + 4;
+  }
+
   return total_size;
 }
 size_t EvaluationResult::ByteSizeLong() const {
@@ -6914,13 +7064,19 @@ size_t EvaluationResult::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         _internal_metadata_.unknown_fields());
   }
-  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
+  if (((_has_bits_[0] & 0x0000000f) ^ 0x0000000f) == 0) {  // All required fields are present.
     // required int32 id = 1;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->id());
 
     // required float fitness = 2;
+    total_size += 1 + 4;
+
+    // required float endPosX = 4;
+    total_size += 1 + 4;
+
+    // required float endPosY = 5;
     total_size += 1 + 4;
 
   } else {
@@ -6964,12 +7120,18 @@ void EvaluationResult::MergeFrom(const EvaluationResult& from) {
 
   objectives_.MergeFrom(from.objectives_);
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 3u) {
+  if (cached_has_bits & 15u) {
     if (cached_has_bits & 0x00000001u) {
       id_ = from.id_;
     }
     if (cached_has_bits & 0x00000002u) {
       fitness_ = from.fitness_;
+    }
+    if (cached_has_bits & 0x00000004u) {
+      endposx_ = from.endposx_;
+    }
+    if (cached_has_bits & 0x00000008u) {
+      endposy_ = from.endposy_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
@@ -6990,7 +7152,7 @@ void EvaluationResult::CopyFrom(const EvaluationResult& from) {
 }
 
 bool EvaluationResult::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
   return true;
 }
 
@@ -7003,6 +7165,8 @@ void EvaluationResult::InternalSwap(EvaluationResult* other) {
   objectives_.InternalSwap(&other->objectives_);
   swap(id_, other->id_);
   swap(fitness_, other->fitness_);
+  swap(endposx_, other->endposx_);
+  swap(endposy_, other->endposy_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }

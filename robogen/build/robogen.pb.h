@@ -1341,17 +1341,19 @@ class Robot : public ::google::protobuf::Message /* @@protoc_insertion_point(cla
   ::google::protobuf::int32 id() const;
   void set_id(::google::protobuf::int32 value);
 
-    // CH added this
+  // required float complexity = 4;
+  bool has_complexity() const;
+  void clear_complexity();
+  static const int kComplexityFieldNumber = 4;
+  float complexity() const;
   void set_complexity(float value);
-  float get_complexity() const;
-  void set_complexity_cost(float value);
-  float get_complexity_cost() const;
 
-  //BK added 
-  void set_endPosX(float value);
-  float get_endPosX() const;
-  void set_endPosY(float value);
-  float get_endPosY() const;
+  // required float complexityCost = 5;
+  bool has_complexitycost() const;
+  void clear_complexitycost();
+  static const int kComplexityCostFieldNumber = 5;
+  float complexitycost() const;
+  void set_complexitycost(float value);
 
   // @@protoc_insertion_point(class_scope:robogenMessage.Robot)
  private:
@@ -1361,6 +1363,10 @@ class Robot : public ::google::protobuf::Message /* @@protoc_insertion_point(cla
   void clear_has_body();
   void set_has_brain();
   void clear_has_brain();
+  void set_has_complexity();
+  void clear_has_complexity();
+  void set_has_complexitycost();
+  void clear_has_complexitycost();
 
   // helper for ByteSizeLong()
   size_t RequiredFieldsByteSizeFallback() const;
@@ -1372,12 +1378,7 @@ class Robot : public ::google::protobuf::Message /* @@protoc_insertion_point(cla
   ::robogenMessage::Brain* brain_;
   ::google::protobuf::int32 id_;
   float complexity_;
-  float complexityCost_;
-
-  //BK added
-  float endPosX_;
-  float endPosY_;
-
+  float complexitycost_;
   friend struct ::protobuf_robogen_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
@@ -2512,11 +2513,19 @@ class EvaluationResult : public ::google::protobuf::Message /* @@protoc_insertio
   float fitness() const;
   void set_fitness(float value);
 
-  //added by BK
-  void setEndPosX(float value);
-  void setEndPosY(float value);
-  float getEndPosX();
-  float getEndPosY();
+  // required float endPosX = 4;
+  bool has_endposx() const;
+  void clear_endposx();
+  static const int kEndPosXFieldNumber = 4;
+  float endposx() const;
+  void set_endposx(float value);
+
+  // required float endPosY = 5;
+  bool has_endposy() const;
+  void clear_endposy();
+  static const int kEndPosYFieldNumber = 5;
+  float endposy() const;
+  void set_endposy(float value);
 
   // @@protoc_insertion_point(class_scope:robogenMessage.EvaluationResult)
  private:
@@ -2524,6 +2533,10 @@ class EvaluationResult : public ::google::protobuf::Message /* @@protoc_insertio
   void clear_has_id();
   void set_has_fitness();
   void clear_has_fitness();
+  void set_has_endposx();
+  void clear_has_endposx();
+  void set_has_endposy();
+  void clear_has_endposy();
 
   // helper for ByteSizeLong()
   size_t RequiredFieldsByteSizeFallback() const;
@@ -2534,9 +2547,8 @@ class EvaluationResult : public ::google::protobuf::Message /* @@protoc_insertio
   ::google::protobuf::RepeatedField< float > objectives_;
   ::google::protobuf::int32 id_;
   float fitness_;
-  //BK added
-  float endPosX_;
-  float endPosY_;
+  float endposx_;
+  float endposy_;
   friend struct ::protobuf_robogen_2eproto::TableStruct;
 };
 // ===================================================================
@@ -3816,38 +3828,53 @@ inline void Robot::set_allocated_brain(::robogenMessage::Brain* brain) {
   // @@protoc_insertion_point(field_set_allocated:robogenMessage.Robot.brain)
 }
 
-// CH added to set and return robot complexity
-
-inline void Robot::set_complexity(float value){
-  complexity_ = value;
+// required float complexity = 4;
+inline bool Robot::has_complexity() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
-
-inline float Robot::get_complexity() const {
+inline void Robot::set_has_complexity() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Robot::clear_has_complexity() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Robot::clear_complexity() {
+  complexity_ = 0;
+  clear_has_complexity();
+}
+inline float Robot::complexity() const {
+  // @@protoc_insertion_point(field_get:robogenMessage.Robot.complexity)
   return complexity_;
 }
-
-inline void Robot::set_complexity_cost(float value){
-  complexityCost_ = value;
+inline void Robot::set_complexity(float value) {
+  set_has_complexity();
+  complexity_ = value;
+  // @@protoc_insertion_point(field_set:robogenMessage.Robot.complexity)
 }
 
-inline float Robot::get_complexity_cost() const {
-  return complexityCost_;
+// required float complexityCost = 5;
+inline bool Robot::has_complexitycost() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
-//BK added this
-//BK added 
-inline void Robot::set_endPosX(float value){
-  endPosX_ = value;
+inline void Robot::set_has_complexitycost() {
+  _has_bits_[0] |= 0x00000010u;
 }
-inline float Robot::get_endPosX() const{
-  return endPosX_;
+inline void Robot::clear_has_complexitycost() {
+  _has_bits_[0] &= ~0x00000010u;
 }
-inline void Robot::set_endPosY(float value){
-  endPosY_ = value;
+inline void Robot::clear_complexitycost() {
+  complexitycost_ = 0;
+  clear_has_complexitycost();
 }
-inline float Robot::get_endPosY() const{
-  return endPosY_;
+inline float Robot::complexitycost() const {
+  // @@protoc_insertion_point(field_get:robogenMessage.Robot.complexityCost)
+  return complexitycost_;
 }
-
+inline void Robot::set_complexitycost(float value) {
+  set_has_complexitycost();
+  complexitycost_ = value;
+  // @@protoc_insertion_point(field_set:robogenMessage.Robot.complexityCost)
+}
 
 // -------------------------------------------------------------------
 
@@ -5147,20 +5174,6 @@ inline void EvaluationResult::set_fitness(float value) {
   // @@protoc_insertion_point(field_set:robogenMessage.EvaluationResult.fitness)
 }
 
-//added by BK for novelty attempt 2
-inline void EvaluationResult::setEndPosX(float value){
-  endPosX_=value;
-}
-inline void EvaluationResult::setEndPosY(float value){
-  endPosY_=value;
-}
-inline float EvaluationResult::getEndPosX(){
-  return endPosX_;
-}
-inline float EvaluationResult::getEndPosY(){
-  return endPosY_;
-}
-
 // repeated float objectives = 3;
 inline int EvaluationResult::objectives_size() const {
   return objectives_.size();
@@ -5189,6 +5202,54 @@ inline ::google::protobuf::RepeatedField< float >*
 EvaluationResult::mutable_objectives() {
   // @@protoc_insertion_point(field_mutable_list:robogenMessage.EvaluationResult.objectives)
   return &objectives_;
+}
+
+// required float endPosX = 4;
+inline bool EvaluationResult::has_endposx() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void EvaluationResult::set_has_endposx() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void EvaluationResult::clear_has_endposx() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void EvaluationResult::clear_endposx() {
+  endposx_ = 0;
+  clear_has_endposx();
+}
+inline float EvaluationResult::endposx() const {
+  // @@protoc_insertion_point(field_get:robogenMessage.EvaluationResult.endPosX)
+  return endposx_;
+}
+inline void EvaluationResult::set_endposx(float value) {
+  set_has_endposx();
+  endposx_ = value;
+  // @@protoc_insertion_point(field_set:robogenMessage.EvaluationResult.endPosX)
+}
+
+// required float endPosY = 5;
+inline bool EvaluationResult::has_endposy() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void EvaluationResult::set_has_endposy() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void EvaluationResult::clear_has_endposy() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void EvaluationResult::clear_endposy() {
+  endposy_ = 0;
+  clear_has_endposy();
+}
+inline float EvaluationResult::endposy() const {
+  // @@protoc_insertion_point(field_get:robogenMessage.EvaluationResult.endPosY)
+  return endposy_;
+}
+inline void EvaluationResult::set_endposy(float value) {
+  set_has_endposy();
+  endposy_ = value;
+  // @@protoc_insertion_point(field_set:robogenMessage.EvaluationResult.endPosY)
 }
 
 #ifdef __GNUC__
