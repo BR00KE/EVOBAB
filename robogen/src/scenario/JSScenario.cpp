@@ -171,6 +171,10 @@ float JSScenario::vectorDistance(emscripten::val vector1,
 	return NAN;
 }
 
+std::vector<float> JSScenario::getEndPosition(){
+	std::vector<float> dummy {0,0};
+	return dummy;
+}
 
 }
 

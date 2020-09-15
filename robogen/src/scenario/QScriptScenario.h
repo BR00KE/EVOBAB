@@ -66,6 +66,7 @@ public:
 	virtual bool endSimulation();
 	virtual double getFitness();
 	virtual bool remainingTrials();
+	virtual std::vector<float> getEndPosition();
 
 
 public slots:

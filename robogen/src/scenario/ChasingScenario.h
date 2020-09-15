@@ -64,6 +64,8 @@ public:
 	virtual bool init(dWorldID odeWorld, dSpaceID odeSpace, boost::shared_ptr<Robot> robot);
 	virtual int getCurTrial() const;
 
+	virtual std::vector<float> getEndPosition();
+
 private:
 
 	std::vector<double> distances_;
