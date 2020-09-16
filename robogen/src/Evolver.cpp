@@ -98,7 +98,7 @@ void addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
 	clone->keyroots();
 	clone->traverse(clone->bodyTree_,clone->labels);
 	*/
-	if(noveltyArchive.size()<15){
+	if(noveltyArchive.size()<50){
 		noveltyArchive.push_back(clone);
 	}
 	//replace individual at random position in the archive
@@ -106,7 +106,7 @@ void addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
 
 		std::random_device rd;     // only used once to initialise (seed) engine
 		std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
-		std::uniform_int_distribution<int> uni(0,15); // guaranteed unbiased
+		std::uniform_int_distribution<int> uni(0,noveltyArchive.size()); // guaranteed unbiased
 
 		int random_integer = uni(rng);
 		noveltyArchive[random_integer]=clone;
@@ -319,14 +319,27 @@ void init(unsigned int seed, std::string outputDirectory,
 	//BK added - evaluate population complexity for gen 0
 	
 	if(conf->noveltySearch){
-		//initialise novelty archive
-		for(int i=0; i<population->size(); i++){
-			if(i%3==0){
-				population->at(i)->calculateNoveltyScore(noveltyArchive,population);//changed to a call for second novelty metric
-				addToArchive(population->at(i));
+		//probabalistically add members of population to novelty archive
+		std::vector<boost::shared_ptr<RobotRepresentation> > pop(population->begin(),population->end());
+		std::vector<boost::shared_ptr<RobotRepresentation> >::iterator It = pop.begin();
+		std::random_device rd;     
+		std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+		std::uniform_int_distribution<int> uni(0,11); 
+		while(It!=pop.end()){
+			int random_integer = uni(rng);
+			if(random_integer<=3){
+				addToArchive(*It);
 			}
-		}
-		population->evaluateNovelty(noveltyArchive, population);//changed to a call for second novelty metric
+			It++;
+		}		
+		//initialise novelty archive
+		// for(int i=0; i<population->size(); i++){
+		// 	if(i%3==0){
+		// 		population->at(i)->calculateNoveltyScore(noveltyArchive,population);//changed to a call for second novelty metric
+		// 		addToArchive(population->at(i));
+		// 	}
+		// }
+		population->evaluateNovelty(noveltyArchive, pop);//changed to a call for second novelty metric
 		std::sort(population->begin(),population->end(),
 					[](boost::shared_ptr<RobotRepresentation> & a, boost::shared_ptr<RobotRepresentation> & b)
 					{return a->getNoveltyScore()>b->getNoveltyScore();});
@@ -457,7 +470,8 @@ void mainEvolutionLoop() {
 			children.evaluateComplexity(robotConf->getComplexityCost());
 			children.evaluate(robotConf, sockets);
 			if(conf->noveltySearch){
-				children.evaluateNovelty(noveltyArchive,population);//BK changed to a call for second novelty metric
+				std::vector<boost::shared_ptr<RobotRepresentation> > pop(population->begin(),population->end());
+				children.evaluateNovelty(noveltyArchive,pop);//BK changed to a call for second novelty metric
 				//probabalistically add children to novelty archive
 				std::vector<boost::shared_ptr<RobotRepresentation> >::iterator childIt = children.begin();
 				std::random_device rd;     

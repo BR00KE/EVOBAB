@@ -49,7 +49,6 @@
 
 //BK added
 #include "evolution/neat/Genome.h"
-//#include "utils/ZhangShashaTreeEditDistance/TreeEditDistance.h"
 
 namespace robogen {
 

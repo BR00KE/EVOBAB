@@ -1672,7 +1672,14 @@ float RobotRepresentation::calculateNoveltyScore(const std::vector<boost::shared
 		distances.push_back(this->euclideanDistance(r->getEndPosition()));
 	}
 	std::sort(distances.begin(),distances.end());
-	return 0; //for now
+	float avgDistance=0;
+	for(int i=1; i<16; i++){
+		avgDistance += distances[i];
+	}
+	avgDistance = avgDistance/15;
+	this->setNoveltyScore(avgDistance);
+	//skip first cause shortest distance will be 0 (individual in pop)
+	return this->getNoveltyScore();
 
 }
 float RobotRepresentation::euclideanDistance(const std::pair<float,float> r2){

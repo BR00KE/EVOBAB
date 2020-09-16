@@ -211,7 +211,7 @@ void IndividualContainer::evaluateNovelty(std::vector<boost::shared_ptr<RobotRep
 
 void IndividualContainer::evaluateNovelty(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive, const std::vector<boost::shared_ptr<RobotRepresentation> > & population ){
 	float novelty = 0.0f;
-	for(int i=0; i<this->size(); i++){
+	for(int i=0; i<this->size(); i++){ 
 		novelty+= this->at(i)->calculateNoveltyScore(noveltyArchive,population);
 	}
 	novelty_ = novelty;
