@@ -187,7 +187,7 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 			saveRobotComplexity(population[i], ss.str());
 		}
 		savePopulationComplexity(population.getComplexity(),logPath_+"/Generation-"+ std::to_string(generation) + "/PopulationComplexity.txt" );
-		savePopulationStats(population, logPath_+ "/Generation-"+ std::to_string(generation) + "PopStats_Complexity-Fitness-Novelty.txt");
+		savePopulationStats(population, logPath_+ "/Generation-"+ std::to_string(generation) + "-PopStats_Complexity-Fitness-Novelty.txt");
 	}
 
 
