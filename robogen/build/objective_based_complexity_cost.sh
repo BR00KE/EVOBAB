@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Starting novelty_search experiments"
+echo "Starting objective_based experiments"
 echo "------------------------------------"
 for i in {0..9} 
 do
@@ -8,7 +8,7 @@ do
 	do
 		echo "Running experiment $i:($x/10)."
 		./robogen-server 800$i &>/dev/null &
-		./robogen-evolver $RANDOM results/baseline/Experiment$i/novelty_output$i ../projectSimulations/novelty_search/evolConf$i.txt --save-all
+		./robogen-evolver $RANDOM results/complexityCost/Experiment$i/objective_output$i ../projectSimulations/objective_based/evolConf$i.txt --save-all --complexity-cost
 		echo "Experiment $i:($x/10) finished."
 	done
 	echo "Experiment set $i finished..."
@@ -20,7 +20,7 @@ do
 	do
 		echo "Running experiment $i:($x/10)."
 		./robogen-server 80$i &>/dev/null &
-		./robogen-evolver $RANDOM results/baseline/Experiment$i/novelty_output$i ../projectSimulations/novelty_search/evolConf$i.txt --save-all
+		./robogen-evolver $RANDOM results/complexityCost/Experiment$i/objective_output$i ../projectSimulations/objective_based/evolConf$i.txt --save-all --complexity-cost
 		echo "Experiment $i:($x/10) finished."
 	done
 	echo "Experiment set $i finished..."

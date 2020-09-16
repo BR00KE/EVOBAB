@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -l select=1:ncpus=24
-#PBS -l walltime=60:00:00
+#PBS -l walltime=1:00:00
 #PBS -q smp
 #PBS -P CSCI1142
 #PBS -M spnchr005@myuct.ac.za
@@ -9,6 +9,7 @@
 #PBS -o /mnt/lustre/users/cspanellis/EVOBAB/std_out.txt
 #PBS -N EVOBABObjective
  
+ module load chpc/cmake/3.11.0/gcc-6.1.0
  
 cd /mnt/lustre/users/cspanellis/EVOBAB/robogen/build
 ./objective_based.sh
