@@ -1,7 +1,7 @@
 #full friction, low obstacles
 #Simulator Configuration File
 
-scenario=novelty_locomotion.js
+scenario=racing
 
 #optionally specify the name of another file where obstacles are defined 
 obstaclesConfigFile= regularobstacles.txt

@@ -1,7 +1,7 @@
 #flat environment - flat ground medium friction (0.6)
 #Simulator Configuration File
 
-scenario=novelty_locomotion.js
+scenario=racing
 
 #starting positions and orientations defined
 startPositionConfigFile=startposconfig.txt
