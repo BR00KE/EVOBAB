@@ -91,12 +91,13 @@ std::vector<boost::shared_ptr<RobotRepresentation> > noveltyArchive;
 void addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
 	boost::shared_ptr<RobotRepresentation> clone = boost::make_shared<RobotRepresentation>(RobotRepresentation(*individual));
 	//set all the things needed to compute the novelty score so it doesn't need to be recomputed every time
+	/*
 	clone->postOrderTraversal();
 	clone->index();
 	clone->l_func();
 	clone->keyroots();
 	clone->traverse(clone->bodyTree_,clone->labels);
-	
+	*/
 	if(noveltyArchive.size()<15){
 		noveltyArchive.push_back(clone);
 	}

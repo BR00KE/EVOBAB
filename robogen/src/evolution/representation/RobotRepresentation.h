@@ -285,7 +285,9 @@ public:
 	 * Calculate and set novelty score for individual given an archive
 	 */
 	float calculateNoveltyScore(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive);
-
+	//BK signature for second novelty metric
+	float calculateNoveltyScore(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive , const std::vector<boost::shared_ptr<RobotRepresentation> > & population );
+	
 	//BK added for novelty attempt two
 	/**
 	 * get and set end position

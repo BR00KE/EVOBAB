@@ -112,6 +112,7 @@ RobotRepresentation::RobotRepresentation(const RobotRepresentation &r) {
 	keyroots_zs=r.keyroots_zs;
 	labels = r.labels;
 	TD=r.TD;
+	endPosition = r.endPosition; 
 }
 
 /**
@@ -1656,6 +1657,15 @@ float RobotRepresentation::calculateNoveltyScore(std::vector<boost::shared_ptr<R
 		this->setNoveltyScore((float) totalTreeEditDistance/noveltyArchive.size());
 	else this->setNoveltyScore(0.0f);
 	return this->getNoveltyScore();
+}
+
+float RobotRepresentation::calculateNoveltyScore(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive , const std::vector<boost::shared_ptr<RobotRepresentation> > & population ){
+	std::set<float> distances; //distances of members of pop and archive
+	for(auto r: noveltyArchive){
+
+	}
+	return 0; //for now
+
 }
 
 }

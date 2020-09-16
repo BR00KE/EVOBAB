@@ -78,7 +78,7 @@ public:
 	 */
 	void evaluateNovelty(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive);
 	
-
+	void evaluateNovelty(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive, const std::vector<boost::shared_ptr<RobotRepresentation> > & population );
 	
 
 protected:
