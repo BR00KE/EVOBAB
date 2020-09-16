@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Starting objective_based experiments"
+echo "Starting novelty_based experiments"
 echo "------------------------------------"
 trap "exit" INT TERM ERR
 trap "kill 0" EXIT
@@ -34,4 +34,4 @@ do
 done
 wait
 echo "Successfully completed all experiments"
-zip results.zip results/*
+zip noveltyResults.zip results/*
