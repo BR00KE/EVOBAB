@@ -293,6 +293,7 @@ public:
 	 */
 	std::pair<float,float> endPosition;
 	void setEndPosition(float x, float y);
+	std::pair<float,float> getEndPosition() const;
 
 	//methods to find tree edit distance between robot representations
 	int label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B);

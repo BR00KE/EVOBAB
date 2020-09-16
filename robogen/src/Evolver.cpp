@@ -322,11 +322,11 @@ void init(unsigned int seed, std::string outputDirectory,
 		//initialise novelty archive
 		for(int i=0; i<population->size(); i++){
 			if(i%3==0){
-				population->at(i)->calculateNoveltyScore(noveltyArchive);
+				population->at(i)->calculateNoveltyScore(noveltyArchive,population);//changed to a call for second novelty metric
 				addToArchive(population->at(i));
 			}
 		}
-		population->evaluateNovelty(noveltyArchive);
+		population->evaluateNovelty(noveltyArchive, population);//changed to a call for second novelty metric
 		std::sort(population->begin(),population->end(),
 					[](boost::shared_ptr<RobotRepresentation> & a, boost::shared_ptr<RobotRepresentation> & b)
 					{return a->getNoveltyScore()>b->getNoveltyScore();});
@@ -457,7 +457,7 @@ void mainEvolutionLoop() {
 			children.evaluateComplexity(robotConf->getComplexityCost());
 			children.evaluate(robotConf, sockets);
 			if(conf->noveltySearch){
-				children.evaluateNovelty(noveltyArchive);
+				children.evaluateNovelty(noveltyArchive,population);//BK changed to a call for second novelty metric
 				//probabalistically add children to novelty archive
 				std::vector<boost::shared_ptr<RobotRepresentation> >::iterator childIt = children.begin();
 				std::random_device rd;     

@@ -687,6 +687,9 @@ void RobotRepresentation::evaluate(Socket *socket,
 void RobotRepresentation::setEndPosition(float x, float y){
 	endPosition = std::make_pair(x,y);
 }
+std::pair<float,float> RobotRepresentation::getEndPosition() const{
+	return endPosition;
+}
 
 double RobotRepresentation::getFitness() const {
 	return fitness_;
@@ -1659,11 +1662,16 @@ float RobotRepresentation::calculateNoveltyScore(std::vector<boost::shared_ptr<R
 	return this->getNoveltyScore();
 }
 
+//calculate novelty score with respect to 15 nearest neighbours in archive and population
 float RobotRepresentation::calculateNoveltyScore(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive , const std::vector<boost::shared_ptr<RobotRepresentation> > & population ){
-	std::set<float> distances; //distances of members of pop and archive
+	std::vector<float> distances; //distances of members of pop and archive
 	for(auto r: noveltyArchive){
-
+		distances.push_back(this->euclideanDistance(r->getEndPosition()));
 	}
+	for(auto r: population){
+		distances.push_back(this->euclideanDistance(r->getEndPosition()));
+	}
+	std::sort(distances.begin(),distances.end());
 	return 0; //for now
 
 }
