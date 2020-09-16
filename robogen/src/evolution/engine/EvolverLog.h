@@ -96,7 +96,7 @@ private:
 
 	void saveRobotComplexity(boost::shared_ptr<RobotRepresentation> robot, std::string fileName);
 	void savePopulationComplexity(float complexity, std::string fileName);
-
+	void savePopulationStats(robogen::Population & population, std::string filename);
 };
 
 } /* namespace robogen */

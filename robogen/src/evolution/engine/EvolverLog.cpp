@@ -155,13 +155,7 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 		std::cout << " " << population[i]->getFitness();
 	}
 	std::cout << std::endl;
-	/**
-	std::cout << "All novelty scores:";//BK added for debugging
-	for(unsigned int i = 0; i<population.size(); ++i) {
-		std::cout << " " << population[i]->getNoveltyScore();
-	}
-	std::cout << std::endl;
-	*/
+	
 	// save robot file of best robot (don't do with fake robot representation)
 	#ifndef FAKEROBOTREPRESENTATION_H
 
@@ -193,7 +187,7 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 			saveRobotComplexity(population[i], ss.str());
 		}
 		savePopulationComplexity(population.getComplexity(),logPath_+"/Generation-"+ std::to_string(generation) + "/PopulationComplexity.txt" );
-
+		savePopulationStats(population, logPath_+ "/Generation-"+ std::to_string(generation) + "PopStats_Complexity-Fitness-Novelty.txt");
 	}
 
 
@@ -224,6 +218,16 @@ void EvolverLog::savePopulationComplexity(float complexity, std::string fileName
 	std::ofstream complexityFile(fileName.c_str(),std::ios::out|std::ios::trunc);
 	complexityFile << complexity << std::endl;
 	complexityFile.close();
+}
+
+//added this method to save all robot stats in one file to make results analysis easier
+void EvolverLog::savePopulationStats(robogen::Population & population, std::string filename){
+	//std::string filename = "PopStats_Complexity-Fitness-Novelty.txt";
+	std::ofstream statsFile(filename.c_str(),std::ios::out|std::ios::trunc);
+	for(int r =0; r<population.size(); r++){
+		statsFile << population[r]->getComplexity()<<" "<<population[r]->getFitness()<<" "<<population[r]->getNoveltyScore()<<std::endl;
+	}
+	statsFile.close();
 }
 
 
