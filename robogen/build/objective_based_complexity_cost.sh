@@ -8,7 +8,7 @@ do
 	do
 		echo "Running experiment $i:($x/10)."
 		./robogen-server 800$i &>/dev/null &
-		./robogen-evolver $RANDOM results/complexityCost/Experiment$i/objective_output$i ../projectSimulations/objective_based/evolConf$i.txt --save-all --complexity-cost
+		./robogen-evolver $RANDOM objectiveResultse/complexityCost/Experiment$i/objective_output$i ../projectSimulations/objective_based/evolConf$i.txt --save-all --complexity-cost
 		echo "Experiment $i:($x/10) finished."
 	done
 	echo "Experiment set $i finished..."
@@ -20,7 +20,7 @@ do
 	do
 		echo "Running experiment $i:($x/10)."
 		./robogen-server 80$i &>/dev/null &
-		./robogen-evolver $RANDOM results/complexityCost/Experiment$i/objective_output$i ../projectSimulations/objective_based/evolConf$i.txt --save-all --complexity-cost
+		./robogen-evolver $RANDOM objectiveResults/complexityCost/Experiment$i/objective_output$i ../projectSimulations/objective_based/evolConf$i.txt --save-all --complexity-cost
 		echo "Experiment $i:($x/10) finished."
 	done
 	echo "Experiment set $i finished..."
