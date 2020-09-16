@@ -287,8 +287,7 @@ public:
 	float calculateNoveltyScore(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive);
 	//BK signature for second novelty metric
 	float calculateNoveltyScore(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive , const std::vector<boost::shared_ptr<RobotRepresentation> > & population );
-	
-	//BK added for novelty attempt two
+	float euclideanDistance(const std::pair<float,float> r2);
 	/**
 	 * get and set end position
 	 */

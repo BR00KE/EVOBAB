@@ -1667,6 +1667,12 @@ float RobotRepresentation::calculateNoveltyScore(const std::vector<boost::shared
 	return 0; //for now
 
 }
+float RobotRepresentation::euclideanDistance(const std::pair<float,float> r2){
+	float x = this->endPosition.first - r2.first;
+	float y = this->endPosition.second - r2.second;
+	float dist = std::pow(x,2) + std::pow(y,2);
+	return std::sqrt(dist);
+}
 
 }
 
