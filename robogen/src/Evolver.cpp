@@ -405,8 +405,14 @@ void mainEvolutionLoop() {
 #endif
 
 	std::cout << "mainEvolutionLoop" << std::endl;
+	if(conf->noveltySearch){
+		population->sort(true);
+	}
 	if (!log->logGeneration(generation, *population.get())) {
 		exitRobogen(EXIT_FAILURE);
+	}
+	if(conf->noveltySearch){
+		population->sort(true,conf->noveltySearch);
 	}
 
 	generation++;

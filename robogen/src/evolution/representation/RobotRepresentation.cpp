@@ -1416,7 +1416,12 @@ float RobotRepresentation::calculateBrainComplexity(){
 void RobotRepresentation::calculateRobotComplexity(){
 	float body = (float) (this->calculateBodyComplexity(bodyTree_) - MIN_BODY_COMPLEXITY)/(MAX_BODY_COMPLEXITY - MIN_BODY_COMPLEXITY);
 	float brain = this->calculateBrainComplexity();
-	complexity_ = (float) (0.7*body + 0.3*brain);
+	if(std::isnan(brain)&&!std::isnan(body)){
+		complexity_ = 0.7*body;
+	}
+	else{
+		complexity_ = (float) (0.7*body + 0.3*brain);
+	}
 	if(std::isnan(complexity_)){
 		complexity_ = 0;
 	}
