@@ -166,7 +166,7 @@ public:
 
 	// CH - added this for complexity cost 
 	float complexity_;
-	float complexityCost_;
+	int complexityCost_;
 
 	//BK added for novelty
 	float endPosX_;

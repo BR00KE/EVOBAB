@@ -50,7 +50,7 @@
 
 namespace robogen {
 void init(unsigned int seed, std::string outputDirectory,
-		std::string confFileName, bool overwrite, bool saveAll);
+		std::string confFileName, bool overwrite, bool saveAll, bool complexityCost);
 
 void printUsage(char *argv[]) {
 	std::cout << std::endl << "USAGE: " << std::endl << "      "
@@ -157,6 +157,8 @@ void parseArgsThenInit(int argc, char* argv[]) {
 
 	bool overwrite = false;
 	bool saveAll = false;
+	// CH - added this for complexity cost experiments
+	bool complexityCost = false;
 	int currentArg = 4;
 	for (; currentArg < argc; currentArg++) {
 		if (std::string("--help").compare(argv[currentArg]) == 0) {
@@ -167,7 +169,10 @@ void parseArgsThenInit(int argc, char* argv[]) {
 			overwrite = true;
 		} else if (std::string("--save-all").compare(argv[currentArg]) == 0) {
 			saveAll = true;
-		} else {
+		} else if (std::string("--complexity-cost").compare(argv[currentArg]) == 0) {
+			complexityCost = true;
+		}
+		else {
 			std::cerr << std::endl << "Invalid option: " << argv[currentArg]
 							 << std::endl << std::endl;
 			printUsage(argv);
@@ -176,12 +181,12 @@ void parseArgsThenInit(int argc, char* argv[]) {
 
 	}
 
-	init(seed, outputDirectory, confFileName, overwrite, saveAll);
+	init(seed, outputDirectory, confFileName, overwrite, saveAll, complexityCost);
 
 }
 
 void init(unsigned int seed, std::string outputDirectory,
-		std::string confFileName, bool overwrite, bool saveAll) {
+		std::string confFileName, bool overwrite, bool saveAll, bool complexityCost) {
 
 	// Seed random number generator
 	rng.seed(seed);
@@ -314,7 +319,7 @@ void init(unsigned int seed, std::string outputDirectory,
 	}
 
 	generation = 1;
-	population->evaluateComplexity(robotConf->getComplexityCost());
+	population->evaluateComplexity(complexityCost);
 	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
 	//BK added - evaluate population complexity for gen 0
 	
