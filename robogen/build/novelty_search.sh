@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Starting novelty_search baseline experiments"
 echo "------------------------------------"
-for x in {4..10}
+for x in {5..10}
 do
 	echo "Finishing experiment set 3"
 	./robogen-server 8003 &>/dev/null &

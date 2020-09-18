@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Starting novelty_search complexity cost experiments"
 echo "------------------------------------"
-for x in {2..10}
+for x in {3..10}
 do
 	echo "Finishing experiment set 1"
 	./robogen-server 8001 &>/dev/null &
