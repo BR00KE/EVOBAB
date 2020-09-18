@@ -1,7 +1,13 @@
 #!/bin/bash
-echo "Starting novelty_search experiments"
+echo "Starting novelty_search complexity cost experiments"
 echo "------------------------------------"
-for i in {0..9} 
+for x in {2..10}
+do
+	echo "Finishing experiment set 1"
+	./robogen-server 8001 &>/dev/null &
+	./robogen-evolver $RANDOM noveltyResults/complexityCost/Experiment1/novelty_output1 ../projectSimulations/novelty_search/evolConf1.txt --save-all --complexity-cost
+done
+for i in {2..9} 
 do
 	echo "Running experiment set $i"
 	for x in {1..10}
