@@ -1,5 +1,5 @@
 echo "Running novelty baseline experiment set 10"
-	for x in {1..10}
+	for x in {7..10}
 	do
 		echo "Running experiment 10:($x/10)."
 		./robogen-server 8010 &>/dev/null &
@@ -8,7 +8,7 @@ echo "Running novelty baseline experiment set 10"
 	done
 echo "Experiment set 10 finished..."
 echo "Finishing novelty baseline experiment set 11"
-	for x in {1..7}
+	for x in {2..7}
 	do
 		echo "Running experiment 11:($x/7)."
 		./robogen-server 8011 &>/dev/null &
