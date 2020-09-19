@@ -4,9 +4,9 @@ echo "Running experiment set 10"
 for x in {6..10}
 do
 	num=$((10 + 12))
-	echo "Running experiment 11:($x/10)."
+	echo "Running experiment 10:($x/10)."
 	./robogen-server 80$num &>/dev/null &
-	./robogen-evolver $RANDOM objectiveResults/complexityCost/Experiment11/objective_output10 ../projectSimulations/objective_based_cost/evolConf10.txt --save-all --complexity-cost
+	./robogen-evolver $RANDOM objectiveResults/complexityCost/Experiment10/objective_output10 ../projectSimulations/objective_based_cost/evolConf10.txt --save-all --complexity-cost
 	echo "Experiment 10:($x/10) finished."
 done
 echo "Experiment set 10 finished..."

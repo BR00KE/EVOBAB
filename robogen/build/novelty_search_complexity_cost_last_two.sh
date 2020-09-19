@@ -1,15 +1,15 @@
 #!/bin/bash
-echo "Starting last two novelty_search complexity cost experiments"
+echo "Finishing novelty_search complexity cost experiment 11"
 echo "------------------------------------"
-for i in {10..11} 
+
 do
-	echo "Running experiment set $i"
-	for x in {1..10}
+	echo "Running experiment set 11"
+	for x in {8..10}
 	do
-		echo "Running experiment $i:($x/10)."
-		./robogen-server 80$i &>/dev/null &
-		./robogen-evolver $RANDOM noveltyResults/complexityCost/Experiment$i/novelty_output$i ../projectSimulations/novelty_search/evolConf$i.txt --save-all --complexity-cost
-		echo "Experiment $i:($x/10) finished."
+		echo "Running experiment 11:($x/10)."
+		./robogen-server 8011 &>/dev/null &
+		./robogen-evolver $RANDOM noveltyResults/complexityCost/Experiment11/novelty_output11 ../projectSimulations/novelty_search/evolConf11.txt --save-all --complexity-cost
+		echo "Experiment 11:($x/10) finished."
 	done
-	echo "Experiment set $i finished..."
+	echo "Experiment set 11 finished..."
 done
