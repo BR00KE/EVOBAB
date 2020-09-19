@@ -1,14 +1,12 @@
-echo "Running last two experiments for objective search with complexity cost"
-for i in {10..11} 
+echo "Finishing last experiment for objective search with complexity cost"
+
+echo "Running experiment set 11"
+for x in {5..10}
 do
-	echo "Running experiment set $i"
-	for x in {1..10}
-	do
-		num=$(($i + 12))
-		echo "Running experiment $i:($x/10)."
-		./robogen-server 80$num &>/dev/null &
-		./robogen-evolver $RANDOM objectiveResults/complexityCost/Experiment$i/objective_output$i ../projectSimulations/objective_based_cost/evolConf$i.txt --save-all --complexity-cost
-		echo "Experiment $i:($x/10) finished."
-	done
-	echo "Experiment set $i finished..."
+	num=$((11 + 12))
+	echo "Running experiment 11:($x/10)."
+	./robogen-server 80$num &>/dev/null &
+	./robogen-evolver $RANDOM objectiveResults/complexityCost/Experiment11/objective_output11 ../projectSimulations/objective_based_cost/evolConf11.txt --save-all --complexity-cost
+	echo "Experiment 11:($x/10) finished."
 done
+echo "Experiment set 11 finished..."
