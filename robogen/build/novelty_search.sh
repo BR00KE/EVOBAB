@@ -1,12 +1,12 @@
 #!/bin/bash
 echo "Starting novelty_search baseline experiments"
 echo "------------------------------------"
-do
-	echo "Finishing experiment set 5"
-	./robogen-server 8005 &>/dev/null &
-	./robogen-evolver $RANDOM noveltyResults/baseline/Experiment5/novelty_output5 ../projectSimulations/novelty_search/evolConf5.txt --save-all
-	echo "Finished experiment set 5"
-done
+
+echo "Finishing experiment set 5"
+./robogen-server 8005 &>/dev/null &
+./robogen-evolver $RANDOM noveltyResults/baseline/Experiment5/novelty_output5 ../projectSimulations/novelty_search/evolConf5.txt --save-all
+echo "Finished experiment set 5"
+
 for i in {6..9} 
 do
 	echo "Running experiment set $i"
