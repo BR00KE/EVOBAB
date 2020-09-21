@@ -2,17 +2,17 @@
 echo "Starting objective_based experiments"
 echo "------------------------------------"
 num=0
-echo "finishing experiment set 3"
-	num=$((3 + 12))
-	for x in {6..10}
+echo "finishing experiment set 4"
+	num=$((4 + 12))
+	for x in {7..10}
 	do
-		echo "Running experiment 3:($x/10)."
+		echo "Running experiment 4:($x/10)."
 		./robogen-server 80$num &>/dev/null &
-		./robogen-evolver $RANDOM objectiveResults/complexityCost/Experiment3/objective_output3 ../projectSimulations/objective_based_cost/evolConf3.txt --save-all --complexity-cost
-		echo "Experiment 3:($x/10) finished."
+		./robogen-evolver $RANDOM objectiveResults/complexityCost/Experiment4/objective_output4 ../projectSimulations/objective_based_cost/evolConf4.txt --save-all --complexity-cost
+		echo "Experiment 4:($x/10) finished."
 	done
-	echo "Experiment set 3 finished..."
-for i in {4..9} 
+	echo "Experiment set 4 finished..."
+for i in {5..6} 
 do
 	echo "Running experiment set $i"
 	num=$(($i + 12))
