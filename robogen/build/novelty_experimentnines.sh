@@ -1,5 +1,5 @@
 echo "Running experiment set 8 baseline"
-for x in {4..10}
+for x in {3..10}
 do
 	echo "Running experiment 8:($x/10). b"
 	./robogen-server 8008 &>/dev/null &
