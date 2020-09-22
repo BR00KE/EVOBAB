@@ -2,7 +2,7 @@
 echo "Starting novelty_search complexity cost experiments"
 echo "------------------------------------"
 echo "running experiment set 7"
-for x in {1..10}
+for x in {4..10}
 do
 	echo "Running experiment 7:($x/10)."
 	./robogen-server 8007 &>/dev/null &

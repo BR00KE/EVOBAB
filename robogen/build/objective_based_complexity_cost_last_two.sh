@@ -1,7 +1,7 @@
 echo "Finishing experiment 10 for objective search with complexity cost"
 
 echo "Running experiment set 7"
-for x in {1..10}
+for x in {6..10}
 do
 	num=$((7 + 12))
 	echo "Running experiment 7:($x/10)."

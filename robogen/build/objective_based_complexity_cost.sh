@@ -4,7 +4,7 @@ echo "------------------------------------"
 num=0
 echo "experiment set 6"
 num=$((6 + 12))
-for x in {1..10}
+for x in {6..10}
 do
 	echo "Running experiment 6:($x/10)."
 	./robogen-server 80$num &>/dev/null &

@@ -3,7 +3,7 @@ echo "Starting novelty_search baseline experiments"
 echo "------------------------------------"
 
 echo "Running experiment set 9"
-for x in {1..10}
+for x in {5..10}
 do
 	echo "Running experiment 9:($x/10)."
 	./robogen-server 8009 &>/dev/null &
