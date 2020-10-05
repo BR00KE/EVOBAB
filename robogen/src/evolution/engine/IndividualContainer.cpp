@@ -201,13 +201,6 @@ void IndividualContainer::evaluateComplexity(bool cost) {
 	complexity_ = complexity;
 }
 
-void IndividualContainer::evaluateNovelty(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive){
-	float novelty =0.0f;
-	for (int i = 0; i<this->size();i++){
-		novelty+= this->at(i)->calculateNoveltyScore(noveltyArchive);
-	}
-	novelty_ = novelty;
-}
 
 void IndividualContainer::evaluateNovelty(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive, const std::vector<boost::shared_ptr<RobotRepresentation> > & population ){
 	float novelty = 0.0f;

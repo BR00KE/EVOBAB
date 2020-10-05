@@ -216,16 +216,6 @@ public:
 	std::vector<boost::shared_ptr<PartRepresentation> > getChildren() const;
 
 
-	//BK: for zhang-shasha
-	/**
-	 * preorder index
-	 */
-	int index_zs;
-	/**
-	 * used by the recursive leftmost() function zhang-shasha
-	 */
-	boost::shared_ptr<PartRepresentation> leftmost_zs; 
-
 	bool childExists(int index);
 private:
 

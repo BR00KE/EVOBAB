@@ -100,6 +100,7 @@ RobotRepresentation::RobotRepresentation(const RobotRepresentation &r) {
 			}
 		}
 	}
+
 	// fitness and associated flag are same
 	fitness_ = r.fitness_;
 	evaluated_ = r.evaluated_;
@@ -108,10 +109,6 @@ RobotRepresentation::RobotRepresentation(const RobotRepresentation &r) {
 	//BK added
 	neatGenome = r.neatGenome;
 	noveltyScore=r.noveltyScore;
-	l=r.l;
-	keyroots_zs=r.keyroots_zs;
-	labels = r.labels;
-	TD=r.TD;
 	endPosition = r.endPosition; 
 }
 
@@ -378,10 +375,6 @@ RobotRepresentation &RobotRepresentation::operator=(
 	//BK added
 	neatGenome = r.neatGenome;
 	noveltyScore=r.noveltyScore;
-	l=r.l;
-	keyroots_zs=r.keyroots_zs;
-	labels = r.labels;
-	TD=r.TD;
 
 	return *this;
 }
@@ -1209,37 +1202,6 @@ float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartReprese
 	else { return 0.0f;}
 }
 
-void RobotRepresentation::createConnectionTable(){
-	NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
-	//create a unordered set of neuronIDs
-	std::set<std::string> neurons;
-	std::map<StringPair,double>::iterator it = weightMap.begin();
-	while(it!=weightMap.end()){
-		//set insert will only insert an element not already present
-		neurons.insert(it->first.first);
-		neurons.insert(it->first.second);
-		
-		it++;
-	}
-	std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
-
-	std::vector< std::vector<double> > connectionTable;
-	//initialise table
-	for(int fromNeuron=0;fromNeuron<neuronIDs.size();fromNeuron++){
-		connectionTable.push_back( std::vector<double>(neuronIDs.size()));
-		for(int toNeuron=0;toNeuron<neuronIDs.size();toNeuron++){
-			StringPair idpair(neuronIDs[fromNeuron],neuronIDs[toNeuron]);
-			it = weightMap.find(idpair);
-			if(it!=weightMap.end()){//connection present in the map already?
-				connectionTable[fromNeuron][toNeuron]=it->second;
-			}
-			else { 
-				connectionTable[fromNeuron][toNeuron]= (double) 0.0;//no connection weight / influence yet
-			}
-		}
-	}
-	
-}
 
 float RobotRepresentation::calculateBrainComplexity(){
 
@@ -1344,7 +1306,6 @@ float RobotRepresentation::calculateBrainComplexity(){
 			}
 		
 
-			//MUST STILL INITIALISE EVERYTHING ELSE NEEDED FOR JOHNSON
 			//blocked
 			std::vector<bool> blocked (adjList.size(), false);
 			// stack- but use a deque because better than stack
@@ -1393,12 +1354,7 @@ float RobotRepresentation::calculateBrainComplexity(){
 		if (specialisationScore>1) specialisationScore = 1;
 		
 		float globalIntegration = 0.0f;
-		// if(countStrongComponentComplexes<interStrongComplexConnections){
-		// 	globalIntegration=(float)interStrongComplexConnections/countStrongComponentComplexes;
-		// }
-		// else{
-		// 	globalIntegration=(float)countStrongComponentComplexes/interStrongComplexConnections;
-		// }
+		
 		globalIntegration = (float) numStrongComponents / interStrongComplexConnections;
 		float neuralComplexity = 0.0f;
 		if (specialisationScore<globalIntegration) {neuralComplexity = (float) specialisationScore/ globalIntegration;}
@@ -1411,7 +1367,7 @@ float RobotRepresentation::calculateBrainComplexity(){
 
 }
 
-// CH DDDDDDDDDDDDD
+// CH 
 
 void RobotRepresentation::calculateRobotComplexity(){
 	float body = (float) (this->calculateBodyComplexity(bodyTree_) - MIN_BODY_COMPLEXITY)/(MAX_BODY_COMPLEXITY - MIN_BODY_COMPLEXITY);
@@ -1451,8 +1407,6 @@ std::vector<boost::weak_ptr<NeuronRepresentation> > RobotRepresentation::getDesc
 	return neurons;
 }
 
-// CH - idk
-
 void RobotRepresentation::setWeightMap(WeightMap weightMap){
 	neuralNetwork_->setWeightMap(weightMap);
 }
@@ -1479,196 +1433,6 @@ float RobotRepresentation::setNoveltyScore(float noveltyScore){
 	this->noveltyScore=noveltyScore;
 }
 
-//Methods implemented for tree edit distance between robot representations
-int RobotRepresentation::label_dist(const boost::shared_ptr<PartRepresentation> A, const boost::shared_ptr<PartRepresentation> B){
-        if(A==nullptr){ //insert operation
-            return getPartComplexity(B);
-        }
-		else if(B==nullptr){//delete operation
-			return getPartComplexity(A);
-		}
-		else{
-			return std::abs(getPartComplexity(A)-getPartComplexity(B));
-		}
-}
-
-//helper function to fill post order labels
-void RobotRepresentation::postOrderTraversal(){
-		std::vector<std::string> labels;
-		this->labels.clear();
-		this->labels=traverse(bodyTree_, labels);
-}
-//recursive helper for post order
-std::vector<std::string> RobotRepresentation::traverse(const boost::shared_ptr<PartRepresentation> & node, std::vector<std::string> & labels){
-	for(int i=0; i<node->getChildrenCount();i++){
-		if(node->childExists(i)){
-			labels = traverse(node->getChild(i),labels);
-		}
-	}
-	labels.push_back(node->getType());
-	return labels;
-}
-//helper functions to index each node in the tree according to traversal method
-int RobotRepresentation::index(boost::shared_ptr<PartRepresentation> node, int index){
-	for(int i=0; i<node->getChildrenCount();i++){
-		if(node->childExists(i))
-			index = this->index(node->getChild(i),index);
-	}
-	index++;
-	node->index_zs=index;
-	return index;
-}
-void RobotRepresentation::index(){
-	index(bodyTree_,0);
-}
-
-int RobotRepresentation::treedist(std::vector<int> & l1, std::vector<int> & l2, int i, int j, boost::shared_ptr<RobotRepresentation> tree2){
-	std::vector<std::vector<int>> forestdist(i+1, std::vector<int>(j+1, 0));
-	// costs of the three atomic operations
-		int Delete = 1;
-		int Insert = 1;
-		int Relabel = 1;
-
-		forestdist[0][0] = 0;
-		for (int i1 = l1.at(i - 1); i1 <= i; i1++) {
-			forestdist[i1][0] = forestdist[i1 - 1][0] + Delete;
-		}
-		for (int j1 = l2.at(j - 1); j1 <= j; j1++) {
-			forestdist[0][j1] = forestdist[0][j1 - 1] + Insert;
-		}
-		for (int i1 = l1.at(i - 1); i1 <= i; i1++) {
-			for (int j1 = l2.at(j - 1); j1 <= j; j1++) {
-				int i_temp = (l1.at(i - 1) > i1 - 1) ? 0 : i1 - 1;
-				int j_temp = (l2.at(j - 1) > j1 - 1) ? 0 : j1 - 1;
-				if ((l1.at(i1 - 1) == l1.at(i - 1)) && (l2.at(j1 - 1) == l2.at(j - 1))) {
-
-					int Cost = (this->labels.at(i1 - 1).compare(tree2->labels.at(j1 - 1))==0) ? 0 : Relabel;
-					forestdist[i1][j1] = std::min(
-							std::min(forestdist[i_temp][j1] + Delete, forestdist[i1][j_temp] + Insert),
-							forestdist[i_temp][j_temp] + Cost);
-					TD[i1][j1] = forestdist[i1][j1];
-				} else {
-					int i1_temp = l1.at(i1 - 1) - 1;
-					int j1_temp = l2.at(j1 - 1) - 1;
-
-					int i_temp2 = (l1.at(i - 1) > i1_temp) ? 0 : i1_temp;
-					int j_temp2 = (l2.at(j - 1) > j1_temp) ? 0 : j1_temp;
-
-					forestdist[i1][j1] = std::min(
-							std::min(forestdist[i_temp][j1] + Delete, forestdist[i1][j_temp] + Insert),
-							forestdist[i_temp2][j_temp2] + TD[i1][j1]);
-				}
-			}
-		}
-
-
-	return forestdist[i][j];
-}
-
-int RobotRepresentation::zhangShasha(boost::shared_ptr<RobotRepresentation> & robot2 ){
-	this->postOrderTraversal();
-	this->index();
-	this->l_func();
-	this->keyroots();
-	this->traverse(this->bodyTree_,this->labels);
-	//won't need to do this for robot 2 (will have been calculated before insertion into archive)
-	/**
-	robot2->postOrderTraversal();
-	robot2->index();
-	robot2->l_func();
-	robot2->keyroots();
-	robot2->traverse(robot2->bodyTree_,robot2->labels);
-	*/
-
-	std::vector<int> l1 = this->l;
-	std::vector<int> keyroots1 = this->keyroots_zs;
-	std::vector<int> l2 = robot2->l;
-	std::vector<int> keyroots2= robot2->keyroots_zs;
-
-	//initialise TD 2D vector
-	TD.resize(l1.size()+1);
-	for(int i=0; i<TD.size();i++){
-		TD[i].resize(l2.size()+1);
-		std::fill(TD[i].begin(), TD[i].end(), 0);
-	}
-
-	// solve subproblems
-	for (int i1 = 1; i1 < keyroots1.size() + 1; i1++) {
-		for (int j1 = 1; j1 < keyroots2.size() + 1; j1++) {
-			int i = keyroots1[i1 - 1];
-			int j = keyroots2[j1 - 1];
-			TD[i][j] = this->treedist(l1, l2, i, j,robot2);
-		}
-	}
-
-	return TD[l1.size()][l2.size()];
-
-	
-}
-void RobotRepresentation::leftmost(boost::shared_ptr<PartRepresentation> node){
-	if (node == nullptr)
-		return;
-	for (int i = 0; i < node->getChildrenCount(); i++) {
-		if(node->childExists(i))
-			leftmost(node->getChild(i));
-	}
-	if (node->getChildrenCount() == 0) {
-		node->leftmost_zs = node;
-	} else {
-		for (int i = 0; i < node->getChildrenCount(); i++) {
-			if(node->childExists(i)){
-				node->leftmost_zs = node->getChild(i)->leftmost_zs;
-				i=node->getChildrenCount();
-			}
-		}
-		if(!node->leftmost_zs.get()){
-			node->leftmost_zs = node;
-		}
-	}
-}
-void RobotRepresentation::leftmost(){
-	leftmost(bodyTree_);
-}
-std::vector<int> RobotRepresentation::l_func(boost::shared_ptr<PartRepresentation> node, std::vector<int>& l){
-	for(int i=0; i<node->getChildrenCount();i++){
-		if(node->childExists(i))
-			l = l_func(node->getChild(i),l);
-	}
-	l.push_back(node->leftmost_zs->index_zs);
-	return l;
-}
-void RobotRepresentation::l_func(){
-	leftmost();
-	std::vector<int> vec;
-	l = l_func(bodyTree_,vec);
-}
-	
-void RobotRepresentation::keyroots(){
-	//calculate the keyroots
-	keyroots_zs.clear();
-	for(int i=0; i<l.size();i++){
-		int flag =0;
-		for (int j = i + 1; j < l.size(); j++) {
-				if (l[j] == l[i]) {
-					flag = 1;
-				}
-		}
-		if (flag == 0) {
-			keyroots_zs.push_back(i + 1);
-		}
-	}
-}
-
-float RobotRepresentation::calculateNoveltyScore(std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive){
-	int totalTreeEditDistance=0;
-	for(int i=0; i<noveltyArchive.size(); i++){ //should be size 15
-		totalTreeEditDistance += this->zhangShasha(noveltyArchive.at(i));
-	}
-	if(noveltyArchive.size()>0)
-		this->setNoveltyScore((float) totalTreeEditDistance/noveltyArchive.size());
-	else this->setNoveltyScore(0.0f);
-	return this->getNoveltyScore();
-}
 
 //calculate novelty score with respect to 15 nearest neighbours in archive and population
 float RobotRepresentation::calculateNoveltyScore(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive , const std::vector<boost::shared_ptr<RobotRepresentation> > & population ){
@@ -1690,6 +1454,7 @@ float RobotRepresentation::calculateNoveltyScore(const std::vector<boost::shared
 	return this->getNoveltyScore();
 
 }
+
 float RobotRepresentation::euclideanDistance(const std::pair<float,float> r2){
 	float x = this->endPosition.first - r2.first;
 	float y = this->endPosition.second - r2.second;
