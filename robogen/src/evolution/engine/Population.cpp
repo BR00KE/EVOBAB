@@ -57,24 +57,26 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 		if (i == 0 || randomizeBrains) {
 			this->push_back(
 				boost::shared_ptr<RobotRepresentation>(
-						new RobotRepresentation(*robot.get()))); //BK change the RobotRepresentation Constructor to make a CPPN
+						new RobotRepresentation(*robot.get()))); 
 			
 			if (randomizeBrains) {
 				mutator->randomizeBrain(this->back());
 			}
 			
-		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
+		} else { 
 			this->push_back( mutator->createOffspring(robot)[0] );
 		}
 
 		if (growBodies) {
 			mutator->growBodyRandomly(this->back());
 		}
-		//BodyVerifier::fixRobotBody(this->back());
+		
 	}
 	return true;
 }
-//BK - the one used for HyperNEAT
+/**
+ * BK - initialise the population (assign each robot a CPPN - for HyperNEAT-lite implementation)
+ */
 bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 		boost::shared_ptr<Mutator> mutator, bool growBodies,
 		bool randomizeBrains, boost::shared_ptr<EvolverConfiguration> evolConf) {
@@ -91,7 +93,7 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 			mutator->growBodyRandomly(this->back());
 
 						
-		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
+		} else { 
 			this->push_back( mutator->createOffspring(robot)[0] );
 		}
 		
@@ -111,7 +113,6 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize, b
 		this->push_back(origin[i]);
 	}
 
-	//this->sort(false);
 	this->sort(true,noveltySearch);
 
 	// idea was to call this->resize(popSize);, but that requires a default
@@ -128,11 +129,14 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize, b
 Population::~Population() {
 }
 
+/**
+ * Return the fittest robot in the population
+ */
 boost::shared_ptr<RobotRepresentation> Population::best() {
 	if (!this->areEvaluated()) { // undefined behavior. No exception (hint)
 		return this->at(0);
 	}
-	this->sort(true); //force the sort for novelty sake?
+	this->sort(true); 
 	return this->at(0);
 }
 

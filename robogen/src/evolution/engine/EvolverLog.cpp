@@ -220,7 +220,9 @@ void EvolverLog::savePopulationComplexity(float complexity, std::string fileName
 	complexityFile.close();
 }
 
-//added this method to save all robot stats in one file to make results analysis easier
+/**
+ * BK - method to save stats for all individuals in population in one file
+ */
 void EvolverLog::savePopulationStats(robogen::Population & population, std::string filename){
 	//std::string filename = "PopStats_Complexity-Fitness-Novelty.txt";
 	std::ofstream statsFile(filename.c_str(),std::ios::out|std::ios::trunc);

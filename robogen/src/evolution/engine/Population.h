@@ -65,8 +65,8 @@ public:
 			bool randomizeBrains);
 
 	/**
-	 * BK - For HyperNEAT light
-	 * Aim to initialise population with random bodies and random CPPNs
+	 * BK - For HyperNEAT-lite
+	 * Initialise population with random bodies and random CPPNs
 	 * Then use CPPNs to fill brain
 	 */
 	bool init(boost::shared_ptr<RobotRepresentation> robot, int popSize,

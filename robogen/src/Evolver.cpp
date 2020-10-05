@@ -86,8 +86,12 @@ void printHelp() {
 			ConfigurationReader::parseConfigurationFile("help");
 }
 
-//BK - novelty - probabalistically maintain an archive of max 50 individuals
+
 std::vector<boost::shared_ptr<RobotRepresentation> > noveltyArchive;
+/**
+ * BK - method required by the noveltySearch experiment
+ * probabalistcally maintain an archive of maximum 50 individuals 
+ */
 void addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
 	boost::shared_ptr<RobotRepresentation> clone = boost::make_shared<RobotRepresentation>(RobotRepresentation(*individual));
 
@@ -97,7 +101,7 @@ void addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
 	//replace individual at random position in the archive
 	else{ 
 
-		std::random_device rd;     // only used once to initialise (seed) engine
+		std::random_device rd;     // (seed) engine
 		std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
 		std::uniform_int_distribution<int> uni(0,noveltyArchive.size()); // guaranteed unbiased
 

@@ -69,14 +69,16 @@ public:
 	 */
 	bool areEvaluated() const;
 
+	/**
+	* function to set the complexity for each member of population
+	*/
 	void evaluateComplexity(bool cost);
 
 	float getComplexity();
 
 	/**
-	 * BK - novelty search: evaluateNovelty() function to set the novelty for new members of the population with respect to the archive and population
-	 */
-	
+	* BK - novelty search: evaluateNovelty() function to set the novelty for new members of the population with respect to the archive and population
+	*/
 	void evaluateNovelty(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive, const std::vector<boost::shared_ptr<RobotRepresentation> > & population );
 	
 

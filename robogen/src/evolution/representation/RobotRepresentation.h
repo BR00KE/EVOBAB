@@ -245,18 +245,18 @@ public:
 	 */
 	float getComplexity();
 	
-	//BK added for HyperNEAT-light 
+	/**
+	 * BK - Set the CPPN associated with a robot representation
+	 */
 	void setNeatGenome(NEAT::Genome & neatGenome);
 
 	NEAT::Genome * getNeatGenomePointer();
+
 	/*
 	* BK: Genome for HyperNEAT-light 
 	*/
 	NEAT::Genome neatGenome;
 	
-	//BK culmulativeWeightMap for neural complexity 
-	 std::map<std::pair<std::string,std::string>, double> culmulativeWeightMap;
-
 	/**
 	 * @return the root node of the robot's morphology tree
 	 */
@@ -283,21 +283,22 @@ public:
 	bool isComplexityCost();
 
 	/**
-	 * BK Get and set novelty score
+	 * BK - @return novelty score of the robot
 	 */
 	float getNoveltyScore() const;
-
+	/**
+	 * BK - set novelty score of the robot
+	 */
 	float setNoveltyScore(float noveltyScore);
 
 	/**
-	 * Calculate and set novelty score for individual given an archive
+	 * BK - Calculate and set novelty score for individual with respect to the novelty archive and current population
 	 */
-	//BK signature for second novelty metric
 	float calculateNoveltyScore(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive , const std::vector<boost::shared_ptr<RobotRepresentation> > & population );
 	float euclideanDistance(const std::pair<float,float> r2);
 	
 	/**
-	 * get and set end position
+	 * BK - get and set end position robot achieves during evaluation - used in calculating novelty score
 	 */
 	std::pair<float,float> endPosition;
 	void setEndPosition(float x, float y);
@@ -314,9 +315,6 @@ private:
 	//added for novelty search;
 	float noveltyScore;
 
-	/**
-	 *
-	 */
 	void recurseNeuronRemoval(boost::shared_ptr<PartRepresentation> part);
 
 	/**
@@ -361,7 +359,10 @@ private:
 	//BK get weight map
 	NeuralNetworkRepresentation::WeightMap getWeightMap();
 
-	// BK - calculates neural complexity of a robot
+	/**
+	 * BK - Calculate the neural complexity of the robot 
+	 * @return neural complexity
+	 */
 	float calculateBrainComplexity();
 	/**
 	 * CH - Calculates the morphologial complexity of a robot by recursively traversing the morphology tree and summing complxity values of all nodes encountered

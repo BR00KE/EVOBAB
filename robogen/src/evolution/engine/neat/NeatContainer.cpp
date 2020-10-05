@@ -64,7 +64,9 @@ NeatContainer::NeatContainer(boost::shared_ptr<EvolverConfiguration> &evoConf,
 NeatContainer::~NeatContainer() {
 }
 
-//BK added: to get vector of initialized genome population
+/**
+ * BK - @return vector of initialized genome population
+ */
 std::vector<NEAT::Genome> NeatContainer::getInitialGenomePop(){
 	return neatPopulation_->m_Genomes;
 }
@@ -73,14 +75,12 @@ bool NeatContainer::fillPopulationWeights(
 		boost::shared_ptr<Population> &population) {
 
 	for(Population::iterator i = population->begin(); i!=population->end(); i++){
-		//std::cout<<typeid(i).name()<<std::endl;
 		boost::shared_ptr<RobotRepresentation> rep = *i;
 		if(!this->fillBrain(rep->getNeatGenomePointer(),rep)){
 	 		return false;
 	 	}
 	}
 	return true;
-	//fillBrain(population->at(1)->getNeatGenomePointer(),population->at(1));
 }
 
 void NeatContainer::printCurrentIds() {

@@ -64,7 +64,9 @@ public:
 	boost::shared_ptr<NeuralNetworkRepresentation> queryCppn(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
 
-	//BK get the initial pop of genomes
+	/**
+	* BK - @return  the initial population of NEAT genomes 
+	*/
 	std::vector<NEAT::Genome> getInitialGenomePop();
 	
 private:

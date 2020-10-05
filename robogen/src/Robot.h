@@ -174,7 +174,9 @@ public:
 	 */
 	int complexityCost_;
 
-	//BK added for novelty
+	/**
+	 * BK - for novelty score, to record end position achieved during evaluation
+	 */
 	float endPosX_;
 	float endPosY_;
 

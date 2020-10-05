@@ -191,6 +191,9 @@ bool IndividualContainer::areEvaluated() const {
 	return evaluated_;
 }
 
+/**
+* function to set the complexity for each member of population
+*/
 void IndividualContainer::evaluateComplexity(bool cost) {
 	double complexity = 0;
 	for (int i = 0; i<this->size();i++){
@@ -201,7 +204,9 @@ void IndividualContainer::evaluateComplexity(bool cost) {
 	complexity_ = complexity;
 }
 
-
+/**
+* BK - novelty search: evaluateNovelty() function to set the novelty for new members of the population with respect to the archive and population
+*/
 void IndividualContainer::evaluateNovelty(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive, const std::vector<boost::shared_ptr<RobotRepresentation> > & population ){
 	float novelty = 0.0f;
 	for(int i=0; i<this->size(); i++){ 
