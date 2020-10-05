@@ -164,8 +164,14 @@ public:
 	void optimizePhysics();
 
 
-	// CH - added this for complexity cost 
+	/**
+	 * CH - Brain-body complexity of robot
+	 */
 	float complexity_;
+
+	/**
+	 * CH - Flag to indicate if complexity cost should be imposed or not
+	 */
 	int complexityCost_;
 
 	//BK added for novelty

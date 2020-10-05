@@ -411,7 +411,10 @@ bool NeatContainer::fillBrain(NEAT::Genome *genome,
 
 }
 
-//CH added this for neural part of complexity metric
+/**
+ * CH - Queries the CPPN for ANN connection weight information for a given robot
+ * @return the robot's ANN with connection weight array for the ANN filled in
+ */
 boost::shared_ptr<NeuralNetworkRepresentation> NeatContainer::queryCppn(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation){
 				// Initialize ODE

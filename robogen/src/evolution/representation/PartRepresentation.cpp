@@ -237,25 +237,6 @@ std::vector<std::string> PartRepresentation::getDescendantsIds() {
 
 }
 
-//CH - added this to get descendants
-std::vector<boost::shared_ptr<PartRepresentation> > PartRepresentation::getDescendants() const{
-	std::vector<boost::shared_ptr<PartRepresentation> > descendants;
-	for (unsigned int i = 0; i < children_.size(); ++i) {
-		// child and all its children
-		if (children_[i].get()) {
-
-			// Add children ID
-			descendants.push_back(children_[i]);
-
-			// Add all the descendants ids
-			std::vector<boost::shared_ptr<PartRepresentation> > tmp = children_[i]->getDescendants();
-			descendants.insert(descendants.end(), tmp.begin(), tmp.end());
-		}
-	}
-	return descendants;
-
-}
-
 boost::shared_ptr<PartRepresentation> PartRepresentation::cloneSubtree() {
 
 	boost::shared_ptr<PartRepresentation> theClone(
@@ -320,7 +301,9 @@ void PartRepresentation::toString(std::stringstream& str, unsigned int depth) {
 
 }
 
-// CH - return children 
+/**
+ * CH - @return the children nodes attached to this body part
+ */
 std::vector<boost::shared_ptr<PartRepresentation> > PartRepresentation::getChildren() const{
 	return children_;
 }

@@ -209,10 +209,9 @@ public:
 	 */
 	void toString(std::stringstream& str, unsigned int depth);
 
-	// CH -added this to return all descendants for a part
-	std::vector<boost::shared_ptr<PartRepresentation> > getDescendants() const;
-
-	// CH - return children
+	/**
+	 * CH - @return all children nodes attached to this body part
+	 */
 	std::vector<boost::shared_ptr<PartRepresentation> > getChildren() const;
 
 

@@ -150,7 +150,7 @@ void parseArgsThenInit(int argc, char* argv[]) {
 
 	bool overwrite = false;
 	bool saveAll = false;
-	// CH - added this for complexity cost experiments
+	// CH - added a complexity cost flag to command line arguments to indicate if experiment should be run with or without a complexity cost
 	bool complexityCost = false;
 	int currentArg = 4;
 	for (; currentArg < argc; currentArg++) {
@@ -254,29 +254,27 @@ void init(unsigned int seed, std::string outputDirectory,
 			exitRobogen(EXIT_FAILURE);
 		}
 	}
-
+	// set neat to True or False based on config files
 	neat = (conf->evolutionaryAlgorithm == EvolverConfiguration::HYPER_NEAT);
-	//bool var = conf->useBrainSeed || neat;
 	population.reset(new Population()); //Population() calls IndividualContainer() which just sets evaluated sorted and evaluated both false
-
-	//BK changed this to use the init method sig i made for hyperneat light implementation 
+	// initialise the robot population from randomly mutated versions of the reference robot specified in the config
 	if (!population->init(referenceBot, conf->mu, mutator, growBodies,
-			((conf->useBrainSeed || neat)), conf )) { //takes ref bot as first individual in the pop and fills pop vec with RobotRepresentations
+			((conf->useBrainSeed || neat)), conf )) { 
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
-
+	// initialise the corresponding population of CPPNs (1 per robot)
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
-		//make a neat population and then pass it to init to assign genomes from this pop to bodies
+		// initialise population of HyperNEAT CPPNs based on robot population
 		std::vector<NEAT::Genome> initialNEATPop = neatContainer->getInitialGenomePop();
 		int c=0;
+		// assign CPPNs to each robot and then query the CPPN for the robot's ANN connection weight information
 		for(Population::iterator i = population->begin(); i!=population->end(); i++){
-			//std::cout<<typeid(i).name()<<std::endl;
 			boost::shared_ptr<RobotRepresentation> rep = *i;
 			rep->neatGenome = initialNEATPop[c];
+			// set the robot's ANN connection weight map based on CPPN query
 			rep->setWeightMap(neatContainer->queryCppn(rep->getNeatGenomePointer(),rep)->getWeightMap());
-
 			c++;
 		}
 	}
@@ -305,17 +303,19 @@ void init(unsigned int seed, std::string outputDirectory,
 
 
 	if(neat) {
-		if(!neatContainer->fillPopulationWeights(population)) { //query for the weights between robots cpgs
+		if(!neatContainer->fillPopulationWeights(population)) {
 			std::cerr << "Filling weights from NEAT failed." << std::endl;
 		 	exitRobogen(EXIT_FAILURE);
 		}
 	}
 
 	generation = 1;
+	// evaluate the complexity of each robot in the population
 	population->evaluateComplexity(complexityCost);
-	population->evaluate(robotConf, sockets); //evaluates all individuals in the pop
-	//BK added - evaluate population complexity for gen 0
-	
+	// evaluate the fitness of each robot in the population
+	population->evaluate(robotConf, sockets); 
+
+	// if config file specifies novelty search, calculate the novelty score of each member of the population and add members to novelty archive
 	if(conf->noveltySearch){
 		//probabalistically add members of population to novelty archive
 		std::vector<boost::shared_ptr<RobotRepresentation> > pop(population->begin(),population->end());
@@ -330,8 +330,7 @@ void init(unsigned int seed, std::string outputDirectory,
 			}
 			It++;
 		}		
-	
-		population->evaluateNovelty(noveltyArchive, pop);
+		population->evaluateNovelty(noveltyArchive, pop);//changed to a call for second novelty metric
 		std::sort(population->begin(),population->end(),
 					[](boost::shared_ptr<RobotRepresentation> & a, boost::shared_ptr<RobotRepresentation> & b)
 					{return a->getNoveltyScore()>b->getNoveltyScore();});
@@ -342,7 +341,7 @@ void init(unsigned int seed, std::string outputDirectory,
 void mainEvolutionLoop();
 
 void postEvaluateNEAT() {
-	population->sort(true); //after neat sorted best to worst
+	population->sort(true); 
 	mainEvolutionLoop();
 }
 
@@ -366,7 +365,7 @@ void triggerPostEvaluate() {
 	if (generation == 1) {
 		mainEvolutionLoop();
 	} else {
-		// CH - added this for our specfic evolution
+		// CH - added a post evaluate method for the case when co-evolution uses HyperNEAT for neural evolution
 		if (neat && conf->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
 			postEvaluateStd();
 		}
@@ -401,20 +400,23 @@ void mainEvolutionLoop() {
 
 	generation++;
 
-
+	// main evolution loop
+	// repeat until number of generations specified in config reached
 	if (generation <= conf->numGenerations) {
 		std::cout << "Generation " << generation << std::endl;
 		children.clear();
 
-		// create children
-		if (neat) {
-		
+		// select parents fit for reproduction and produce offspring
+		if (neat) { 
+			// initialise a deterministic tournament selector 
 			selector->initPopulation(population);
 			unsigned int numOffspring = 0;
+			// keep creating children until the number of offsping (lambda) in the config is reached
 			while (numOffspring < conf->lambda) {
 
 				std::pair<boost::shared_ptr<RobotRepresentation>,
 						boost::shared_ptr<RobotRepresentation> > selection;
+				// Select two distinct parents
 				if (!selector->select(selection.first)) {
 					std::cerr << "Selector::select() failed." << std::endl;
 					exitRobogen(EXIT_FAILURE);
@@ -432,17 +434,17 @@ void mainEvolutionLoop() {
 					}
 					tries++;
 				} while (selection.first == selection.second);
-
+				// mate parents to produce offspring
 				std::vector<boost::shared_ptr<RobotRepresentation> > offspring
 					= mutator->createOffspringHyperNEAT(selection.first,
 											   selection.second);
-				//fill brain for offspring
-				
+				// fill the offspring's brains based on the new CPPN 
 				for(boost::shared_ptr<RobotRepresentation> rep:offspring){
-					if(!neatContainer->fillBrain(rep->getNeatGenomePointer(),rep)) { //query for the weights between robots cpgs
+					if(!neatContainer->fillBrain(rep->getNeatGenomePointer(),rep)) {
 						std::cerr << "Filling offspring weights from NEAT failed." << std::endl;
 						exitRobogen(EXIT_FAILURE);
 					}
+					// set the offspring's ANN connection weight map by querying CPPN
 					rep->setWeightMap(neatContainer->queryCppn(rep->getNeatGenomePointer(),rep)->getWeightMap());
 				}
 				
@@ -456,9 +458,11 @@ void mainEvolutionLoop() {
 					numOffspring++;
 				}
 			}
+			// evaluate the complexity of newly created offspring
 			children.evaluateComplexity(robotConf->getComplexityCost());
+			// evaluate the fitness of newly created offspring
 			children.evaluate(robotConf, sockets);
-
+			// evaluate the novelty of newly created offspring
 			if(conf->noveltySearch){
 				std::vector<boost::shared_ptr<RobotRepresentation> > pop(population->begin(),population->end());
 				children.evaluateNovelty(noveltyArchive,pop);//probabalistically add children to novelty archive
@@ -475,7 +479,7 @@ void mainEvolutionLoop() {
 				}
 			}
 
-		} else {
+		} else { // robogen standard logic
 			selector->initPopulation(population);
 			unsigned int numOffspring = 0;
 			while (numOffspring < conf->lambda) {

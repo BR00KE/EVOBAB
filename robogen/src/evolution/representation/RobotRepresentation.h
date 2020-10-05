@@ -240,7 +240,9 @@ public:
 											std::string robotFileString);
 
 	
-	// CH - returns the complexity of a robot
+	/**
+	 * @return the brain-body complexity of the robot, CH
+	 */
 	float getComplexity();
 	
 	//BK added for HyperNEAT-light 
@@ -255,23 +257,30 @@ public:
 	//BK culmulativeWeightMap for neural complexity 
 	 std::map<std::pair<std::string,std::string>, double> culmulativeWeightMap;
 
-	// CH - I NEED THIS OK
+	/**
+	 * @return the root node of the robot's morphology tree
+	 */
 	boost::shared_ptr<PartRepresentation> getBodyRoot();
 
-	// CH - get all descendant neurons of a part
-	std::vector<boost::weak_ptr<NeuronRepresentation> > getDescendantNeurons(const std::vector<boost::shared_ptr<PartRepresentation > > parts);
-
-	// CH - set weight map
+	/**
+	 * CH - Sets the ANN connection weight map of the robot
+	 */
 	void setWeightMap(WeightMap weightMap);
 
-	// CH - calculates and combines neural and physical complexity
+	/**
+	 * CH, BK - Calculates and combines the neural and morphological complexity of the robot
+	 */
 	void calculateRobotComplexity();
 
-	// CH - added for setting the complexity cost flag in the simulator
+	/**
+	 * CH - Sets the complexity cost flag to 1 (true) or 0 (false)
+	 */
 	void setComplexityCost(bool val);
-	// CH - added for setting the complexity cost flag in the simulator
-	bool isComplexityCost();
 
+	/**
+	 * @return the complexity cost flag, CH
+	 */
+	bool isComplexityCost();
 
 	/**
 	 * BK Get and set novelty score
@@ -346,7 +355,7 @@ private:
 	 */
 	bool evaluated_;
 
-	// CH - for complexity metric
+	// CH - Stores the brain-body complexity of the robot
 	double complexity_;
 	
 	//BK get weight map
@@ -354,12 +363,19 @@ private:
 
 	// BK - calculates neural complexity of a robot
 	float calculateBrainComplexity();
-	// CH - calculates the body complexity of a robot
+	/**
+	 * CH - Calculates the morphologial complexity of a robot by recursively traversing the morphology tree and summing complxity values of all nodes encountered
+	 * @return morphologial complexity
+	 */
 	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
-	// CH - gets the complexity of a given body part
+	/**
+	 * @return the inherent complexity value of a robot body part
+	 */
 	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
 	
-	// CH - added them for body complexity scaling
+	/**
+	 * CH - Minimum and maximum morphological complexity values used for scaling
+	 */
 	static const int MIN_BODY_COMPLEXITY = 2;
 	static const int MAX_BODY_COMPLEXITY = 90;
 

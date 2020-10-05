@@ -114,20 +114,19 @@ std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspring(
 	return offspring;
 }
 
-// CH - added this boi
+/**
+ * CH - creates offspring from two parents using standard body mutation and an adapted version of HyperNEAT
+ * @return the created offspring
+ */
 std::vector<boost::shared_ptr<RobotRepresentation> > Mutator::createOffspringHyperNEAT(
 	boost::shared_ptr<RobotRepresentation> parent1,
 	boost::shared_ptr<RobotRepresentation> parent2){
 
 	std::vector<boost::shared_ptr<RobotRepresentation> > offspring;
-
+	// create initial offspring based on parent1
 	offspring.push_back(boost::shared_ptr<RobotRepresentation>(new
 			RobotRepresentation(*parent1.get())));
-	// offspring.push_back(boost::shared_ptr<RobotRepresentation>(new
-	// 		RobotRepresentation(*parent2.get())));
-	// this->crossover(offspring[0], offspring[1]);
-	
-	// Mutate
+	// Mutate the brain and body of the offspring
 	for(size_t i = 0; i < offspring.size(); ++i) {
 		this->mutateBrainBody(offspring[i], parent1, parent2);
 	}
@@ -228,10 +227,15 @@ bool Mutator::mutate(boost::shared_ptr<RobotRepresentation>& robot) {
 	return mutated;
 }
 
-// CH - added this boi
+/**
+ * CH - Populates the brain and body trees of an offspring based on the parents
+ * @return true if mutation and crossover were successful
+ */
 bool Mutator::mutateBrainBody(boost::shared_ptr<RobotRepresentation>& robot, boost::shared_ptr<RobotRepresentation> & parent1, boost::shared_ptr<RobotRepresentation> & parent2){
 	bool mutated = false;
+	// mutate brain with HyperNEAT
 	mutated = (this->mutateBrainHyperNEAT(robot, parent1, parent2) || mutated);
+	// mutate body
 	mutated = (this->mutateBody(robot) || mutated);
 	return mutated;
 }
@@ -247,7 +251,10 @@ double clip(double value, double min, double max) {
 	return value;
 }
 
-// CH - hyperneat brain crossover
+/**
+ * CH - Mates the CPPNs of two parents and assigns the result to their offspring
+ * @return true if crossover was successful
+ */
 bool Mutator::mutateBrainHyperNEAT(boost::shared_ptr<RobotRepresentation>& robot,boost::shared_ptr<RobotRepresentation> &parent1, boost::shared_ptr<RobotRepresentation> &parent2){
 	bool mutated = false;
 	NEAT::RNG rng;

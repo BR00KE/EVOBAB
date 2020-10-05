@@ -66,7 +66,9 @@ public:
 			boost::shared_ptr<RobotRepresentation> parent2 =
 					boost::shared_ptr<RobotRepresentation>());
 
-	// CH - added this for our hyperneat offspring production
+	/**
+	 * CH - Performs mutation and crossover on a pair of robots using HyperNEAT and body mutation (co-evolution)
+	 */
 	std::vector<boost::shared_ptr<RobotRepresentation> > createOffspringHyperNEAT(
 		boost::shared_ptr<RobotRepresentation> parent1,
 		boost::shared_ptr<RobotRepresentation> parent2 =
@@ -86,7 +88,10 @@ private:
 	 */
 	bool mutate(boost::shared_ptr<RobotRepresentation>& robot);
 
-	// CH - Added for body/brain mutation with hyperneat
+	/**
+	 * CH - Performs crossover on the controllers of two robots, assigns the result to their offspring and mutates the offspring's body
+	 * @return true if mutation and crossover were successful
+	 */ 
 	bool mutateBrainBody(boost::shared_ptr<RobotRepresentation>& robot, 
 			boost::shared_ptr<RobotRepresentation> &parent1, 
 			boost::shared_ptr<RobotRepresentation> &parent2);
@@ -103,7 +108,10 @@ private:
 	 * Mutation operators
 	 */
 	bool mutateBrain(boost::shared_ptr<RobotRepresentation>& robot);
-	// CH - added this for hyperneat brain crossover
+	/**
+	 * CH - Mates the CPPNs of two parents and assigns the result to their offspring
+	 * @return true if crossover was successful
+	 */
 	bool mutateBrainHyperNEAT(boost::shared_ptr<RobotRepresentation> & robot, boost::shared_ptr<RobotRepresentation> &parent1, boost::shared_ptr<RobotRepresentation> &parent2);
 	bool mutateBody(boost::shared_ptr<RobotRepresentation>& robot);
 	bool removeSubtree(boost::shared_ptr<RobotRepresentation>& robot);

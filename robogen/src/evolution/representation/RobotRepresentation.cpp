@@ -1179,7 +1179,10 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 
 }
 
-// CH - complexity calculation
+/**
+ * CH - Calculates the morphologial complexity of a robot by recursively traversing the morphology tree and summing complxity values of all nodes encountered
+ * @return morphologial complexity
+ */
 float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root){
 	float complexity = 0.0f;
 	int count =0;
@@ -1193,6 +1196,9 @@ float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartReprese
 	return complexity;
 }
 
+/**
+ * @return the inherent complexity value of a robot body part
+ */
 float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
 	std::stringstream str;
 	str << part->getType();
@@ -1202,7 +1208,9 @@ float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartReprese
 	else { return 0.0f;}
 }
 
-
+/**
+ * BK, CH - @return  the neural complexity of the robot
+ */
 float RobotRepresentation::calculateBrainComplexity(){
 
 	/*
@@ -1340,7 +1348,7 @@ float RobotRepresentation::calculateBrainComplexity(){
 			cycles.erase(std::unique(cycles.begin(),cycles.end() ),cycles.end());
 			totalNumCycles+=cycles.size()-singleCyclesCount;
 		}
-
+		// calculate local specialisation
 		float avgDegreeOfSpecialisation = (float) totalNumCycles/countStrongComponentComplexes;
 
 		int numNeuronsInSpecialisations = 0.0f;
@@ -1352,11 +1360,12 @@ float RobotRepresentation::calculateBrainComplexity(){
 		float specialisationScore = avgDegreeOfSpecialisation*proportionOfBrainSpecialised;
 
 		if (specialisationScore>1) specialisationScore = 1;
-		
+		// calculate global integration
 		float globalIntegration = 0.0f;
 		
 		globalIntegration = (float) numStrongComponents / interStrongComplexConnections;
 		float neuralComplexity = 0.0f;
+		// calculate final neural complexity
 		if (specialisationScore<globalIntegration) {neuralComplexity = (float) specialisationScore/ globalIntegration;}
 		else {neuralComplexity = (float) globalIntegration/specialisationScore;}
 
@@ -1367,8 +1376,9 @@ float RobotRepresentation::calculateBrainComplexity(){
 
 }
 
-// CH 
-
+/**
+ * CH, BK - Calculates and combines the neural and morphological complexity of the robot
+ */
 void RobotRepresentation::calculateRobotComplexity(){
 	float body = (float) (this->calculateBodyComplexity(bodyTree_) - MIN_BODY_COMPLEXITY)/(MAX_BODY_COMPLEXITY - MIN_BODY_COMPLEXITY);
 	float brain = this->calculateBrainComplexity();
@@ -1383,9 +1393,10 @@ void RobotRepresentation::calculateRobotComplexity(){
 	}
 }
 
-// CH - returns complexity of robot
+/**
+ * @return the brain-body complexity of the robot, CH
+ */
 float RobotRepresentation::getComplexity(){
-	//weighted sum must happen
 	return complexity_;
 }
 //BK added for HyperNEAT-light attempt
@@ -1393,20 +1404,16 @@ void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
 	this->neatGenome = neatgenome;
 }
 
-// CH - added this to get root
+/**
+ * @return the root node of the robot's morphology tree
+ */
 boost::shared_ptr<PartRepresentation> RobotRepresentation::getBodyRoot(){
 	return bodyTree_;
 }
-// CH - fetch descendant neurons of a part
-std::vector<boost::weak_ptr<NeuronRepresentation> > RobotRepresentation::getDescendantNeurons(const std::vector<boost::shared_ptr<PartRepresentation > > parts){
-	std::vector<boost::weak_ptr<NeuronRepresentation> > neurons;
-	for (boost::shared_ptr<PartRepresentation> part : parts){
-		std::vector<boost::weak_ptr<NeuronRepresentation> > temp = neuralNetwork_->getBodyPartNeurons(part->getId());
-		neurons.insert(neurons.end(), temp.begin(), temp.end());
-	}
-	return neurons;
-}
 
+/**
+ * CH - Sets the ANN connection weight map of the robot
+ */
 void RobotRepresentation::setWeightMap(WeightMap weightMap){
 	neuralNetwork_->setWeightMap(weightMap);
 }
@@ -1416,11 +1423,15 @@ NeuralNetworkRepresentation::WeightMap RobotRepresentation::getWeightMap(){
 	return neuralNetwork_->getWeightMap();
 }
 
-// CH - added for setting the complexity cost flag in the simulator
+/**
+ * CH - Sets the complexity cost flag to 1 (true) or 0 (false)
+ */
 void RobotRepresentation::setComplexityCost(bool val){
 	complexityCost_ = val;
 }
-// CH - added for setting the complexity cost flag in the simulator
+/**
+ * @return the complexity cost flag, CH
+ */
 bool RobotRepresentation::isComplexityCost(){
 	return complexityCost_;
 }

@@ -264,8 +264,10 @@ public:
 		return obstacleOverlapPolicy_;
 	}
 
-	// CH added for complexity cost
-
+	/**
+	 * CH - Returns the complexity cost flag (1==true, 0==false)
+	 * @return the complexity cost flag
+	 */
 	bool getComplexityCost(){
 		return complexityCost_;
 	}
@@ -417,8 +419,9 @@ private:
 	 */
 	unsigned int obstacleOverlapPolicy_;
 
-	// CH - for complexity cost flag in simulator
-
+	/**
+	 * CH - flag to enable or disable complexity cost
+	 */
 	bool complexityCost_;
 
 };

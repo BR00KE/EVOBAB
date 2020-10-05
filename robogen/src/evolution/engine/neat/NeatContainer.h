@@ -57,7 +57,10 @@ public:
 	bool fillBrain(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
 
-	//CH added this for the neural part of the complexity metric
+	/**
+	 * CH - Queries the CPPN for ANN connection weight information for a given robot
+	 * @return the robot's ANN with connection weight array for the ANN filled in
+	 */
 	boost::shared_ptr<NeuralNetworkRepresentation> queryCppn(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
 
