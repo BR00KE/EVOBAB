@@ -25,7 +25,7 @@ The --complexity-cost tag was used to run evolutions with a simulation time pena
 
 All of the evolution configuration files used for this project can be found in robogen/projectSimulations/  
 The evolution configurations for novelty search are found in robogen/projectSimulations/novelty_search/  
-The novelty search experiments were conducted by running two scripts found in robogen/build: `./novelty_search.sh` and `./novelty_search_complexity_cost.sh` 
+The novelty search experiments were conducted by running two scripts found in robogen/build: `./novelty_search.sh` and `./novelty_search_complexity_cost.sh`  
 Likewise, the evolution configurations for objective-based search are found in robogen/projectSimulations/objective_search/  
 The objective search experiments were conducted by running two scripts found in robogen/build: `./objective_based.sh` and `objective_based_complexity_cost.sh`  
 
@@ -34,3 +34,18 @@ Navigate to the robogen-windows/run directory
 `./robogen-file-viewer <robot.json or .txt file> <scenarioConfiguration .txt file>`
 
 ## Example Usage
+Example for running an evolution using objective-based search and the first simulation environment. (the --complexity-cost argument could optionally be added)  
+```
+./robogen-server 8000  
+./robogen-evolver 1 results/ ../projectSimulations/objective_based/evolConf0.txt --save-all  
+```
+  
+To test run both objective search and novelty search with and without an imposed cost on complexity for populations of 10 for 5 generations:  
+simply run `./testRun.sh` in robogen/build  
+The output of these runs can be found in testRunResults/  
+  
+Example usage of robogen-file-viewer on Windows:  
+`./robogen-file-viewer ../examples/simpleRobot.txt ../projectSimulations/objective_based/sim_configs/conf0.txt`  
+
+## Evolutionary algorithm class structure overview
+![Evolutionary algorithm class structure overview](https://github.com/BrookeSte/EVOBAB/blob/master/ClassUseDiagram.png)
