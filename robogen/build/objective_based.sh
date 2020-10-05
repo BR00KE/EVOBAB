@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Starting objective_based experiments"
 echo "------------------------------------"
-for i in {0..9} 
+for i in {0..11} 
 do
 	echo "Running experiment set $i"
 	for x in {1..10}
