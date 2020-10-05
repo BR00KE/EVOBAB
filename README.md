@@ -47,4 +47,5 @@ The output of these runs can be found in testRunResults/
 Example usage of robogen-file-viewer on Windows:  
 `./robogen-file-viewer ../examples/simpleRobot.txt ../projectSimulations/objective_based/sim_configs/conf0.txt`  
 
-## Learning algorithm class structure overview
+## Evolutionary algorithm class structure overview
+![Evolutionary algorithm class structure overview](https://github.com/BrookeSte/EVOBAB/blob/master/ClassUseDiagram.png)
