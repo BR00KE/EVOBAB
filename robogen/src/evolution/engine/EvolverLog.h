@@ -95,6 +95,12 @@ private:
 	void copyConfFile(std::string fileName);
 
 	void saveRobotComplexity(boost::shared_ptr<RobotRepresentation> robot, std::string fileName);
+	void savePopulationComplexity(float complexity, std::string fileName);
+
+	/**
+	 * BK - method to save stats for all individuals in population in one file
+	 */
+	void savePopulationStats(robogen::Population & population, std::string filename);
 };
 
 } /* namespace robogen */

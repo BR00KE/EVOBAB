@@ -58,28 +58,27 @@ NeatContainer::NeatContainer(boost::shared_ptr<EvolverConfiguration> &evoConf,
 			count++;
 		}
 	}
-
+	
 }
 
 NeatContainer::~NeatContainer() {
 }
 
+/**
+ * BK - @return vector of initialized genome population
+ */
+std::vector<NEAT::Genome> NeatContainer::getInitialGenomePop(){
+	return neatPopulation_->m_Genomes;
+}
+
 bool NeatContainer::fillPopulationWeights(
 		boost::shared_ptr<Population> &population) {
 
-	for(NeatIdToGenomeMap::iterator i = neatIdToGenomeMap_.begin();
-			i != neatIdToGenomeMap_.end(); i++) {
-		unsigned int id = i->first;
-		NEAT::Genome *genome = i->second;
-		if(neatIdToRobotMap_.count(id) == 0) {
-			std::cout << "No robot in map with id " << id << std::endl;
-			return false;
-		}
-		boost::shared_ptr<RobotRepresentation> robot = neatIdToRobotMap_[id];
-		if(!this->fillBrain(genome, robot)) {
-			return false;
-		}
-
+	for(Population::iterator i = population->begin(); i!=population->end(); i++){
+		boost::shared_ptr<RobotRepresentation> rep = *i;
+		if(!this->fillBrain(rep->getNeatGenomePointer(),rep)){
+	 		return false;
+	 	}
 	}
 	return true;
 }
@@ -125,7 +124,7 @@ bool NeatContainer::produceNextGeneration(boost::shared_ptr<Population>
 	//std::cout << "before epoch size is " << neatIdToGenomeMap_.size()
 	//		<< " " << neatIdToRobotMap_.size() << std::endl;
 	//printCurrentIds();
-	neatPopulation_->Epoch();
+	neatPopulation_->Epoch(); //Epoch performs one generation and reproduces the genomes
 	std::vector<unsigned int> currentIds;
 	std::vector<unsigned int> newIds;
 	std::cout <<  neatPopulation_->m_Species.size() << " species" << std::endl;
@@ -211,6 +210,7 @@ bool NeatContainer::produceNextGeneration(boost::shared_ptr<Population>
 bool NeatContainer::fillBrain(NEAT::Genome *genome,
 		boost::shared_ptr<RobotRepresentation> &robotRepresentation) {
 
+	
 	// Initialize ODE
 	dInitODE();
 	dWorldID odeWorld = dWorldCreate();
@@ -411,7 +411,128 @@ bool NeatContainer::fillBrain(NEAT::Genome *genome,
 
 }
 
+/**
+ * CH - Queries the CPPN for ANN connection weight information for a given robot
+ * @return the robot's ANN with connection weight array for the ANN filled in
+ */
+boost::shared_ptr<NeuralNetworkRepresentation> NeatContainer::queryCppn(NEAT::Genome *genome,
+			boost::shared_ptr<RobotRepresentation> &robotRepresentation){
+				// Initialize ODE
+	dInitODE();
+	dWorldID odeWorld = dWorldCreate();
+	dWorldSetGravity(odeWorld, 0, 0, 0);
+	dSpaceID odeSpace = dHashSpaceCreate(0);
 
+	// code block to protect object for ODE cleanup
+	// use for loop so can break out of it -- hack, I know
+	for(unsigned int useless = 0; useless < 1; ++useless) {
+		NEAT::NeuralNetwork net;
+	    genome->BuildPhenotype(net);
 
+	    typedef std::map<std::string, boost::weak_ptr<NeuronRepresentation> >
+	    	NeuronMap;
 
+	    std::map<std::string, std::vector<double> > neuronToPositionMap;
+	    NeuronMap neuronMap;
+
+	    // FIRST NEED TO CREATE PHYSICAL ROBOT REP TO DETERMINE POSITIONS
+
+	    // parse robot message
+		robogenMessage::Robot robotMessage = robotRepresentation->serialize();
+		// parse robot
+		boost::shared_ptr<Robot> robot(new Robot);
+		if (!robot->init(odeWorld, odeSpace, robotMessage)) {
+			std::cout << "Problem when initializing robot in "
+					<< "NeatContainer::fillBrain!" << std::endl;
+			break;
+		}
+
+		RobotRepresentation::IdPartMap body = robotRepresentation->getBody();
+		boost::shared_ptr<NeuralNetworkRepresentation> brain =
+				robotRepresentation->getBrain();
+
+		// For each body part, get its position then create an entry for every
+		// neuron by adding a 4th coordinate that is the neurons ioID.
+
+		for(RobotRepresentation::IdPartMap::iterator i = body.begin();
+				i != body.end(); i++) {
+			std::string id = i->first;
+			boost::shared_ptr<PartRepresentation> part = i->second.lock();
+			std::vector<boost::weak_ptr<NeuronRepresentation> > neurons =
+					brain->getBodyPartNeurons(part->getId());
+			osg::Vec3 pos = robot->getBodyPart(id)->getRootPosition();
+
+			for (unsigned int j = 0; j<neurons.size(); j++) {
+				std::vector<double> position;
+				position.push_back(pos.x() * 10.0); //roughly something in [-1,1]
+				position.push_back(pos.y() * 10.0);
+				//position.push_back(pos.z());
+				float io = neurons[j].lock()->getIoPair().second;
+				position.push_back((io/10.0));
+				neuronToPositionMap[neurons[j].lock()->getId()] = position;
+				neuronMap[neurons[j].lock()->getId()] = neurons[j];
+
+			}
+		}
+
+		// Now go through all neurons and query for weights and params with
+		// the obtained coordinates
+
+		for(NeuronMap::iterator i = neuronMap.begin(); i != neuronMap.end(); i++) {
+			std::vector<double> positionI = neuronToPositionMap[i->first];
+			boost::shared_ptr<NeuronRepresentation> neuronI = i->second.lock();
+			for(NeuronMap::iterator j = neuronMap.begin(); j != neuronMap.end();
+					j++) {
+				std::vector<double> positionJ = neuronToPositionMap[j->first];
+				boost::shared_ptr<NeuronRepresentation> neuronJ = j->second.lock();
+
+				if (brain->connectionExists(neuronI->getId(), neuronJ->getId())) {
+					// only set weights on existing connections
+					net.Flush();
+					std::vector<double> inputs;
+					for (unsigned int k = 0; k < positionI.size(); k++) {
+						inputs.push_back(positionI[k]);
+					}
+					for (unsigned int k = 0; k < positionJ.size(); k++) {
+						inputs.push_back(positionJ[k]);
+					}
+					inputs.push_back(1.0); //bias
+
+					net.Input(inputs);
+					for(int t=0; t<10; t++) {
+						net.Activate();
+					}
+					std::vector<double> outputs = net.Output();
+
+					if (outputs[0] < 0.5) {
+						// if first output is under threshold,
+						// connection "does not exist" according to genome so set
+						// weight to 0
+						brain->setWeight(neuronI->getIoPair(),
+								neuronJ->getIoPair(), 0.0);
+					} else {
+						// otherwise use the second output
+						// translate from [0,1] to [min, max]
+						double weight = outputs[1] * (evoConf_->maxBrainWeight -
+								evoConf_->minBrainWeight) +
+								evoConf_->minBrainWeight;
+						brain->setWeight(neuronI->getIoPair(),
+								neuronJ->getIoPair(), weight);
+					}
+				}
+			}
+		}
+		return brain;
+
+	}
+	// Destroy ODE space
+	dSpaceDestroy(odeSpace);
+
+	// Destroy ODE world
+	dWorldDestroy(odeWorld);
+
+	// Destroy the ODE engine
+	dCloseODE();
+	return NULL;
+}
 } /* namespace robogen */

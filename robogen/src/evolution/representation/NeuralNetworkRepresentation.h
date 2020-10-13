@@ -187,6 +187,16 @@ public:
 	 */
 	int getNumHidden();
 
+	/**
+	 * CH - sets the ANN connection weight map
+	 */
+	void setWeightMap(WeightMap weightMap);
+	
+	/**
+	 * @return ANN connection weight map, CH
+	 */
+	WeightMap getWeightMap() const;
+
 
 private:
 	/**

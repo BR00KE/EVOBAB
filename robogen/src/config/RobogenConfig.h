@@ -67,7 +67,7 @@ public:
 			bool capAcceleration, float maxLinearAcceleration,
 			float maxAngularAcceleration, int maxDirectionShiftsPerSecond,
 			osg::Vec3 gravity, bool disallowObstacleCollisions,
-			unsigned int obstacleOverlapPolicy) :
+			unsigned int obstacleOverlapPolicy, bool complexityCost=false) :
 				scenario_(scenario), scenarioFile_(scenarioFile),
 				timeSteps_(timeSteps),
 				timeStepLength_(timeStepLength),
@@ -86,7 +86,8 @@ public:
 				maxDirectionShiftsPerSecond_(maxDirectionShiftsPerSecond),
 				gravity_(gravity),
 				disallowObstacleCollisions_(disallowObstacleCollisions),
-				obstacleOverlapPolicy_(obstacleOverlapPolicy) {
+				obstacleOverlapPolicy_(obstacleOverlapPolicy), 
+				complexityCost_(complexityCost) {
 
 		simulationTime_ = timeSteps * timeStepLength;
 
@@ -264,6 +265,15 @@ public:
 	}
 
 	/**
+	 * CH - Returns the complexity cost flag (1==true, 0==false)
+	 * @return the complexity cost flag
+	 */
+	bool getComplexityCost(){
+		return complexityCost_;
+	}
+
+
+	/**
 	 * Convert configuration into configuration message.
 	 */
 	robogenMessage::SimulatorConf serialize() const{
@@ -408,6 +418,12 @@ private:
 	 * initial AABB
 	 */
 	unsigned int obstacleOverlapPolicy_;
+
+	/**
+	 * CH - flag to enable or disable complexity cost
+	 */
+	bool complexityCost_;
+
 };
 
 }

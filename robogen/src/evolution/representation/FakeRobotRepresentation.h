@@ -117,6 +117,7 @@ private:
  * Operator > returns true if fitness of a exceeds fitness of b
  */
 inline bool operator >(const RobotRepresentation &a, const RobotRepresentation &b){
+	
 	return a.getFitness()>b.getFitness();
 }
 

@@ -48,6 +48,15 @@
 #include "utils/RobogenUtils.h"
 #include "brain/NeuralNetwork.h"
 
+//include boost graph stuff
+#include <boost/config.hpp>
+#include <boost/graph/strong_components.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graphviz.hpp>
+#include <boost/graph/graph_utility.hpp>
+
+#include <algorithm>
+
 #define VERIFY_ON_LOAD_TXT
 #ifdef VERIFY_ON_LOAD_TXT
 #include "evolution/engine/BodyVerifier.h"
@@ -55,8 +64,12 @@
 
 namespace robogen {
 
+NEAT::Genome * RobotRepresentation::getNeatGenomePointer(){
+		return & neatGenome;
+	}
+
 RobotRepresentation::RobotRepresentation() :
-		maxid_(1000), evaluated_(false) {
+		maxid_(1000), evaluated_(false), noveltyScore(0), complexityCost_(false) {
 
 }
 
@@ -87,10 +100,16 @@ RobotRepresentation::RobotRepresentation(const RobotRepresentation &r) {
 			}
 		}
 	}
+
 	// fitness and associated flag are same
 	fitness_ = r.fitness_;
 	evaluated_ = r.evaluated_;
 	maxid_ = r.maxid_;
+	
+	//BK added
+	neatGenome = r.neatGenome;
+	noveltyScore=r.noveltyScore;
+	endPosition = r.endPosition; 
 }
 
 /**
@@ -352,6 +371,11 @@ RobotRepresentation &RobotRepresentation::operator=(
 	fitness_ = r.fitness_;
 	evaluated_ = r.evaluated_;
 	maxid_ = r.maxid_;
+
+	//BK added
+	neatGenome = r.neatGenome;
+	noveltyScore=r.noveltyScore;
+
 	return *this;
 }
 
@@ -571,6 +595,9 @@ robogenMessage::Robot RobotRepresentation::serialize() const {
 	robogenMessage::Robot message;
 	// id - this can probably be removed
 	message.set_id(1);
+	message.set_complexity(complexity_);
+	if (complexityCost_) { message.set_complexitycost(1);}
+	else {message.set_complexitycost(0);}
 	// body
 	bodyTree_->addSubtreeToBodyMessage(message.mutable_body(), true);
 	// brain
@@ -608,7 +635,6 @@ void RobotRepresentation::evaluate(Socket *socket,
 	robogenMessage::SimulatorConf* evalConf = evalReq->mutable_configuration();
 	*evalRobot = serialize();
 	*evalConf = robotConf->serialize();
-
 	ProtobufPacket<robogenMessage::EvaluationRequest> robotPacket(evalReq);
 	std::vector<unsigned char> forgedMessagePacket;
 	robotPacket.forge(forgedMessagePacket);
@@ -641,10 +667,21 @@ void RobotRepresentation::evaluate(Socket *socket,
 		exit(EXIT_FAILURE);
 	} else {
 		fitness_ = resultPacket.getMessage()->fitness();
+		//BK added
+		this->setEndPosition(resultPacket.getMessage()->endposx(),resultPacket.getMessage()->endposy());
+		//endPosY_
 		evaluated_ = true;
 	}
 #endif
 
+}
+
+//BK added for novelty attempt 2
+void RobotRepresentation::setEndPosition(float x, float y){
+	endPosition = std::make_pair(x,y);
+}
+std::pair<float,float> RobotRepresentation::getEndPosition() const{
+	return endPosition;
 }
 
 double RobotRepresentation::getFitness() const {
@@ -1142,32 +1179,27 @@ bool RobotRepresentation::createRobotMessageFromFile(robogenMessage::Robot
 
 }
 
-float RobotRepresentation::calculateBodyComplexity(){
-	if(bodyTree_==NULL){ return 0;}
+/**
+ * CH - Calculates the morphologial complexity of a robot by recursively traversing the morphology tree and summing complxity values of all nodes encountered
+ * @return morphologial complexity
+ */
+float RobotRepresentation::calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root){
 	float complexity = 0.0f;
-	std::queue<boost::shared_ptr<PartRepresentation> > queue;
-	queue.push(bodyTree_);
-	while(!queue.empty()){
-		int size = queue.size();
-		while(size>0){
-			boost::shared_ptr<PartRepresentation> part = queue.front();
-			complexity+= getPartComplexity(part);
-			queue.pop();
-			for (unsigned int i = 0; i<part->getArity();i++){
-				boost::shared_ptr<PartRepresentation> tempPart = part->getChild(i);
-				if (part->getChild(i)!=NULL)
-				{
-					queue.push(part->getChild(i));
-				}
-			}
-			size--;
+	int count =0;
+	for (unsigned int i = 0; i < root->getChildren().size(); ++i) {
+		if (root->getChildren()[i].get()) {
+			complexity += getPartComplexity(root->getChildren()[i]);
+			int count1 = 0;
+			complexity += calculateBodyComplexity(root->getChildren()[i]);
 		}
 	}
-	this->complexity_ = complexity;
 	return complexity;
 }
 
-float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentation> part){
+/**
+ * @return the inherent complexity value of a robot body part
+ */
+float RobotRepresentation::getPartComplexity(const boost::shared_ptr<PartRepresentation> part){
 	std::stringstream str;
 	str << part->getType();
 	if(str.str()==PART_TYPE_PASSIVE_HINGE){return part->passiveHingeComplexity;}
@@ -1176,8 +1208,269 @@ float RobotRepresentation::getPartComplexity(boost::shared_ptr<PartRepresentatio
 	else { return 0.0f;}
 }
 
+/**
+ * BK, CH - @return  the neural complexity of the robot
+ */
+float RobotRepresentation::calculateBrainComplexity(){
+
+	/*
+	 * Create directed graph and adjacency list representations for the neuron network
+	 */ 
+	if (getWeightMap().size()!=0){
+		NeuralNetworkRepresentation::WeightMap weightMap = RobotRepresentation::getWeightMap();
+		//create a unordered set of neuronIDs
+		std::set<std::string> neurons;
+		std::map<StringPair,double>::iterator it = weightMap.begin();
+		while(it!=weightMap.end()){
+			//set insert will only insert an element not already present
+			neurons.insert(it->first.first);
+			neurons.insert(it->first.second);
+			it++;
+		}
+		std::vector<std::string> neuronIDs(neurons.begin(),neurons.end());
+		int numNeurons = neuronIDs.size();
+
+		//want to pass in a vector<vector<int>> & adjacencyList   of a strongly connected component
+		typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> DirectedGraph;
+		typedef boost::graph_traits<DirectedGraph>::edge_iterator edge_iterator;
+		DirectedGraph neuronNetwork;
+		std::vector<int> adjLists[numNeurons];//adjacency list for each vertex
+		//add edges to graph
+		for(auto connection: weightMap){
+			auto it=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.first );
+			auto it2=std::find(neuronIDs.begin(),neuronIDs.end(),connection.first.second );
+			int i1 = it-neuronIDs.begin();
+			int i2 = it2-neuronIDs.begin();
+
+			boost::add_edge(i1,i2,neuronNetwork); 
+			//create adjacency list for each vertex at same time 
+			adjLists[i1].push_back(i2);
+		}
+
+		/*
+		* Group neurons into strongly connected components 
+		*/
+		std::vector<int> components(numNeurons);
+		
+		int numStrongComponents = boost::strong_components(neuronNetwork, 
+								boost::make_iterator_property_map(components.begin(),boost::get(boost::vertex_index,neuronNetwork),components[0]));
+
+		int countStrongComponentComplexes=0;//count strong components with more than one neuron. //could maybe add more logic to increase importance of having more neurons in a complex
+		//put all neurons that make up a 'strongly connected component' together (count at same time)
+		std::set<int> indexStrongComplexes;//indexes of the strongly connected components with >1 neuron
+		std::vector<int> strongComponentMembers[numStrongComponents];
+		for(int i=0; i<numNeurons;i++){
+			if(strongComponentMembers[components[i]].size()>0){ //now more than one member
+				countStrongComponentComplexes++; 
+				indexStrongComplexes.insert(components[i]);
+			} 
+			strongComponentMembers[components[i]].push_back(i);
+		}
+		
+		/*
+		* count inter-complex connections (incl. those from single neuron complexes)
+		* at the same time remove such connections from the adjacency list of neuron in question
+		*/
+		int interStrongComplexConnections=0;
+		for(auto members: strongComponentMembers){
+			//count where there is an adjacent vertex to one of the members not in the cluster
+			for(int member: members){
+				int i=0;
+				for(int adjacent: adjLists[member]){
+					auto it = std::find(members.begin(),members.end(),adjacent);
+					if(it==members.end()){ //adjacent not present in strong component members then increment count
+						interStrongComplexConnections++;
+						if(adjLists[member].size()==1){adjLists[member].clear();}
+						else{adjLists[member].erase(adjLists[member].begin()+i);i--;}
+					}
+					i++;
+				}
+			}
+		}
+		/*
+		* for each strongly connected component with >1 neuron, pass to johnson's algorithm to detect the number of cycles
+		* Calculate the average number of cycles found in such strongly connected components
+		*/
+		int totalNumCycles=0; //counter for all the cycles found in strongly connected components
+
+		for(int strongComplex:indexStrongComplexes){
+			//create an adjacency list for the complex
+			std::map<int, int> indexMapping;
+			std::vector<std::vector<int> > adjList;
+			int index = 0;
+			for(int neuron: strongComponentMembers[strongComplex]){
+				if(indexMapping.count(neuron)==0){
+					indexMapping.insert({neuron,index});
+					index++;
+				}
+			}
+			std::vector<int> indexAdjustedNeurons;
+			for(int neuron: strongComponentMembers[strongComplex]){
+				std::vector<int> indexAdjustedNeurons;
+				for (int adjNeuron : adjLists[neuron]){
+					indexAdjustedNeurons.push_back(indexMapping[adjNeuron]);
+				}
+				adjList.push_back(indexAdjustedNeurons);
+			}
+		
+
+			//blocked
+			std::vector<bool> blocked (adjList.size(), false);
+			// stack- but use a deque because better than stack
+			std::deque<int>  stackLike;
+			// cycles
+			std::vector<std::vector<int> > cycles;
+			// initialize B
+			std::vector<std::vector<int> >  B_Fruitless ;
+
+			for (int i=0; i< adjList.size()  ; i++ ) {
+				std::vector<int>* k = new std::vector<int>;
+				B_Fruitless.push_back(*k);
+			}
+			// loop to start new search from each node i
+			for (int i=0; i< adjList.size()  ; i++ ) {
+				// clear all book keeping
+				for (int j =0; j< adjList.size(); j++) {
+				blocked[j] = false;
+				B_Fruitless[j].clear();
+				}
+				findCycles(i, i, adjList,  blocked, stackLike, B_Fruitless, cycles);
+			}
+
+			std::vector<std::vector<int> >::iterator cyc = cycles.begin();
+			int singleCyclesCount=0;
+			for(auto & cyc: cycles){
+				std::sort(cyc.begin(),cyc.end());
+				if(cyc.size()==1){
+					singleCyclesCount++;
+				}
+			}
+			cycles.erase(std::unique(cycles.begin(),cycles.end() ),cycles.end());
+			totalNumCycles+=cycles.size()-singleCyclesCount;
+		}
+		// calculate local specialisation
+		float avgDegreeOfSpecialisation = (float) totalNumCycles/countStrongComponentComplexes;
+
+		int numNeuronsInSpecialisations = 0.0f;
+		for(int index: indexStrongComplexes){
+			numNeuronsInSpecialisations+=strongComponentMembers[index].size();
+		}
+		float proportionOfBrainSpecialised = (float) numNeuronsInSpecialisations/numNeurons;
+
+		float specialisationScore = avgDegreeOfSpecialisation*proportionOfBrainSpecialised;
+
+		if (specialisationScore>1) specialisationScore = 1;
+		// calculate global integration
+		float globalIntegration = 0.0f;
+		
+		globalIntegration = (float) numStrongComponents / interStrongComplexConnections;
+		float neuralComplexity = 0.0f;
+		// calculate final neural complexity
+		if (specialisationScore<globalIntegration) {neuralComplexity = (float) specialisationScore/ globalIntegration;}
+		else {neuralComplexity = (float) globalIntegration/specialisationScore;}
+
+		return neuralComplexity;
+	}
+	else{
+		return 0.0f;}
+
+}
+
+/**
+ * CH, BK - Calculates and combines the neural and morphological complexity of the robot
+ */
+void RobotRepresentation::calculateRobotComplexity(){
+	float body = (float) (this->calculateBodyComplexity(bodyTree_) - MIN_BODY_COMPLEXITY)/(MAX_BODY_COMPLEXITY - MIN_BODY_COMPLEXITY);
+	float brain = this->calculateBrainComplexity();
+	if(std::isnan(brain)&&!std::isnan(body)){
+		complexity_ = 0.7*body;
+	}
+	else{
+		complexity_ = (float) (0.7*body + 0.3*brain);
+	}
+	if(std::isnan(complexity_)){
+		complexity_ = 0;
+	}
+}
+
+/**
+ * @return the brain-body complexity of the robot, CH
+ */
 float RobotRepresentation::getComplexity(){
 	return complexity_;
+}
+//BK added for HyperNEAT-light attempt
+void RobotRepresentation::setNeatGenome(NEAT::Genome & neatgenome){
+	this->neatGenome = neatgenome;
+}
+
+/**
+ * @return the root node of the robot's morphology tree
+ */
+boost::shared_ptr<PartRepresentation> RobotRepresentation::getBodyRoot(){
+	return bodyTree_;
+}
+
+/**
+ * CH - Sets the ANN connection weight map of the robot
+ */
+void RobotRepresentation::setWeightMap(WeightMap weightMap){
+	neuralNetwork_->setWeightMap(weightMap);
+}
+
+//BK
+NeuralNetworkRepresentation::WeightMap RobotRepresentation::getWeightMap(){
+	return neuralNetwork_->getWeightMap();
+}
+
+/**
+ * CH - Sets the complexity cost flag to 1 (true) or 0 (false)
+ */
+void RobotRepresentation::setComplexityCost(bool val){
+	complexityCost_ = val;
+}
+/**
+ * @return the complexity cost flag, CH
+ */
+bool RobotRepresentation::isComplexityCost(){
+	return complexityCost_;
+}
+//added for novelty Search
+float RobotRepresentation::getNoveltyScore() const{
+	return noveltyScore;
+}
+
+float RobotRepresentation::setNoveltyScore(float noveltyScore){
+	this->noveltyScore=noveltyScore;
+}
+
+
+//calculate novelty score with respect to 15 nearest neighbours in archive and population
+float RobotRepresentation::calculateNoveltyScore(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive , const std::vector<boost::shared_ptr<RobotRepresentation> > & population ){
+	std::vector<float> distances; //distances of members of pop and archive
+	for(auto r: noveltyArchive){
+		distances.push_back(this->euclideanDistance(r->getEndPosition()));
+	}
+	for(auto r: population){
+		distances.push_back(this->euclideanDistance(r->getEndPosition()));
+	}
+	std::sort(distances.begin(),distances.end());
+	float avgDistance=0;
+	for(int i=1; i<16; i++){
+		avgDistance += distances[i];
+	}
+	avgDistance = avgDistance/15;
+	this->setNoveltyScore(avgDistance);
+	//skip first cause shortest distance will be 0 (individual in pop)
+	return this->getNoveltyScore();
+
+}
+
+float RobotRepresentation::euclideanDistance(const std::pair<float,float> r2){
+	float x = this->endPosition.first - r2.first;
+	float y = this->endPosition.second - r2.second;
+	float dist = std::pow(x,2) + std::pow(y,2);
+	return std::sqrt(dist);
 }
 
 }

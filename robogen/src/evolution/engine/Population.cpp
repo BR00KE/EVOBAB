@@ -57,24 +57,51 @@ bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
 		if (i == 0 || randomizeBrains) {
 			this->push_back(
 				boost::shared_ptr<RobotRepresentation>(
-						new RobotRepresentation(*robot.get())));
-
+						new RobotRepresentation(*robot.get()))); 
+			
 			if (randomizeBrains) {
 				mutator->randomizeBrain(this->back());
 			}
-		} else { // i > 0 and !randomizeBrains, create mutated copy of seed
+			
+		} else { 
 			this->push_back( mutator->createOffspring(robot)[0] );
 		}
 
 		if (growBodies) {
 			mutator->growBodyRandomly(this->back());
 		}
-		//BodyVerifier::fixRobotBody(this->back());
+		
+	}
+	return true;
+}
+/**
+ * BK - initialise the population (assign each robot a CPPN - for HyperNEAT-lite implementation)
+ */
+bool Population::init(boost::shared_ptr<RobotRepresentation> robot, int popSize,
+		boost::shared_ptr<Mutator> mutator, bool growBodies,
+		bool randomizeBrains, boost::shared_ptr<EvolverConfiguration> evolConf) {
+
+
+	// fill population vector
+	for (int i = 0; i < popSize; i++) {
+
+		
+		if (i == 0 || randomizeBrains) {
+			this->push_back(
+				boost::shared_ptr<RobotRepresentation>(
+						new RobotRepresentation(*robot.get()))); 
+			mutator->growBodyRandomly(this->back());
+
+						
+		} else { 
+			this->push_back( mutator->createOffspring(robot)[0] );
+		}
+		
 	}
 	return true;
 }
 
-bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
+bool Population::init(const IndividualContainer &origin, unsigned int popSize, bool noveltySearch) {
 
 	if (!origin.areEvaluated()) {
 		std::cout << "Trying to initialize population of n best Robots from "
@@ -86,7 +113,7 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
 		this->push_back(origin[i]);
 	}
 
-	this->sort();
+	this->sort(true,noveltySearch);
 
 	// idea was to call this->resize(popSize);, but that requires a default
 	// constructor to be present for RobotRepresentation, which is not the case
@@ -96,18 +123,20 @@ bool Population::init(const IndividualContainer &origin, unsigned int popSize) {
 	}
 
 	this->evaluated_ = true;
-
 	return true;
 }
 
 Population::~Population() {
 }
 
+/**
+ * Return the fittest robot in the population
+ */
 boost::shared_ptr<RobotRepresentation> Population::best() {
 	if (!this->areEvaluated()) { // undefined behavior. No exception (hint)
 		return this->at(0);
 	}
-	this->sort();
+	this->sort(true); 
 	return this->at(0);
 }
 

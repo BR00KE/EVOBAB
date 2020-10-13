@@ -155,7 +155,7 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 		std::cout << " " << population[i]->getFitness();
 	}
 	std::cout << std::endl;
-
+	
 	// save robot file of best robot (don't do with fake robot representation)
 	#ifndef FAKEROBOTREPRESENTATION_H
 
@@ -183,9 +183,11 @@ bool EvolverLog::logGeneration(int generation, Population &population) {
 			ss << logPath_+"/Generation-"+ std::to_string(generation) + "/Individual-" << (i+1) << ".json";
 			saveRobotJson(population[i], ss.str());
 			ss.str(std::string());
-			ss << logPath_+"/Generation-"+ std::to_string(generation) + "/Individual-" << (i+1) << "-Complexity.txt";
+			ss << logPath_+"/Generation-"+ std::to_string(generation) + "/Individual-" << (i+1) << "-Complexity-Fitness-Novelty.txt";
 			saveRobotComplexity(population[i], ss.str());
 		}
+		savePopulationComplexity(population.getComplexity(),logPath_+"/Generation-"+ std::to_string(generation) + "/PopulationComplexity.txt" );
+		savePopulationStats(population, logPath_+ "/Generation-"+ std::to_string(generation) + "-PopStats_Complexity-Fitness-Novelty.txt");
 	}
 
 
@@ -207,9 +209,29 @@ void EvolverLog::copyConfFile(std::string fileName) {
 }
 void EvolverLog::saveRobotComplexity(boost::shared_ptr<RobotRepresentation> robot, std::string fileName){
 	std::ofstream complexityFile(fileName.c_str(),std::ios::out|std::ios::trunc);
-	complexityFile << robot->getComplexity();
+	complexityFile << robot->getComplexity() <<std::endl;
+	complexityFile << robot->getFitness()<<std::endl;
+	complexityFile << robot->getNoveltyScore()<<std::endl;
 	complexityFile.close();
 }
+void EvolverLog::savePopulationComplexity(float complexity, std::string fileName){
+	std::ofstream complexityFile(fileName.c_str(),std::ios::out|std::ios::trunc);
+	complexityFile << complexity << std::endl;
+	complexityFile.close();
+}
+
+/**
+ * BK - method to save stats for all individuals in population in one file
+ */
+void EvolverLog::savePopulationStats(robogen::Population & population, std::string filename){
+	//std::string filename = "PopStats_Complexity-Fitness-Novelty.txt";
+	std::ofstream statsFile(filename.c_str(),std::ios::out|std::ios::trunc);
+	for(int r =0; r<population.size(); r++){
+		statsFile << population[r]->getComplexity()<<" "<<population[r]->getFitness()<<" "<<population[r]->getNoveltyScore()<<std::endl;
+	}
+	statsFile.close();
+}
+
 
 
 } /* namespace robogen */

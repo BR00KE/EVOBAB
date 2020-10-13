@@ -137,6 +137,12 @@ public:
 	virtual double getFitness() = 0;
 
 	/**
+	 * BK-added - Get the endPosition
+	 * @return endPosition
+	 */
+	virtual std::vector<float> getEndPosition() = 0;
+
+	/**
 	 * @return true if another trial must be executed
 	 */
 	virtual bool remainingTrials() = 0;

@@ -12,7 +12,7 @@
  * This file is part of the ROBOGEN Framework.
  *
  * The ROBOGEN Framework is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License (GPL)
+ * it under the terms of the GNU General Pcomplexity += ublic License (GPL)
  * as published by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
@@ -28,6 +28,7 @@
  */
 
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/lexical_cast.hpp>
 #include "config/EvolverConfiguration.h"
 #include "evolution/representation/RobotRepresentation.h"
@@ -38,17 +39,18 @@
 #include "evolution/engine/selectors/DeterministicTournament.h"
 
 #include "evolution/engine/neat/NeatContainer.h"
-
+#include <random>
 #ifdef EMSCRIPTEN
 #include <emscripten/bind.h>
 #include "emscripten.h"
 #include <utils/network/FakeJSSocket.h>
 #include <sstream>
+
 #endif
 
 namespace robogen {
 void init(unsigned int seed, std::string outputDirectory,
-		std::string confFileName, bool overwrite, bool saveAll);
+		std::string confFileName, bool overwrite, bool saveAll, bool complexityCost);
 
 void printUsage(char *argv[]) {
 	std::cout << std::endl << "USAGE: " << std::endl << "      "
@@ -84,6 +86,30 @@ void printHelp() {
 			ConfigurationReader::parseConfigurationFile("help");
 }
 
+
+std::vector<boost::shared_ptr<RobotRepresentation> > noveltyArchive;
+/**
+ * BK - method required by the noveltySearch experiment
+ * probabalistcally maintain an archive of maximum 50 individuals 
+ */
+void addToArchive(boost::shared_ptr<RobotRepresentation> & individual){
+	boost::shared_ptr<RobotRepresentation> clone = boost::make_shared<RobotRepresentation>(RobotRepresentation(*individual));
+
+	if(noveltyArchive.size()<50){
+		noveltyArchive.push_back(clone);
+	}
+	//replace individual at random position in the archive
+	else{ 
+
+		std::random_device rd;     // (seed) engine
+		std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+		std::uniform_int_distribution<int> uni(0,noveltyArchive.size()); // guaranteed unbiased
+
+		int random_integer = uni(rng);
+		noveltyArchive[random_integer]=clone;
+	}
+}
+
 boost::shared_ptr<Population> population;
 IndividualContainer children;
 boost::shared_ptr<NeatContainer> neatContainer;
@@ -95,6 +121,7 @@ boost::shared_ptr<Selector> selector;
 boost::shared_ptr<Mutator> mutator;
 unsigned int generation;
 boost::random::mt19937 rng;
+
 
 std::vector<Socket*> sockets;
 
@@ -127,6 +154,8 @@ void parseArgsThenInit(int argc, char* argv[]) {
 
 	bool overwrite = false;
 	bool saveAll = false;
+	// CH - added a complexity cost flag to command line arguments to indicate if experiment should be run with or without a complexity cost
+	bool complexityCost = false;
 	int currentArg = 4;
 	for (; currentArg < argc; currentArg++) {
 		if (std::string("--help").compare(argv[currentArg]) == 0) {
@@ -137,7 +166,10 @@ void parseArgsThenInit(int argc, char* argv[]) {
 			overwrite = true;
 		} else if (std::string("--save-all").compare(argv[currentArg]) == 0) {
 			saveAll = true;
-		} else {
+		} else if (std::string("--complexity-cost").compare(argv[currentArg]) == 0) {
+			complexityCost = true;
+		}
+		else {
 			std::cerr << std::endl << "Invalid option: " << argv[currentArg]
 							 << std::endl << std::endl;
 			printUsage(argv);
@@ -146,15 +178,14 @@ void parseArgsThenInit(int argc, char* argv[]) {
 
 	}
 
-	init(seed, outputDirectory, confFileName, overwrite, saveAll);
+	init(seed, outputDirectory, confFileName, overwrite, saveAll, complexityCost);
 
 }
 
 void init(unsigned int seed, std::string outputDirectory,
-		std::string confFileName, bool overwrite, bool saveAll) {
+		std::string confFileName, bool overwrite, bool saveAll, bool complexityCost) {
 
 	// Seed random number generator
-
 	rng.seed(seed);
 
 	conf.reset(new EvolverConfiguration());
@@ -166,6 +197,7 @@ void init(unsigned int seed, std::string outputDirectory,
 
 	robotConf = ConfigurationReader::parseConfigurationFile(
 			conf->simulatorConfFile);
+
 	if (robotConf == NULL) {
 		std::cerr << "Problems parsing the robot configuration file. Quit."
 				<< std::endl;
@@ -226,20 +258,31 @@ void init(unsigned int seed, std::string outputDirectory,
 			exitRobogen(EXIT_FAILURE);
 		}
 	}
-
+	// set neat to True or False based on config files
 	neat = (conf->evolutionaryAlgorithm == EvolverConfiguration::HYPER_NEAT);
-	population.reset(new Population());
+	population.reset(new Population()); //Population() calls IndividualContainer() which just sets evaluated sorted and evaluated both false
+	// initialise the robot population from randomly mutated versions of the reference robot specified in the config
 	if (!population->init(referenceBot, conf->mu, mutator, growBodies,
-			(!(conf->useBrainSeed || neat)) ) ) {
+			((conf->useBrainSeed || neat)), conf )) { 
 		std::cerr << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
-	population->evaluateComplexity();
-
+	// initialise the corresponding population of CPPNs (1 per robot)
 	if (neat) {
 		neatContainer.reset(new NeatContainer(conf, population, seed, rng));
+		// initialise population of HyperNEAT CPPNs based on robot population
+		std::vector<NEAT::Genome> initialNEATPop = neatContainer->getInitialGenomePop();
+		int c=0;
+		// assign CPPNs to each robot and then query the CPPN for the robot's ANN connection weight information
+		for(Population::iterator i = population->begin(); i!=population->end(); i++){
+			boost::shared_ptr<RobotRepresentation> rep = *i;
+			rep->neatGenome = initialNEATPop[c];
+			// set the robot's ANN connection weight map based on CPPN query
+			rep->setWeightMap(neatContainer->queryCppn(rep->getNeatGenomePointer(),rep)->getWeightMap());
+			c++;
+		}
 	}
-
+	
 	// ---------------------------------------
 	// open sockets for communication with simulator processes
 	// ---------------------------------------
@@ -262,21 +305,47 @@ void init(unsigned int seed, std::string outputDirectory,
 	// run evolution TODO stopping criterion
 	// ---------------------------------------
 
+
 	if(neat) {
 		if(!neatContainer->fillPopulationWeights(population)) {
 			std::cerr << "Filling weights from NEAT failed." << std::endl;
-			exitRobogen(EXIT_FAILURE);
+		 	exitRobogen(EXIT_FAILURE);
 		}
 	}
 
 	generation = 1;
-	population->evaluate(robotConf, sockets);
-}
+	// evaluate the complexity of each robot in the population
+	population->evaluateComplexity(complexityCost);
+	// evaluate the fitness of each robot in the population
+	population->evaluate(robotConf, sockets); 
+
+	// if config file specifies novelty search, calculate the novelty score of each member of the population and add members to novelty archive
+	if(conf->noveltySearch){
+		//probabalistically add members of population to novelty archive
+		std::vector<boost::shared_ptr<RobotRepresentation> > pop(population->begin(),population->end());
+		std::vector<boost::shared_ptr<RobotRepresentation> >::iterator It = pop.begin();
+		std::random_device rd;     
+		std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+		std::uniform_int_distribution<int> uni(0,11); 
+		while(It!=pop.end()){
+			int random_integer = uni(rng);
+			if(random_integer<=3){
+				addToArchive(*It);
+			}
+			It++;
+		}		
+		population->evaluateNovelty(noveltyArchive, pop);//changed to a call for second novelty metric
+		std::sort(population->begin(),population->end(),
+					[](boost::shared_ptr<RobotRepresentation> & a, boost::shared_ptr<RobotRepresentation> & b)
+					{return a->getNoveltyScore()>b->getNoveltyScore();});
+	}
+
+}//end of init
 
 void mainEvolutionLoop();
 
 void postEvaluateNEAT() {
-	population->sort(true);
+	population->sort(true); 
 	mainEvolutionLoop();
 }
 
@@ -289,7 +358,7 @@ void postEvaluateStd() {
 
 	// replace
 	population.reset(new Population());
-	if (!population->init(children, conf->mu)) {
+	if (!population->init(children, conf->mu,conf->noveltySearch)) {
 		std::cout << "Error when initializing population!" << std::endl;
 		exitRobogen(EXIT_FAILURE);
 	}
@@ -300,7 +369,11 @@ void triggerPostEvaluate() {
 	if (generation == 1) {
 		mainEvolutionLoop();
 	} else {
-		if (neat) {
+		// CH - added a post evaluate method for the case when co-evolution uses HyperNEAT for neural evolution
+		if (neat && conf->evolutionMode == EvolverConfiguration::FULL_EVOLVER) {
+			postEvaluateStd();
+		}
+		else if(neat){
 			postEvaluateNEAT();
 		} else {
 			postEvaluateStd();
@@ -319,28 +392,98 @@ void mainEvolutionLoop() {
 #endif
 
 	std::cout << "mainEvolutionLoop" << std::endl;
+	if(conf->noveltySearch){
+		population->sort(true);
+	}
 	if (!log->logGeneration(generation, *population.get())) {
 		exitRobogen(EXIT_FAILURE);
+	}
+	if(conf->noveltySearch){
+		population->sort(true,conf->noveltySearch);
 	}
 
 	generation++;
 
-
+	// main evolution loop
+	// repeat until number of generations specified in config reached
 	if (generation <= conf->numGenerations) {
 		std::cout << "Generation " << generation << std::endl;
 		children.clear();
 
-		// create children
-		if (neat) {
-			//neatPopulation->Epoch();
-			if(!neatContainer->produceNextGeneration(population)) {
-				std::cerr << "Producing next generation from NEAT failed."
-						<< std::endl;
-				exitRobogen(EXIT_FAILURE);
-			}
-			population->evaluate(robotConf, sockets);
+		// select parents fit for reproduction and produce offspring
+		if (neat) { 
+			// initialise a deterministic tournament selector 
+			selector->initPopulation(population);
+			unsigned int numOffspring = 0;
+			// keep creating children until the number of offsping (lambda) in the config is reached
+			while (numOffspring < conf->lambda) {
 
-		} else {
+				std::pair<boost::shared_ptr<RobotRepresentation>,
+						boost::shared_ptr<RobotRepresentation> > selection;
+				// Select two distinct parents
+				if (!selector->select(selection.first)) {
+					std::cerr << "Selector::select() failed." << std::endl;
+					exitRobogen(EXIT_FAILURE);
+				}
+				unsigned int tries = 0;
+				do {
+					if (tries > 10000) {
+						std::cerr << "Selecting second parent failed after "
+								"10000 tries, giving up.";
+						exitRobogen(EXIT_FAILURE);
+					}
+					if (!selector->select(selection.second)) {
+						std::cerr << "Selector::select() failed." << std::endl;
+						exitRobogen(EXIT_FAILURE);
+					}
+					tries++;
+				} while (selection.first == selection.second);
+				// mate parents to produce offspring
+				std::vector<boost::shared_ptr<RobotRepresentation> > offspring
+					= mutator->createOffspringHyperNEAT(selection.first,
+											   selection.second);
+				// fill the offspring's brains based on the new CPPN 
+				for(boost::shared_ptr<RobotRepresentation> rep:offspring){
+					if(!neatContainer->fillBrain(rep->getNeatGenomePointer(),rep)) {
+						std::cerr << "Filling offspring weights from NEAT failed." << std::endl;
+						exitRobogen(EXIT_FAILURE);
+					}
+					// set the offspring's ANN connection weight map by querying CPPN
+					rep->setWeightMap(neatContainer->queryCppn(rep->getNeatGenomePointer(),rep)->getWeightMap());
+				}
+				
+				// no crossover, or can fit both new individuals
+				if ( (numOffspring + offspring.size()) <= conf->lambda ) {
+					children.insert(children.end(), offspring.begin(),
+													offspring.end() );
+					numOffspring += offspring.size();
+				} else { // crossover, but can only fit one
+					children.push_back(offspring[0]);
+					numOffspring++;
+				}
+			}
+			// evaluate the complexity of newly created offspring
+			children.evaluateComplexity(robotConf->getComplexityCost());
+			// evaluate the fitness of newly created offspring
+			children.evaluate(robotConf, sockets);
+			// evaluate the novelty of newly created offspring
+			if(conf->noveltySearch){
+				std::vector<boost::shared_ptr<RobotRepresentation> > pop(population->begin(),population->end());
+				children.evaluateNovelty(noveltyArchive,pop);//probabalistically add children to novelty archive
+				std::vector<boost::shared_ptr<RobotRepresentation> >::iterator childIt = children.begin();
+				std::random_device rd;     
+				std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+				std::uniform_int_distribution<int> uni(0,11); 
+				while(childIt!=children.end()){
+					int random_integer = uni(rng);
+					if(random_integer<=3){
+						addToArchive(*childIt);
+					}
+					childIt++;
+				}
+			}
+
+		} else { // robogen standard logic
 			selector->initPopulation(population);
 			unsigned int numOffspring = 0;
 			while (numOffspring < conf->lambda) {
@@ -380,7 +523,6 @@ void mainEvolutionLoop() {
 				}
 			}
 			children.evaluate(robotConf, sockets);
-			children.evaluateComplexity();
 		}
 #ifndef EMSCRIPTEN
 		triggerPostEvaluate();

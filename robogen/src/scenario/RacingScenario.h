@@ -61,12 +61,16 @@ public:
 	virtual bool afterSimulationStep();
 	virtual bool endSimulation();
 	virtual double getFitness();
+	virtual std::vector<float> getEndPosition();
 	virtual bool remainingTrials();
 	virtual int getCurTrial() const;
 
 private:
 
 	std::vector<osg::Vec2> startPosition_;
+	//added by Brooke
+	osg::Vec2 endPosition_;
+	std::vector<osg::Vec2> endPositions_;
 	std::vector<double> distances_;
 	unsigned int curTrial_;
 

@@ -152,7 +152,10 @@ boost::shared_ptr<RobogenConfig> ConfigurationReader::parseConfigurationFile(
 					" terminated with a constrain violation.\n"\
 					"\t'elevateRobot' -- the robot will be elevated to be"\
 					" above all obstacles before the simulation begins.\n")
-			;
+			("complexityCost",
+					boost::program_options::value<bool>(),
+					"Flag to impose a complexity cost on evolution. False by default")
+		;
 
 	if (fileName == "help") {
 		desc.print(std::cout);
@@ -489,6 +492,11 @@ boost::shared_ptr<RobogenConfig> ConfigurationReader::parseConfigurationFile(
 		return boost::shared_ptr<RobogenConfig>();
 	}
 
+	bool complexityCost = false;
+	if(vm.count("complexityCost")) {
+		complexityCost = vm["complexityCost"].as<bool>();
+	}
+
 	return boost::shared_ptr<RobogenConfig>(
 			new RobogenConfig(scenario, scenarioFile, nTimeSteps,
 					timeStep, actuationPeriod, terrain,
@@ -498,7 +506,7 @@ boost::shared_ptr<RobogenConfig> ConfigurationReader::parseConfigurationFile(
 					motorNoiseLevel, capAcceleration, maxLinearAcceleration,
 					maxAngularAcceleration, maxDirectionShiftsPerSecond,
 					gravity, disallowObstacleCollisions,
-					obstacleOverlapPolicy));
+					obstacleOverlapPolicy, complexityCost));
 
 }
 
@@ -780,8 +788,7 @@ boost::shared_ptr<RobogenConfig> ConfigurationReader::parseRobogenMessage(
 							  simulatorConf.gravityy(),
 							  simulatorConf.gravityz()),
 					simulatorConf.disallowobstaclecollisions(),
-					simulatorConf.obstacleoverlappolicy()
-					));
+					simulatorConf.obstacleoverlappolicy()));
 
 }
 

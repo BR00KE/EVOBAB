@@ -56,7 +56,6 @@
 namespace NEAT
 {
 
-
 //////////////////////////////////////////////
 // The Genome class
 //////////////////////////////////////////////
@@ -167,7 +166,7 @@ public:
     // Builds this genome from an opened file
     Genome(std::ifstream& a_DataFile);
 
-    // This creates a standart minimal genome - perceptron-like structure
+    // This creates a standard minimal genome - perceptron-like structure
     Genome(unsigned int a_ID,
            unsigned int a_NumInputs,
            unsigned int a_NumHidden, // ignored for seed_type == 0, specifies number of hidden units if seed_type == 1

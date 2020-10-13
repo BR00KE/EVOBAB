@@ -68,7 +68,8 @@ boost::shared_ptr<Scenario> ScenarioFactory::createScenario(boost::shared_ptr<Ro
 
 	if (config->getScenario() == "racing") {
 		return boost::shared_ptr<Scenario>(new RacingScenario(config));
-	} else if (config->getScenario() == "chasing") {
+	} 
+	else if (config->getScenario() == "chasing") {
 		return boost::shared_ptr<Scenario>(new ChasingScenario(config));
 	} else {
 		// we are getting scenario in js

@@ -111,4 +111,10 @@ int ChasingScenario::getCurTrial() const {
 	return curTrial_;
 }
 
+std::vector<float> ChasingScenario::getEndPosition(){
+	std::vector<float> dummy {0,0};
+	return dummy;
+}
+
+
 }

@@ -123,10 +123,12 @@ private:
     // How many generations passed until the last change of MPC
     unsigned int m_GensSinceMPCLastChanged;
 
-    // The initial list of genomes
-    std::vector<Genome> m_Genomes;
+    
 
 public:
+
+    // The initial list of genomes - BK made public
+    std::vector<Genome> m_Genomes;
 
     // Random number generator
     RNG m_RNG;

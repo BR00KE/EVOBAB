@@ -44,7 +44,11 @@
 #include "evolution/representation/PartRepresentation.h"
 #include "evolution/representation/NeuralNetworkRepresentation.h"
 #include "utils/network/TcpSocket.h"
+#include "utils/Johnson.h"
 #include "robogen.pb.h"
+
+//BK added
+#include "evolution/neat/Genome.h"
 
 namespace robogen {
 
@@ -61,6 +65,8 @@ public:
 	 * Map from an id string to a weak pointer of a part representation
 	 */
 	typedef std::map<std::string, boost::weak_ptr<PartRepresentation> > IdPartMap;
+	typedef std::pair<std::string,std::string> StringPair;
+	typedef std::map<StringPair, double> WeightMap;
 
 	/**
 	 * Copy constructor: Deep copy body parts and Neural network
@@ -233,16 +239,82 @@ public:
 	static bool createRobotMessageFromFile(robogenMessage::Robot &robotMessage,
 											std::string robotFileString);
 
-	float calculateBodyComplexity();
-
-	float getPartComplexity(boost::shared_ptr<PartRepresentation> part);
-
-	float getComplexity();
-
-private:
+	
 	/**
-	 *
+	 * @return the brain-body complexity of the robot, CH
 	 */
+	float getComplexity();
+	
+	/**
+	 * BK - Set the CPPN associated with a robot representation
+	 */
+	void setNeatGenome(NEAT::Genome & neatGenome);
+
+	NEAT::Genome * getNeatGenomePointer();
+
+	/*
+	* BK: Genome for HyperNEAT-light 
+	*/
+	NEAT::Genome neatGenome;
+	
+	/**
+	 * @return the root node of the robot's morphology tree
+	 */
+	boost::shared_ptr<PartRepresentation> getBodyRoot();
+
+	/**
+	 * CH - Sets the ANN connection weight map of the robot
+	 */
+	void setWeightMap(WeightMap weightMap);
+
+	/**
+	 * CH, BK - Calculates and combines the neural and morphological complexity of the robot
+	 */
+	void calculateRobotComplexity();
+
+	/**
+	 * CH - Sets the complexity cost flag to 1 (true) or 0 (false)
+	 */
+	void setComplexityCost(bool val);
+
+	/**
+	 * @return the complexity cost flag, CH
+	 */
+	bool isComplexityCost();
+
+	/**
+	 * BK - @return novelty score of the robot
+	 */
+	float getNoveltyScore() const;
+	/**
+	 * BK - set novelty score of the robot
+	 */
+	float setNoveltyScore(float noveltyScore);
+
+	/**
+	 * BK - Calculate and set novelty score for individual with respect to the novelty archive and current population
+	 */
+	float calculateNoveltyScore(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive , const std::vector<boost::shared_ptr<RobotRepresentation> > & population );
+	float euclideanDistance(const std::pair<float,float> r2);
+	
+	/**
+	 * BK - get and set end position robot achieves during evaluation - used in calculating novelty score
+	 */
+	std::pair<float,float> endPosition;
+	void setEndPosition(float x, float y);
+	std::pair<float,float> getEndPosition() const;
+
+	
+	/**
+	 * Points to the root of the robot body tree
+	 */
+	boost::shared_ptr<PartRepresentation> bodyTree_;
+	
+private:
+
+	//added for novelty search;
+	float noveltyScore;
+
 	void recurseNeuronRemoval(boost::shared_ptr<PartRepresentation> part);
 
 	/**
@@ -254,10 +326,6 @@ private:
 	bool addClonesToMap(boost::shared_ptr<PartRepresentation> part,
 			std::map<std::string, std::string> &neuronReMapping);
 
-	/**
-	 * Points to the root of the robot body tree
-	 */
-	boost::shared_ptr<PartRepresentation> bodyTree_;
 
 	/**
 	 * Neural network representation of the robot
@@ -285,7 +353,34 @@ private:
 	 */
 	bool evaluated_;
 
-	float complexity_;
+	// CH - Stores the brain-body complexity of the robot
+	double complexity_;
+	
+	//BK get weight map
+	NeuralNetworkRepresentation::WeightMap getWeightMap();
+
+	/**
+	 * BK - Calculate the neural complexity of the robot 
+	 * @return neural complexity
+	 */
+	float calculateBrainComplexity();
+	/**
+	 * CH - Calculates the morphologial complexity of a robot by recursively traversing the morphology tree and summing complxity values of all nodes encountered
+	 * @return morphologial complexity
+	 */
+	float calculateBodyComplexity(boost::shared_ptr<PartRepresentation> root);
+	/**
+	 * @return the inherent complexity value of a robot body part
+	 */
+	float getPartComplexity(const boost::shared_ptr<PartRepresentation> part);
+	
+	/**
+	 * CH - Minimum and maximum morphological complexity values used for scaling
+	 */
+	static const int MIN_BODY_COMPLEXITY = 2;
+	static const int MAX_BODY_COMPLEXITY = 90;
+
+	bool complexityCost_;
 
 };
 

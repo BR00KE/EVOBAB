@@ -57,7 +57,7 @@ public:
 	 * Sorts individuals from best to worst.
 	 * @param forceSort, will re-sort even if sorted_ flag is true
 	 */
-	void sort(bool forceSort=false);
+	void sort(bool forceSort=false, bool novelty=false);
 
 	/**
 	 * Append the contents of another IndividualContainer to this one.
@@ -69,10 +69,18 @@ public:
 	 */
 	bool areEvaluated() const;
 
-	void evaluateComplexity();
+	/**
+	* function to set the complexity for each member of population
+	*/
+	void evaluateComplexity(bool cost);
 
 	float getComplexity();
 
+	/**
+	* BK - novelty search: evaluateNovelty() function to set the novelty for new members of the population with respect to the archive and population
+	*/
+	void evaluateNovelty(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive, const std::vector<boost::shared_ptr<RobotRepresentation> > & population );
+	
 
 protected:
 
@@ -82,6 +90,7 @@ private:
 
 	bool sorted_;
 	float complexity_;
+	float novelty_;
 
 };
 

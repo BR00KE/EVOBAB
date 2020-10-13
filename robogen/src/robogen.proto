@@ -52,6 +52,8 @@ message Robot {
   required int32 id = 1;
   required Body body = 2; 
   required Brain brain = 3;
+  required float complexity = 4;
+  required float complexityCost = 5;
 }
 
 message Obstacle {
@@ -118,5 +120,7 @@ message EvaluationResult {
     required int32 id = 1; 
     required float fitness = 2;
     repeated float objectives = 3;
+    required float endPosX = 4; 
+    required float endPosY =5; 
 }
 

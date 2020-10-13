@@ -33,6 +33,8 @@
 #include "evolution/engine/Population.h"
 #include "evolution/neat/Population.h"
 #include "evolution/neat/Genome.h"
+#include "evolution/representation/NeuralNetworkRepresentation.h"
+
 
 namespace robogen {
 
@@ -51,11 +53,25 @@ public:
 
 	bool produceNextGeneration(boost::shared_ptr<Population> &population);
 
-private:
-
+	//BK made this method public 
 	bool fillBrain(NEAT::Genome *genome,
 			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
 
+	/**
+	 * CH - Queries the CPPN for ANN connection weight information for a given robot
+	 * @return the robot's ANN with connection weight array for the ANN filled in
+	 */
+	boost::shared_ptr<NeuralNetworkRepresentation> queryCppn(NEAT::Genome *genome,
+			boost::shared_ptr<RobotRepresentation> &robotRepresentation);
+
+	/**
+	* BK - @return  the initial population of NEAT genomes 
+	*/
+	std::vector<NEAT::Genome> getInitialGenomePop();
+	
+private:
+	
+	
 	typedef std::map<unsigned int, NEAT::Genome*> NeatIdToGenomeMap;
 	typedef std::map<unsigned int, boost::shared_ptr<RobotRepresentation> >
 		NeatIdToRobotMap;

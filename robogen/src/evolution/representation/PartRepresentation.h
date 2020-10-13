@@ -37,6 +37,7 @@
 #include <boost/weak_ptr.hpp>
 #include "robogen.pb.h"
 
+
 namespace robogen {
 
 /**
@@ -47,9 +48,9 @@ namespace robogen {
 class PartRepresentation {
 
 public:
-	static constexpr float fixedBrickComplexity = 1;
-	static constexpr float passiveHingeComplexity = 2;
-	static constexpr float activeHingeComplexity = 3; 
+	static constexpr double fixedBrickComplexity = 1;
+	static constexpr double passiveHingeComplexity = 2;
+	static constexpr double activeHingeComplexity = 3; 
 
 	static std::map<class PartRepresentation, std::string> PART_REPRESENTATION_TYPE_MAP;
 
@@ -98,7 +99,8 @@ public:
 	 * @return type of the part
 	 */
 	const std::string &getType();
-
+	//added by BK
+	const int & getTypeCost();
 	/**
 	 * @return the parameters of the part
 	 */
@@ -207,7 +209,19 @@ public:
 	 */
 	void toString(std::stringstream& str, unsigned int depth);
 
+	/**
+	 * CH - @return all children nodes attached to this body part
+	 */
+	std::vector<boost::shared_ptr<PartRepresentation> > getChildren() const;
+
+
+	bool childExists(int index);
 private:
+
+	/**
+	 * Children of this part in the body tree
+	 */
+	std::vector<boost::shared_ptr<PartRepresentation> > children_;
 
 	/**
 	 * Identifier string (name) of this part
@@ -229,10 +243,6 @@ private:
 	 */
 	std::string type_;
 
-	/**
-	 * Children of this part in the body tree
-	 */
-	std::vector<boost::shared_ptr<PartRepresentation> > children_;
 
 	/**
 	 * Parent body part - raw pointer as present (or NULL) by design

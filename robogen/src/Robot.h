@@ -163,6 +163,23 @@ public:
 	 */
 	void optimizePhysics();
 
+
+	/**
+	 * CH - Brain-body complexity of robot
+	 */
+	float complexity_;
+
+	/**
+	 * CH - Flag to indicate if complexity cost should be imposed or not
+	 */
+	int complexityCost_;
+
+	/**
+	 * BK - for novelty score, to record end position achieved during evaluation
+	 */
+	float endPosX_;
+	float endPosY_;
+
 private:
 
 	/**

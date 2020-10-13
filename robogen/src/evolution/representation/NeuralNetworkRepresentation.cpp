@@ -510,4 +510,17 @@ int NeuralNetworkRepresentation::getNumOutputs() {
 	return numOutputs;
 }
 
+/**
+ * CH - sets the ANN connection weight map
+ */
+void NeuralNetworkRepresentation::setWeightMap(WeightMap weightMap){
+	weights_ = weightMap;
+}
+/**
+ * @return the ANN connection weight map
+ */
+NeuralNetworkRepresentation::WeightMap NeuralNetworkRepresentation::getWeightMap() const{
+	return weights_;
+}
+
 } /* namespace robogen */

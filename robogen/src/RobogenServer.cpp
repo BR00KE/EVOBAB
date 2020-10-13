@@ -196,10 +196,12 @@ int main(int argc, char* argv[]) {
 					// Compute fitness
 					// ---------------------------------------
 					double fitness;
+					std::vector<float> endPosition;
 					if (simulationResult == CONSTRAINT_VIOLATED) {
 						fitness = MIN_FITNESS;
 					} else {
 						fitness = scenario->getFitness();
+						endPosition = scenario->getEndPosition();
 					}
 					std::cout << "Fitness for the current solution: " << fitness
 							<< std::endl << std::endl;
@@ -210,6 +212,10 @@ int main(int argc, char* argv[]) {
 					boost::shared_ptr<robogenMessage::EvaluationResult> evalResultPacket(
 							new robogenMessage::EvaluationResult());
 					evalResultPacket->set_fitness(fitness);
+					//BK added
+					evalResultPacket->set_endposx(endPosition[0]);
+					evalResultPacket->set_endposy(endPosition[1]);
+					
 					evalResultPacket->set_id(packet.getMessage()->robot().id());
 					ProtobufPacket<robogenMessage::EvaluationResult> evalResult;
 					evalResult.setMessage(evalResultPacket);

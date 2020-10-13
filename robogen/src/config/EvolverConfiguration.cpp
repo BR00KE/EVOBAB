@@ -122,6 +122,9 @@ bool EvolverConfiguration::init(std::string configFileName) {
 
     bodyParamSigma = 0.1;
 
+	//BK attempt to add noveltySearch optional parameter
+	noveltySearch = false; //default is false
+
 	// DON'T AUTO-INDENT THE FOLLOWING ON ECLIPSE:
 	desc.add_options()
 		("referenceRobotFile",
@@ -210,6 +213,11 @@ bool EvolverConfiguration::init(std::string configFileName) {
 				&pAddHiddenNeuron),
 				"Probability of adding a hidden neuron (currently only works "\
 				"if pBrainCrossover==0.0"
+		)
+		("noveltySearch", //BK added this
+				boost::program_options::value<bool>(
+				&noveltySearch),
+				"If novelty search true selection will be performed based on novelty score"
 		)
 		("pOscillatorNeuron",
 					boost::program_options::value<double>(
@@ -597,14 +605,16 @@ bool EvolverConfiguration::init(std::string configFileName) {
 
 	evolutionaryAlgorithm = BASIC;
 	if ( vm.count("evolutionaryAlgorithm") > 0 ) {
-		if (vm["evolutionaryAlgorithm"].as<std::string>().compare("HyperNEAT")
+		if (vm["evolutionaryAlgorithm"].as<std::string>().compare("HyperNEAT") //HyperNeat Selected
 				== 0) {
-
+			// CH - commented this out so that we could implement co-evolution with HyperNEAT (not supported by standard Robogen)
+			/*we're supporting FULL_EVOLVER with HyperNeat
 			if (evolutionMode == FULL_EVOLVER) {
 				std::cerr << "Currently using HyperNEAT with full evolution "
 						<< "is not supported" << std::endl;
 				return false;
 			}
+			*/ 
 
 			evolutionaryAlgorithm = HYPER_NEAT;
 			neatParams.PopulationSize = mu;

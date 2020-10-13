@@ -31,6 +31,7 @@
 #include <queue>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <random>
 #ifdef EMSCRIPTEN
 #include <utils/network/FakeJSSocket.h>
 #include <boost/lexical_cast.hpp>
@@ -100,7 +101,7 @@ void IndividualContainer::evaluate(boost::shared_ptr<RobogenConfig> robotConf,
 		FakeJSSocket socket;
 		boost::shared_ptr<RobotRepresentation> currentRobot = indiQueue.front();
 		indiQueue.pop();
-		currentRobot->evaluate(&socket, robotConf);
+		currentRobot->&socket, robotConf);
 		int ptrToIndividual = (int) currentRobot.get();
 		if (!firstIndividual) {
 			message += ",";
@@ -155,13 +156,25 @@ bool robotFitnessComparator(const boost::shared_ptr<RobotRepresentation>& a,
 
 }
 
-void IndividualContainer::sort(bool forceSort) {
+bool robotNoveltyComparator(const boost::shared_ptr<RobotRepresentation>& a,
+		const boost::shared_ptr<RobotRepresentation>& b) {
+
+	return a->getNoveltyScore() > b->getNoveltyScore();
+
+}
+
+void IndividualContainer::sort(bool forceSort, bool novelty) {
 
 	if (sorted_  && (!forceSort)) {
 		return;
 	}
-
-	std::sort(this->begin(), this->end(), robotFitnessComparator);
+	if(novelty){
+		std::sort(this->begin(), this->end(), robotNoveltyComparator);
+	}
+	else{
+		std::sort(this->begin(), this->end(), robotFitnessComparator);
+	}
+	
 	sorted_ = true;
 }
 
@@ -178,16 +191,34 @@ bool IndividualContainer::areEvaluated() const {
 	return evaluated_;
 }
 
-void IndividualContainer::evaluateComplexity() {
-	float complexity = 0.0f;
+/**
+* function to set the complexity for each member of population
+*/
+void IndividualContainer::evaluateComplexity(bool cost) {
+	double complexity = 0;
 	for (int i = 0; i<this->size();i++){
-		complexity += this->at(i)->calculateBodyComplexity();
+		this->at(i)->calculateRobotComplexity();
+		complexity += this->at(i)->getComplexity();
+		this->at(i)->setComplexityCost(cost);
 	}
 	complexity_ = complexity;
+}
+
+/**
+* BK - novelty search: evaluateNovelty() function to set the novelty for new members of the population with respect to the archive and population
+*/
+void IndividualContainer::evaluateNovelty(const std::vector<boost::shared_ptr<RobotRepresentation> > & noveltyArchive, const std::vector<boost::shared_ptr<RobotRepresentation> > & population ){
+	float novelty = 0.0f;
+	for(int i=0; i<this->size(); i++){ 
+		novelty+= this->at(i)->calculateNoveltyScore(noveltyArchive,population);
+	}
+	novelty_ = novelty;
 }
 
 float IndividualContainer::getComplexity(){
 	return complexity_;
 }
+
+
 
 } /* namespace robogen */

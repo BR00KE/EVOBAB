@@ -74,6 +74,9 @@ public:
 	virtual bool remainingTrials();
 	virtual int getCurTrial() const;
 
+	virtual std::vector<float> getEndPosition();
+
+
 	std::string getId() {
 		return id_;
 	}

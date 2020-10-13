@@ -268,6 +268,11 @@ float QScriptScenario::vectorDistance(QScriptValue vector1,
 }
 
 
+std::vector<float> QScriptScenario::getEndPosition(){
+	std::vector<float> dummy {0,0};
+	return dummy;
+}
+
 }
 
 #endif
