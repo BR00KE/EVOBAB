@@ -1,4 +1,4 @@
-# UCT Honours Project Investigating the Impact of a Complexity Cost on the Complexity of Robots Evolved for Locomotion Under Novelty Search and Objective Search
+# The Environment and Body-Brain Complexity
 
 This project makes use of and extends the open source [Robogen](https://github.com/lis-epfl/robogen) platform for the simulated co-evolution of robot bodies and brains.  
 The folder 'robogen' contains all the code used to run the experiments for this project and should be run on Linux.  
