@@ -1,0 +1,7 @@
+The videos show examples of performant robots evolved over 100 generations in: 
+- the flat environment, 
+- environment with evenly spaced regular obstacles, 
+- environment with irregularly spaced obstacles of differing heights and 
+- tilted environment
+for both the objective-based and novelty search approaches to evolution.
+
