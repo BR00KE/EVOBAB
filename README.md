@@ -49,3 +49,19 @@ Example usage of robogen-file-viewer on Windows:
 
 ## Evolutionary algorithm class structure overview
 ![Evolutionary algorithm class structure overview](https://github.com/BrookeSte/EVOBAB/blob/master/ClassUseDiagram.png)
+
+## Demo Videos
+The videos show examples of performant robots evolved over 100 generations in: 
+- flat environment, 
+- environment with evenly spaced regular obstacles, 
+- environment with irregularly spaced obstacles of differing heights and 
+- tilted environment
+for both the objective-based and novelty search approaches to evolution. 
+(better quality videos are in the "demo-videos" folder although gifs are played here)
+
+#### Objective based video:
+![RobotsEvolvedUsingObjectiveBasedSearch](https://user-images.githubusercontent.com/28669464/112896645-f0ade600-90de-11eb-899d-6ca91a19e7cd.gif)
+
+#### Novelty search video:
+![RobotsEvolvedUsingNoveltySearch](https://user-images.githubusercontent.com/28669464/112896674-f6a3c700-90de-11eb-8507-2dfae8747ad6.gif)
+
